@@ -45,44 +45,34 @@ class DashboardService
         $todayOrders   = $this->countOrdersBetween(dash_today_start(), dash_today_end());
         $weekOrders    = $this->countOrdersBetween(dash_week_start(), dash_today_end());
         $pendingOrders = $this->countOrdersByStatus('pending');
-        $orderCards = [
+
+        $dto = new DashboardDTO();
+
+
+        $dto->orderCards =  [
             new MetricCardDTO('Toplam Siparis', $totalOrders),
             new MetricCardDTO('Bugun Siparis', $todayOrders),
             new MetricCardDTO('Bu Hafta Siparis', $weekOrders),
             new MetricCardDTO('Bekleyen Siparis', $pendingOrders),
         ];
 
-        $latestOrders = $this->getLatestOrders(5);
-        $ordersLineSeries = $this->getOrdersDailySeries(14);
-        $ordersBarSeries  = $ordersLineSeries;
-        $revenueTable = $this->getRevenueTable();
+        $dto->latestOrders = $this->getLatestOrders(5);
+        $dto->ordersLineSeries = $this->getOrdersDailySeries(14);
+        $dto->ordersBarSeries = $dto->ordersLineSeries; // Simdilik ayni veriyi kullaniyorum, ihtiyaca gore farkli seriler olabilir
+        $dto->revenueTable = $this->getRevenueTable();
 
-        $visitCard = $this->getVisitCard();
-        $visitsCompareSeries = $this->getVisitsCompareSeries(14);
+        $dto->visitCard = $this->getVisitCard();
+        $dto->visitsCompareSeries = $this->getVisitsCompareSeries(14);
 
-        $topCategoryPie = $this->getTopCategoryPie(6);
-        $topAuthors = $this->getTopAuthors(10);
-        $topDigitalBooks = $this->getTopDigitalBooks(10);
+        $dto->topCategoryPie = $this->getTopCategoryPie(6);
+        $dto->topAuthors = $this->getTopAuthors(10);
+        $dto->topDigitalBooks = $this->getTopDigitalBooks(10);
 
-        $newUserCards = $this->getNewUserCards();
-        $latestLogs = $this->getLatestAuditLogs(15);
-        $notes = $this->getAdminNotes(20);
+        $dto->newUserCards = $this->getNewUserCards();
+        $dto->latestLogs = $this->getLatestAuditLogs(15);
+        $dto->notes = $this->getAdminNotes(20);
 
-        return new DashboardDTO([
-            'orderCards' => $orderCards,
-            'ordersLineSeries' => $ordersLineSeries,
-            'ordersBarSeries' => $ordersBarSeries,
-            'latestOrders' => $latestOrders,
-            'revenueTable' => $revenueTable,
-            'visitCard' => $visitCard,
-            'visitsCompareSeries' => $visitsCompareSeries,
-            'topCategoryPie' => $topCategoryPie,
-            'topAuthors' => $topAuthors,
-            'topDigitalBooks' => $topDigitalBooks,
-            'newUserCards' => $newUserCards,
-            'latestLogs' => $latestLogs,
-            'notes' => $notes,
-        ]);
+        return $dto;
     }
 
     private function countOrders(): int
