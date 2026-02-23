@@ -1,0 +1,236 @@
+DEBUG - 2026-02-13 06:03:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:03:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:03:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:03:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:03:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:03:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:03:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:03:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:04:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:04:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:04:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:04:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:08:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:08:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 06:09:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:32:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:32:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:32:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:36:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:36:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:36:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:36:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-13 12:36:28 --> Error: Class "App\DTO\Admin\MetricCardDTO" not found
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Services\Admin\DashboardService.php on line 30.
+ 1 APPPATH\Controllers\Admin\Dashboard.php(14): App\Services\Admin\DashboardService->getDashboard()
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Hilal Yeşim\\Desktop\\E-TICARET\\public\\index.php')
+DEBUG - 2026-02-13 12:36:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-13 12:36:31 --> Error: Class "App\DTO\Admin\MetricCardDTO" not found
+[Method: GET, Route: admin/dashboard]
+in APPPATH\Services\Admin\DashboardService.php on line 30.
+ 1 APPPATH\Controllers\Admin\Dashboard.php(14): App\Services\Admin\DashboardService->getDashboard()
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 3 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Hilal Yeşim\\Desktop\\E-TICARET\\public\\index.php')
+DEBUG - 2026-02-13 12:40:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-13 12:40:40 --> mysqli_sql_exception: Unknown column 'u.name' in 'field list' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `l`.`id`...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `l`.`id`...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `l`.`id`...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `l`.`id`...', Array, false)
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Services\Admin\DashboardService.php(387): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Services\Admin\DashboardService.php(49): App\Services\Admin\DashboardService->getLatestAuditLogs(15)
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Controllers\Admin\Dashboard.php(14): App\Services\Admin\DashboardService->getDashboard()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\rewrite.php(44): require_once('C:\\Users\\Hilal ...')
+#14 {main}
+CRITICAL - 2026-02-13 12:40:40 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'u.name' in 'field list'
+[Method: GET, Route: admin/dashboard]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `l`.`id`, `u`.`name` as `actor_name`, `l`.`actor_role`, `l`.`action`, `l`.`entity_type`, `l`.`entity_id`, `l`.`meta_json`, `l`.`created_at`
+FROM `audit_logs` `l`
+LEFT JOIN `users` `u` ON `u`.`id` = `l`.`actor_id`
+ORDER BY `l`.`id` DESC
+ LIMIT 15', [], false)
+ 2 APPPATH\Services\Admin\DashboardService.php(387): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH\Services\Admin\DashboardService.php(49): App\Services\Admin\DashboardService->getLatestAuditLogs(15)
+ 4 APPPATH\Controllers\Admin\Dashboard.php(14): App\Services\Admin\DashboardService->getDashboard()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 6 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 7 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+11 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Hilal Yeşim\\Desktop\\E-TICARET\\public\\index.php')
+CRITICAL - 2026-02-13 12:40:40 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'u.name' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `l`.`id`, `u`.`name` as `actor_name`, `l`.`actor_role`, `l`.`action`, `l`.`entity_type`, `l`.`entity_id`, `l`.`meta_json`, `l`.`created_at`
+FROM `audit_logs` `l`
+LEFT JOIN `users` `u` ON `u`.`id` = `l`.`actor_id`
+ORDER BY `l`.`id` DESC
+ LIMIT 15')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `l`.`id`, `u`.`name` as `actor_name`, `l`.`actor_role`, `l`.`action`, `l`.`entity_type`, `l`.`entity_id`, `l`.`meta_json`, `l`.`created_at`
+FROM `audit_logs` `l`
+LEFT JOIN `users` `u` ON `u`.`id` = `l`.`actor_id`
+ORDER BY `l`.`id` DESC
+ LIMIT 15')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `l`.`id`, `u`.`name` as `actor_name`, `l`.`actor_role`, `l`.`action`, `l`.`entity_type`, `l`.`entity_id`, `l`.`meta_json`, `l`.`created_at`
+FROM `audit_logs` `l`
+LEFT JOIN `users` `u` ON `u`.`id` = `l`.`actor_id`
+ORDER BY `l`.`id` DESC
+ LIMIT 15', [], false)
+ 4 APPPATH\Services\Admin\DashboardService.php(387): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH\Services\Admin\DashboardService.php(49): App\Services\Admin\DashboardService->getLatestAuditLogs(15)
+ 6 APPPATH\Controllers\Admin\Dashboard.php(14): App\Services\Admin\DashboardService->getDashboard()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Hilal Yeşim\\Desktop\\E-TICARET\\public\\index.php')
+CRITICAL - 2026-02-13 12:40:40 --> [Caused by] mysqli_sql_exception: Unknown column 'u.name' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT `l`.`id`, `u`.`name` as `actor_name`, `l`.`actor_role`, `l`.`action`, `l`.`entity_type`, `l`.`entity_id`, `l`.`meta_json`, `l`.`created_at`
+FROM `audit_logs` `l`
+LEFT JOIN `users` `u` ON `u`.`id` = `l`.`actor_id`
+ORDER BY `l`.`id` DESC
+ LIMIT 15', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `l`.`id`, `u`.`name` as `actor_name`, `l`.`actor_role`, `l`.`action`, `l`.`entity_type`, `l`.`entity_id`, `l`.`meta_json`, `l`.`created_at`
+FROM `audit_logs` `l`
+LEFT JOIN `users` `u` ON `u`.`id` = `l`.`actor_id`
+ORDER BY `l`.`id` DESC
+ LIMIT 15')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `l`.`id`, `u`.`name` as `actor_name`, `l`.`actor_role`, `l`.`action`, `l`.`entity_type`, `l`.`entity_id`, `l`.`meta_json`, `l`.`created_at`
+FROM `audit_logs` `l`
+LEFT JOIN `users` `u` ON `u`.`id` = `l`.`actor_id`
+ORDER BY `l`.`id` DESC
+ LIMIT 15')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `l`.`id`, `u`.`name` as `actor_name`, `l`.`actor_role`, `l`.`action`, `l`.`entity_type`, `l`.`entity_id`, `l`.`meta_json`, `l`.`created_at`
+FROM `audit_logs` `l`
+LEFT JOIN `users` `u` ON `u`.`id` = `l`.`actor_id`
+ORDER BY `l`.`id` DESC
+ LIMIT 15', [], false)
+ 5 APPPATH\Services\Admin\DashboardService.php(387): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH\Services\Admin\DashboardService.php(49): App\Services\Admin\DashboardService->getLatestAuditLogs(15)
+ 7 APPPATH\Controllers\Admin\Dashboard.php(14): App\Services\Admin\DashboardService->getDashboard()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Dashboard->index()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Dashboard))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Hilal Yeşim\\Desktop\\E-TICARET\\public\\index.php')
+DEBUG - 2026-02-13 12:50:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:52:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-13 12:55:03 --> Error: Class "App\DTOs\UserDTO" not found
+[Method: POST, Route: register/save]
+in APPPATH\Controllers\Register.php on line 22.
+ 1 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Register->save()
+ 2 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Register))
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 7 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Hilal Yeşim\\Desktop\\E-TICARET\\public\\index.php')
+DEBUG - 2026-02-13 12:55:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:55:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:55:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 12:55:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-13 12:55:20 --> Error: Class "App\Models\ProductsModel" not found
+[Method: GET, Route: products/selection]
+in APPPATH\Services\ProductsService.php on line 12.
+ 1 APPPATH\Controllers\ProductController.php(21): App\Services\ProductsService->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ProductController->__construct()
+ 3 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 4 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Hilal Yeşim\\Desktop\\E-TICARET\\public\\index.php')
+ERROR - 2026-02-13 13:10:10 --> mysqli_sql_exception: Unknown column 'created_at' in 'field list' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `ty...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `ty...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `ty...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `ty...', Array, false)
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Seeds\ProductsFullSeeder.php(25): CodeIgniter\Database\BaseBuilder->insert(Array)
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\Seeder.php(149): App\Database\Seeds\ProductsFullSeeder->run()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('App\\Database\\Se...')
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run(Array)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#12 {main}
+ERROR - 2026-02-13 13:14:31 --> mysqli_sql_exception: Duplicate entry '' for key 'PRIMARY' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `ty...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `ty...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `ty...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `ty...', Array, false)
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Seeds\ProductsFullSeeder.php(36): CodeIgniter\Database\BaseBuilder->insert(Array)
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Seeds\ProductsFullSeeder.php(47): App\Database\Seeds\ProductsFullSeeder->App\Database\Seeds\{closure}('types', 'name', Array)
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\Seeder.php(149): App\Database\Seeds\ProductsFullSeeder->run()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('App\\Database\\Se...')
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-13 13:16:40 --> mysqli_sql_exception: Duplicate entry '' for key 'PRIMARY' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `ty...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `ty...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `ty...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `ty...', Array, false)
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Seeds\ProductsFullSeeder.php(20): CodeIgniter\Database\BaseBuilder->insert(Array)
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\Seeder.php(149): App\Database\Seeds\ProductsFullSeeder->run()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('App\\Database\\Se...')
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run(Array)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#12 {main}
+ERROR - 2026-02-13 13:17:02 --> mysqli_sql_exception: Duplicate entry '' for key 'PRIMARY' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `ty...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `ty...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `ty...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `ty...', Array, false)
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Seeds\ProductsFullSeeder.php(20): CodeIgniter\Database\BaseBuilder->insert(Array)
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\Seeder.php(149): App\Database\Seeds\ProductsFullSeeder->run()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Seed.php(79): CodeIgniter\Database\Seeder->call('App\\Database\\Se...')
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Seed->run(Array)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('db:seed', Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#12 {main}
+DEBUG - 2026-02-13 13:37:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 13:37:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 13:37:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 13:37:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 13:38:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 13:38:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 13:39:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-13 13:58:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

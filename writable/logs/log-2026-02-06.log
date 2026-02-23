@@ -1,0 +1,75 @@
+DEBUG - 2026-02-06 09:21:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:21:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:21:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:22:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:22:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:22:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:22:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:22:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:23:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:23:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:23:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:23:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 09:23:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:08:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:08:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:09:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:09:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:09:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:09:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:09:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:09:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:10:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 11:10:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-06 11:55:53 --> mysqli_sql_exception: Can't create table `staj_proje`.`user_permissions` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('CREATE TABLE `u...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('CREATE TABLE `u...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('CREATE TABLE `u...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\Forge.php(570): CodeIgniter\Database\BaseConnection->query('CREATE TABLE `u...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-06-114253_CreateRbacTables.php(123): CodeIgniter\Database\Forge->createTable('user_permission...', true, Array)
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\CreateRbacTables->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+DEBUG - 2026-02-06 15:08:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 15:08:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 15:08:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-06 15:08:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-06 15:25:31 --> mysqli_sql_exception: Incorrect table definition; there can be only one auto column and it must be defined as a key in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE `us...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE `us...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE `us...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\Forge.php(772): CodeIgniter\Database\BaseConnection->query('ALTER TABLE `us...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-06-151738_AddIdToUserPermissions.php(12): CodeIgniter\Database\Forge->addColumn('user_permission...', Array)
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\AddIdToUserPermissions->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-06 15:25:54 --> mysqli_sql_exception: Incorrect table definition; there can be only one auto column and it must be defined as a key in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE `us...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE `us...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE `us...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\Forge.php(772): CodeIgniter\Database\BaseConnection->query('ALTER TABLE `us...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-06-151738_AddIdToUserPermissions.php(12): CodeIgniter\Database\Forge->addColumn('user_permission...', Array)
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\AddIdToUserPermissions->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}

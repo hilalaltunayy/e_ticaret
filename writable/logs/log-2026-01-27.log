@@ -1,0 +1,973 @@
+DEBUG - 2026-01-27 05:54:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 05:55:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 05:55:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 05:55:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 05:55:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 06:56:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-01-27 06:57:00 --> ArgumentCountError: Too few arguments to function App\Controllers\ProductController::__construct(), 0 passed in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php on line 903 and exactly 1 expected
+[Method: GET, Route: products]
+in APPPATH\Controllers\ProductController.php on line 11.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ProductController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 7 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 07:03:03 --> ArgumentCountError: Too few arguments to function App\Controllers\ProductController::__construct(), 0 passed in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php on line 903 and exactly 1 expected
+[Method: GET, Route: products]
+in APPPATH\Controllers\ProductController.php on line 11.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ProductController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 7 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 07:03:07 --> ArgumentCountError: Too few arguments to function App\Controllers\ProductController::__construct(), 0 passed in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php on line 903 and exactly 1 expected
+[Method: GET, Route: products]
+in APPPATH\Controllers\ProductController.php on line 11.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ProductController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(498): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 7 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+ERROR - 2026-01-27 07:05:48 --> mysqli_sql_exception: Table 'staj_proje.products' doesn't exist in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT *\nFROM `...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *\nFROM `...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *\nFROM `...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(677): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\ProductsService.php(16): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\ProductController.php(30): App\Services\ProductsService->getAllProducts()
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\ProductController->index()
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#15 {main}
+CRITICAL - 2026-01-27 07:05:48 --> CodeIgniter\Database\Exceptions\DatabaseException: Table 'staj_proje.products' doesn't exist
+[Method: GET, Route: products]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `products`', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(677): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Services\ProductsService.php(16): CodeIgniter\BaseModel->findAll()
+ 5 APPPATH\Controllers\ProductController.php(30): App\Services\ProductsService->getAllProducts()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->index()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 07:05:48 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Table 'staj_proje.products' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `products`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `products`')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `products`', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(677): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Services\ProductsService.php(16): CodeIgniter\BaseModel->findAll()
+ 7 APPPATH\Controllers\ProductController.php(30): App\Services\ProductsService->getAllProducts()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->index()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 07:05:48 --> [Caused by] mysqli_sql_exception: Table 'staj_proje.products' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT *
+FROM `products`', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `products`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `products`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `products`', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(677): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Services\ProductsService.php(16): CodeIgniter\BaseModel->findAll()
+ 8 APPPATH\Controllers\ProductController.php(30): App\Services\ProductsService->getAllProducts()
+ 9 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->index()
+10 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+11 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+14 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+15 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+DEBUG - 2026-01-27 07:06:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-01-27 07:06:25 --> mysqli_sql_exception: Table 'staj_proje.products' doesn't exist in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT *\nFROM `...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *\nFROM `...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *\nFROM `...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *\nFROM `...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(677): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\ProductsService.php(16): CodeIgniter\BaseModel->findAll()
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\ProductController.php(30): App\Services\ProductsService->getAllProducts()
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\ProductController->index()
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#15 {main}
+CRITICAL - 2026-01-27 07:06:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Table 'staj_proje.products' doesn't exist
+[Method: GET, Route: products]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `products`', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(677): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Services\ProductsService.php(16): CodeIgniter\BaseModel->findAll()
+ 5 APPPATH\Controllers\ProductController.php(30): App\Services\ProductsService->getAllProducts()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->index()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 07:06:25 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Table 'staj_proje.products' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `products`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `products`')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `products`', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(677): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Services\ProductsService.php(16): CodeIgniter\BaseModel->findAll()
+ 7 APPPATH\Controllers\ProductController.php(30): App\Services\ProductsService->getAllProducts()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->index()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 07:06:25 --> [Caused by] mysqli_sql_exception: Table 'staj_proje.products' doesn't exist
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT *
+FROM `products`', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT *
+FROM `products`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT *
+FROM `products`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT *
+FROM `products`', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(677): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Services\ProductsService.php(16): CodeIgniter\BaseModel->findAll()
+ 8 APPPATH\Controllers\ProductController.php(30): App\Services\ProductsService->getAllProducts()
+ 9 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->index()
+10 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+11 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+14 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+15 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+DEBUG - 2026-01-27 07:29:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 07:31:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 07:32:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 07:32:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 07:32:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 08:02:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-01-27 08:03:01 --> mysqli_sql_exception: Unknown column 'updated_at' in 'field list' in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `pr...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `pr...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `pr...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `pr...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(838): CodeIgniter\Model->doInsert(Array)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(797): CodeIgniter\BaseModel->insert(Array, false)
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(751): CodeIgniter\Model->insert(Array, false)
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\ProductsService.php(21): CodeIgniter\BaseModel->save(Array)
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\ProductController->save()
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#17 {main}
+CRITICAL - 2026-01-27 08:03:01 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+[Method: POST, Route: products/save]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 3 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 4 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 5 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 6 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:03:01 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:01\', \'2026-01-27 08:03:01\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:01\', \'2026-01-27 08:03:01\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 5 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 6 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 7 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 8 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+11 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+12 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+16 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:03:01 --> [Caused by] mysqli_sql_exception: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:01\', \'2026-01-27 08:03:01\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:01\', \'2026-01-27 08:03:01\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:01\', \'2026-01-27 08:03:01\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 8 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 9 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+12 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+13 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+ERROR - 2026-01-27 08:03:07 --> mysqli_sql_exception: Unknown column 'updated_at' in 'field list' in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `pr...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `pr...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `pr...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `pr...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(838): CodeIgniter\Model->doInsert(Array)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(797): CodeIgniter\BaseModel->insert(Array, false)
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(751): CodeIgniter\Model->insert(Array, false)
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\ProductsService.php(21): CodeIgniter\BaseModel->save(Array)
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\ProductController->save()
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#17 {main}
+CRITICAL - 2026-01-27 08:03:07 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+[Method: POST, Route: products/save]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 3 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 4 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 5 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 6 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:03:07 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:07\', \'2026-01-27 08:03:07\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:07\', \'2026-01-27 08:03:07\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 5 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 6 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 7 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 8 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+11 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+12 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+16 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:03:07 --> [Caused by] mysqli_sql_exception: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:07\', \'2026-01-27 08:03:07\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:07\', \'2026-01-27 08:03:07\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'36.000\', \'2026-01-27 08:03:07\', \'2026-01-27 08:03:07\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 8 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 9 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+12 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+13 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+DEBUG - 2026-01-27 08:04:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-01-27 08:04:33 --> mysqli_sql_exception: Unknown column 'updated_at' in 'field list' in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `pr...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `pr...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `pr...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `pr...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(838): CodeIgniter\Model->doInsert(Array)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(797): CodeIgniter\BaseModel->insert(Array, false)
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(751): CodeIgniter\Model->insert(Array, false)
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\ProductsService.php(21): CodeIgniter\BaseModel->save(Array)
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\ProductController->save()
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#17 {main}
+CRITICAL - 2026-01-27 08:04:33 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+[Method: POST, Route: products/save]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 3 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 4 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 5 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 6 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:04:33 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:04:33\', \'2026-01-27 08:04:33\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:04:33\', \'2026-01-27 08:04:33\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 5 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 6 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 7 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 8 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+11 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+12 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+16 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:04:33 --> [Caused by] mysqli_sql_exception: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:04:33\', \'2026-01-27 08:04:33\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:04:33\', \'2026-01-27 08:04:33\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:04:33\', \'2026-01-27 08:04:33\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 8 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 9 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+12 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+13 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+ERROR - 2026-01-27 08:06:12 --> mysqli_sql_exception: Unknown column 'updated_at' in 'field list' in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `pr...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `pr...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `pr...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `pr...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(838): CodeIgniter\Model->doInsert(Array)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(797): CodeIgniter\BaseModel->insert(Array, false)
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(751): CodeIgniter\Model->insert(Array, false)
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\ProductsService.php(21): CodeIgniter\BaseModel->save(Array)
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\ProductController->save()
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#17 {main}
+CRITICAL - 2026-01-27 08:06:12 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+[Method: POST, Route: products/save]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 3 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 4 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 5 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 6 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:06:12 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:12\', \'2026-01-27 08:06:12\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:12\', \'2026-01-27 08:06:12\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 5 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 6 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 7 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 8 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+11 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+12 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+16 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:06:12 --> [Caused by] mysqli_sql_exception: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:12\', \'2026-01-27 08:06:12\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:12\', \'2026-01-27 08:06:12\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:12\', \'2026-01-27 08:06:12\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 8 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 9 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+12 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+13 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+ERROR - 2026-01-27 08:06:37 --> mysqli_sql_exception: Unknown column 'updated_at' in 'field list' in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `pr...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `pr...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `pr...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `pr...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(838): CodeIgniter\Model->doInsert(Array)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(797): CodeIgniter\BaseModel->insert(Array, false)
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(751): CodeIgniter\Model->insert(Array, false)
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\ProductsService.php(21): CodeIgniter\BaseModel->save(Array)
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\ProductController->save()
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#17 {main}
+CRITICAL - 2026-01-27 08:06:37 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+[Method: POST, Route: products/save]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 3 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 4 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 5 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 6 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:06:37 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:37\', \'2026-01-27 08:06:37\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:37\', \'2026-01-27 08:06:37\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 5 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 6 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 7 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 8 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+11 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+12 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+16 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:06:37 --> [Caused by] mysqli_sql_exception: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:37\', \'2026-01-27 08:06:37\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:37\', \'2026-01-27 08:06:37\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'PC\', \'2000\', \'2026-01-27 08:06:37\', \'2026-01-27 08:06:37\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 8 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 9 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+12 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+13 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+ERROR - 2026-01-27 08:20:48 --> mysqli_sql_exception: Unknown column 'updated_at' in 'field list' in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `pr...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `pr...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `pr...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `pr...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(838): CodeIgniter\Model->doInsert(Array)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(797): CodeIgniter\BaseModel->insert(Array, false)
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(751): CodeIgniter\Model->insert(Array, false)
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\ProductsService.php(21): CodeIgniter\BaseModel->save(Array)
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\ProductController->save()
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#17 {main}
+CRITICAL - 2026-01-27 08:20:48 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+[Method: POST, Route: products/save]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 3 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 4 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 5 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 6 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:20:48 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'Pc\', \'200\', \'2026-01-27 08:20:48\', \'2026-01-27 08:20:48\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'Pc\', \'200\', \'2026-01-27 08:20:48\', \'2026-01-27 08:20:48\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 5 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 6 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 7 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 8 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+11 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+12 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+16 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 08:20:48 --> [Caused by] mysqli_sql_exception: Unknown column 'updated_at' in 'field list'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'Pc\', \'200\', \'2026-01-27 08:20:48\', \'2026-01-27 08:20:48\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'Pc\', \'200\', \'2026-01-27 08:20:48\', \'2026-01-27 08:20:48\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (\'Pc\', \'200\', \'2026-01-27 08:20:48\', \'2026-01-27 08:20:48\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `products` (`product_name`, `price`, `created_at`, `updated_at`) VALUES (:product_name:, :price:, :created_at:, :updated_at:)', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 8 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 9 APPPATH\Services\ProductsService.php(21): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\ProductController.php(45): App\Services\ProductsService->saveProduct(Object(App\DTOs\ProductDTO))
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->save()
+12 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+13 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+DEBUG - 2026-01-27 08:53:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 08:53:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 08:53:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 09:56:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-01-27 09:56:52 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "product_create.php"
+[Method: GET, Route: products/new]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(214): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('product_create.php')
+ 2 SYSTEMPATH\Common.php(1199): CodeIgniter\View\View->render('product_create', [], true)
+ 3 APPPATH\Controllers\ProductController.php(41): view('product_create')
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->new()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 09:57:04 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "product_create.php"
+[Method: GET, Route: products/new]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(214): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('product_create.php')
+ 2 SYSTEMPATH\Common.php(1199): CodeIgniter\View\View->render('product_create', [], true)
+ 3 APPPATH\Controllers\ProductController.php(41): view('product_create')
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->new()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 09:57:10 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "product_create.php"
+[Method: GET, Route: products/new]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(214): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('product_create.php')
+ 2 SYSTEMPATH\Common.php(1199): CodeIgniter\View\View->render('product_create', [], true)
+ 3 APPPATH\Controllers\ProductController.php(41): view('product_create')
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->new()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+DEBUG - 2026-01-27 09:57:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 09:57:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-01-27 09:57:38 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "product_create.php"
+[Method: GET, Route: products/new]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(214): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('product_create.php')
+ 2 SYSTEMPATH\Common.php(1199): CodeIgniter\View\View->render('product_create', [], true)
+ 3 APPPATH\Controllers\ProductController.php(41): view('product_create')
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->new()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+DEBUG - 2026-01-27 10:02:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-01-27 10:02:17 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "product_create.php"
+[Method: GET, Route: products/new]
+in SYSTEMPATH\Exceptions\FrameworkException.php on line 39.
+ 1 SYSTEMPATH\View\View.php(214): CodeIgniter\Exceptions\FrameworkException::forInvalidFile('product_create.php')
+ 2 SYSTEMPATH\Common.php(1199): CodeIgniter\View\View->render('product_create', [], true)
+ 3 APPPATH\Controllers\ProductController.php(41): view('product_create')
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->new()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+DEBUG - 2026-01-27 10:26:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:26:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:26:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:26:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:27:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:27:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:28:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:28:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:28:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:28:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:28:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:29:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:29:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 10:38:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 11:38:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:00:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:30:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:30:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:30:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:31:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:31:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:31:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:31:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:31:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:32:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:33:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:34:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:34:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:34:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:34:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:34:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:34:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:34:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:35:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:47:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:47:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:47:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:47:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:47:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:47:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:47:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:49:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 12:49:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:05:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:07:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:07:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:07:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:07:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:07:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:07:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:08:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:08:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-01-27 13:11:41 --> ErrorException: Cannot declare class App\Filters\Filters, because the name is already in use
+[Method: POST, Route: login/auth]
+in APPPATH\Config\Filters.php on line 16.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+CRITICAL - 2026-01-27 13:11:50 --> ErrorException: Cannot declare class App\Filters\Filters, because the name is already in use
+[Method: POST, Route: login/auth]
+in APPPATH\Config\Filters.php on line 16.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+DEBUG - 2026-01-27 13:12:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:12:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:12:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:12:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:12:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:12:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:12:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:12:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:13:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:21:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:39:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:39:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:40:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 13:40:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:24:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:29:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:36:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:36:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:37:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:37:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:37:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:38:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:38:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:38:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:38:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:38:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:41:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:41:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:41:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:41:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:43:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:43:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-01-27 14:44:29 --> mysqli_sql_exception: Duplicate entry 'altunay@gmail.com' for key 'email' in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `us...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `us...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `us...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `us...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(838): CodeIgniter\Model->doInsert(Array)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(797): CodeIgniter\BaseModel->insert(Array, false)
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(751): CodeIgniter\Model->insert(Array, false)
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\AuthService.php(20): CodeIgniter\BaseModel->save(Array)
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\Register.php(36): App\Services\AuthService->registerUser(Object(App\DTOs\UserDTO))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\Register->save()
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Register))
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#17 {main}
+CRITICAL - 2026-01-27 14:44:29 --> CodeIgniter\Database\Exceptions\DatabaseException: Duplicate entry 'altunay@gmail.com' for key 'email'
+[Method: POST, Route: register/save]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `users` (`username`, `email`, `password`) VALUES (:username:, :email:, :password:)', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 3 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 4 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 5 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 6 APPPATH\Services\AuthService.php(20): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Register.php(36): App\Services\AuthService->registerUser(Object(App\DTOs\UserDTO))
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Register->save()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Register))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 14:44:29 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Duplicate entry 'altunay@gmail.com' for key 'email'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$wICNt/Z6y/Y9.Qe6GjFuqez5NrTMVkXFhnH1UrrfWFdv0lZUzFRnC\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$wICNt/Z6y/Y9.Qe6GjFuqez5NrTMVkXFhnH1UrrfWFdv0lZUzFRnC\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `users` (`username`, `email`, `password`) VALUES (:username:, :email:, :password:)', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 5 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 6 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 7 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 8 APPPATH\Services\AuthService.php(20): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Register.php(36): App\Services\AuthService->registerUser(Object(App\DTOs\UserDTO))
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Register->save()
+11 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Register))
+12 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+16 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 14:44:29 --> [Caused by] mysqli_sql_exception: Duplicate entry 'altunay@gmail.com' for key 'email'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$wICNt/Z6y/Y9.Qe6GjFuqez5NrTMVkXFhnH1UrrfWFdv0lZUzFRnC\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$wICNt/Z6y/Y9.Qe6GjFuqez5NrTMVkXFhnH1UrrfWFdv0lZUzFRnC\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$wICNt/Z6y/Y9.Qe6GjFuqez5NrTMVkXFhnH1UrrfWFdv0lZUzFRnC\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `users` (`username`, `email`, `password`) VALUES (:username:, :email:, :password:)', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 8 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 9 APPPATH\Services\AuthService.php(20): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Register.php(36): App\Services\AuthService->registerUser(Object(App\DTOs\UserDTO))
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Register->save()
+12 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Register))
+13 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+ERROR - 2026-01-27 14:45:40 --> mysqli_sql_exception: Duplicate entry 'altunay@gmail.com' for key 'email' in C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `us...', 0)
+#1 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `us...')
+#2 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `us...')
+#3 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `us...', Array, false)
+#4 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+#5 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(838): CodeIgniter\Model->doInsert(Array)
+#6 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Model.php(797): CodeIgniter\BaseModel->insert(Array, false)
+#7 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\BaseModel.php(751): CodeIgniter\Model->insert(Array, false)
+#8 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Services\AuthService.php(20): CodeIgniter\BaseModel->save(Array)
+#9 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\app\Controllers\Register.php(36): App\Services\AuthService->registerUser(Object(App\DTOs\UserDTO))
+#10 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(933): App\Controllers\Register->save()
+#11 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Register))
+#12 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#13 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#14 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#15 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#16 C:\xampp\htdocs\codeigniter4-framework-v4.6.4-0-ge4d3702\codeigniter4-framework-e4d3702\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#17 {main}
+CRITICAL - 2026-01-27 14:45:40 --> CodeIgniter\Database\Exceptions\DatabaseException: Duplicate entry 'altunay@gmail.com' for key 'email'
+[Method: POST, Route: register/save]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `users` (`username`, `email`, `password`) VALUES (:username:, :email:, :password:)', [...], false)
+ 2 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 3 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 4 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 5 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 6 APPPATH\Services\AuthService.php(20): CodeIgniter\BaseModel->save([...])
+ 7 APPPATH\Controllers\Register.php(36): App\Services\AuthService->registerUser(Object(App\DTOs\UserDTO))
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Register->save()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Register))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 14:45:40 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Duplicate entry 'altunay@gmail.com' for key 'email'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$3njgnIEAi74RzFlNPrKRYeFTczlYnO0tYngJT0GYd3yzSeCn4KtUy\')')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$3njgnIEAi74RzFlNPrKRYeFTczlYnO0tYngJT0GYd3yzSeCn4KtUy\')')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `users` (`username`, `email`, `password`) VALUES (:username:, :email:, :password:)', [...], false)
+ 4 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 5 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 6 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 7 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 8 APPPATH\Services\AuthService.php(20): CodeIgniter\BaseModel->save([...])
+ 9 APPPATH\Controllers\Register.php(36): App\Services\AuthService->registerUser(Object(App\DTOs\UserDTO))
+10 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Register->save()
+11 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Register))
+12 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+13 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+14 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+15 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+16 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+CRITICAL - 2026-01-27 14:45:40 --> [Caused by] mysqli_sql_exception: Duplicate entry 'altunay@gmail.com' for key 'email'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$3njgnIEAi74RzFlNPrKRYeFTczlYnO0tYngJT0GYd3yzSeCn4KtUy\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$3njgnIEAi74RzFlNPrKRYeFTczlYnO0tYngJT0GYd3yzSeCn4KtUy\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `users` (`username`, `email`, `password`) VALUES (\'\', \'altunay@gmail.com\', \'$2y$10$3njgnIEAi74RzFlNPrKRYeFTczlYnO0tYngJT0GYd3yzSeCn4KtUy\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2345): CodeIgniter\Database\BaseConnection->query('INSERT INTO `users` (`username`, `email`, `password`) VALUES (:username:, :email:, :password:)', [...], false)
+ 5 SYSTEMPATH\Model.php(394): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(838): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(797): CodeIgniter\BaseModel->insert([...], false)
+ 8 SYSTEMPATH\BaseModel.php(751): CodeIgniter\Model->insert([...], false)
+ 9 APPPATH\Services\AuthService.php(20): CodeIgniter\BaseModel->save([...])
+10 APPPATH\Controllers\Register.php(36): App\Services\AuthService->registerUser(Object(App\DTOs\UserDTO))
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Register->save()
+12 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Register))
+13 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('C:\\xampp\\htdocs\\codeigniter4-framework-v4.6.4-0-ge4d3702\\codeigniter4-framework-e4d3702\\public\\index.php')
+DEBUG - 2026-01-27 14:46:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:46:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:47:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-01-27 14:47:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

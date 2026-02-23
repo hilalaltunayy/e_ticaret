@@ -1,0 +1,518 @@
+ERROR - 2026-02-07 06:28:37 --> mysqli_sql_exception: Cannot drop index 'idx_role_permissions_permission': needed in a foreign key constraint in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('DROP INDEX idx_...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('DROP INDEX idx_...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('DROP INDEX idx_...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-06-114253_CreateRbacTables.php(151): CodeIgniter\Database\BaseConnection->query('DROP INDEX idx_...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\CreateRbacTables->down()
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(287): CodeIgniter\Database\MigrationRunner->migrate('down', Object(stdClass))
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\MigrateRollback.php(101): CodeIgniter\Database\MigrationRunner->regress(5)
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\MigrateRollback->run(Array)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate:rollbac...', Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#12 {main}
+ERROR - 2026-02-07 07:40:51 --> mysqli_sql_exception: Can't DROP COLUMN `id`; check that it exists in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE use...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE use...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE use...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-06-151738_AddIdToUserPermissions.php(14): CodeIgniter\Database\BaseConnection->query('ALTER TABLE use...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\AddIdToUserPermissions->up()
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#12 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Incorrect table definition; there can be only one auto column and it must be defined as a key in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE use...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE use...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE use...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE use...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(155): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE use...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(29): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('users', 'INT(11)')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Multiple primary key defined in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE use...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE use...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE use...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE use...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(164): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE use...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(29): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('users', 'INT(11)')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Incorrect table definition; there can be only one auto column and it must be defined as a key in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE pro...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE pro...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE pro...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE pro...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(155): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE pro...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(32): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('products', 'INT(11)')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Multiple primary key defined in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE pro...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE pro...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE pro...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE pro...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(164): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE pro...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(32): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('products', 'INT(11)')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Incorrect table definition; there can be only one auto column and it must be defined as a key in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE ord...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE ord...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE ord...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE ord...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(155): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE ord...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(35): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('orders', 'INT(11)')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Multiple primary key defined in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE ord...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE ord...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE ord...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE ord...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(164): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE ord...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(35): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('orders', 'INT(11)')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Incorrect table definition; there can be only one auto column and it must be defined as a key in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE rol...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE rol...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE rol...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE rol...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(155): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE rol...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(38): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('roles', 'BIGINT(20) UNSI...')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Multiple primary key defined in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE rol...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE rol...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE rol...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE rol...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(164): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE rol...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(38): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('roles', 'BIGINT(20) UNSI...')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Incorrect table definition; there can be only one auto column and it must be defined as a key in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE per...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE per...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE per...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE per...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(155): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE per...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(41): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('permissions', 'BIGINT(20) UNSI...')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Multiple primary key defined in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE per...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE per...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE per...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE per...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(164): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE per...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(41): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('permissions', 'BIGINT(20) UNSI...')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Incorrect table definition; there can be only one auto column and it must be defined as a key in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE use...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE use...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE use...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE use...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(155): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE use...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(44): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('user_permission...', 'BIGINT(20) UNSI...')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Multiple primary key defined in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE use...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE use...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE use...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE use...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(164): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE use...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(44): App\Database\Migrations\SwitchToUuidPrimaryKeys->swapPkToUuid('user_permission...', 'BIGINT(20) UNSI...')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#13 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#14 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Failed to add the foreign key constraint. Missing index for constraint 'fk_orders_product_uuid' in the referenced table 'products' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('\n            AL...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('\n            AL...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('\n            AL...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('\n            AL...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(83): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('\n            AL...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Failed to add the foreign key constraint. Missing index for constraint 'fk_up_user_uuid' in the referenced table 'users' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('\n            AL...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('\n            AL...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('\n            AL...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('\n            AL...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(90): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('\n            AL...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Failed to add the foreign key constraint. Missing index for constraint 'fk_up_permission_uuid' in the referenced table 'permissions' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('\n            AL...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('\n            AL...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('\n            AL...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('\n            AL...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(97): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('\n            AL...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Failed to add the foreign key constraint. Missing index for constraint 'fk_rp_role_uuid' in the referenced table 'roles' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('\n            AL...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('\n            AL...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('\n            AL...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('\n            AL...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(104): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('\n            AL...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Failed to add the foreign key constraint. Missing index for constraint 'fk_rp_permission_uuid' in the referenced table 'permissions' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('\n            AL...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('\n            AL...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('\n            AL...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('\n            AL...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(111): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('\n            AL...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Key column 'legacy_user_id' doesn't exist in table in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE use...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE use...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE use...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE use...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(128): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE use...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Key column 'legacy_permission_id' doesn't exist in table in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE use...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE use...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE use...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE use...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(129): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE use...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Key column 'legacy_role_id' doesn't exist in table in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE rol...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE rol...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE rol...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE rol...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(132): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE rol...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:24:48 --> mysqli_sql_exception: Key column 'legacy_permission_id' doesn't exist in table in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE rol...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE rol...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE rol...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(173): CodeIgniter\Database\BaseConnection->query('ALTER TABLE rol...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-092323_SwitchToUuidPrimaryKeys.php(133): App\Database\Migrations\SwitchToUuidPrimaryKeys->safeQuery('ALTER TABLE rol...')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\SwitchToUuidPrimaryKeys->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:38:44 --> mysqli_sql_exception: Can't DROP COLUMN `id`; check that it exists in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE use...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE use...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE use...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-06-151738_AddIdToUserPermissions.php(14): CodeIgniter\Database\BaseConnection->query('ALTER TABLE use...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\AddIdToUserPermissions->up()
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#12 {main}
+ERROR - 2026-02-07 09:38:45 --> mysqli_sql_exception: Table 'staj_proje.categories' doesn't exist in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE cat...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE cat...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE cat...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-081423_ConvertNumericIdsToUuid.php(48): CodeIgniter\Database\BaseConnection->query('ALTER TABLE cat...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-081423_ConvertNumericIdsToUuid.php(17): App\Database\Migrations\AddNewUuidIds->addNewId('categories')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\AddNewUuidIds->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 09:59:20 --> mysqli_sql_exception: Can't DROP COLUMN `id`; check that it exists in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE use...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE use...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE use...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-06-151738_AddIdToUserPermissions.php(14): CodeIgniter\Database\BaseConnection->query('ALTER TABLE use...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\AddIdToUserPermissions->up()
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#12 {main}
+ERROR - 2026-02-07 09:59:20 --> mysqli_sql_exception: Table 'staj_proje.orders' doesn't exist in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE ord...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE ord...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE ord...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-081423_ConvertNumericIdsToUuid.php(48): CodeIgniter\Database\BaseConnection->query('ALTER TABLE ord...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-081423_ConvertNumericIdsToUuid.php(20): App\Database\Migrations\AddNewUuidIds->addNewId('orders')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\AddNewUuidIds->up()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+ERROR - 2026-02-07 11:00:06 --> mysqli_sql_exception: Can't create table `staj_proje`.`products` (errno: 150 "Foreign key constraint is incorrectly formed") in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(327): mysqli->query('ALTER TABLE pro...', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('ALTER TABLE pro...')
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('ALTER TABLE pro...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\app\Database\Migrations\2026-02-07-104831_CreateInitialSchemaUuid.php(93): CodeIgniter\Database\BaseConnection->query('ALTER TABLE pro...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(874): App\Database\Migrations\CreateInitialSchemaUuid->up()
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(180): CodeIgniter\Database\MigrationRunner->migrate('up', Object(stdClass))
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\Migrate.php(85): CodeIgniter\Database\MigrationRunner->latest(NULL)
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\Migrate->run(Array)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate', Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#12 {main}
+ERROR - 2026-02-07 11:16:57 --> Error connecting to the database: mysqli_sql_exception: Unknown database 'staj_proje' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:201
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php(201): mysqli->real_connect('localhost', 'root', Object(SensitiveParameterValue), 'staj_proje', 3306, '', 0)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(419): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(614): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(1525): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FRO...')
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(1545): CodeIgniter\Database\BaseConnection->listTables()
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(766): CodeIgniter\Database\BaseConnection->tableExists('migrations')
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(644): CodeIgniter\Database\MigrationRunner->ensureTable()
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\MigrateStatus.php(115): CodeIgniter\Database\MigrationRunner->getHistory('')
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\MigrateStatus->run(Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate:status', Array)
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#12 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#13 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Unknown database 'staj_proje' in C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MySQLi\Connection.php:246
+Stack trace:
+#0 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(419): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(614): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(1525): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FRO...')
+#3 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\BaseConnection.php(1545): CodeIgniter\Database\BaseConnection->listTables()
+#4 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(766): CodeIgniter\Database\BaseConnection->tableExists('migrations')
+#5 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Database\MigrationRunner.php(644): CodeIgniter\Database\MigrationRunner->ensureTable()
+#6 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Commands\Database\MigrateStatus.php(115): CodeIgniter\Database\MigrationRunner->getHistory('')
+#7 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Commands.php(74): CodeIgniter\Commands\Database\MigrateStatus->run(Array)
+#8 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate:status', Array)
+#9 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(388): CodeIgniter\CLI\Console->run()
+#10 C:\Users\Hilal Yeşim\Desktop\E-TICARET\system\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+#11 C:\Users\Hilal Yeşim\Desktop\E-TICARET\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+#12 {main}
+CRITICAL - 2026-02-07 11:16:57 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Unknown database 'staj_proje'
+[Method: CLI, Route: migrate:status]
+in SYSTEMPATH\Database\BaseConnection.php on line 465.
+ 1 SYSTEMPATH\Database\BaseConnection.php(614): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseConnection.php(1525): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FROM `staj_proje`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(1545): CodeIgniter\Database\BaseConnection->listTables()
+ 4 SYSTEMPATH\Database\MigrationRunner.php(766): CodeIgniter\Database\BaseConnection->tableExists('migrations')
+ 5 SYSTEMPATH\Database\MigrationRunner.php(644): CodeIgniter\Database\MigrationRunner->ensureTable()
+ 6 SYSTEMPATH\Commands\Database\MigrateStatus.php(115): CodeIgniter\Database\MigrationRunner->getHistory('')
+ 7 SYSTEMPATH\CLI\Commands.php(74): CodeIgniter\Commands\Database\MigrateStatus->run([])
+ 8 SYSTEMPATH\CLI\Console.php(47): CodeIgniter\CLI\Commands->run('migrate:status', [])
+ 9 SYSTEMPATH\Boot.php(388): CodeIgniter\CLI\Console->run()
+10 SYSTEMPATH\Boot.php(133): CodeIgniter\Boot::runCommand(Object(CodeIgniter\CLI\Console))
+11 ROOTPATH\spark(87): CodeIgniter\Boot::bootSpark(Object(Config\Paths))
+DEBUG - 2026-02-07 13:47:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 13:47:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 13:47:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 13:47:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 13:48:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 13:48:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 13:50:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 13:50:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 13:50:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 13:51:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 14:20:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 14:20:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 14:20:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 14:20:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 14:20:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-02-07 14:20:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

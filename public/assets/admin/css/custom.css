@@ -1,0 +1,45 @@
+﻿/* Able Pro override: custom admin branding */
+.pc-sidebar .m-header .b-brand {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 10px;
+}
+
+.pc-sidebar .m-header .b-brand .pc-brand-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  display: inline-block;
+  vertical-align: middle;
+  color: #0D2B5B;
+}
+
+.pc-sidebar .m-header .b-brand .pc-brand-text {
+  font-size: 21px !important;
+  font-weight: 800 !important;
+  line-height: 1.1;
+  display: inline-block;
+  white-space: nowrap;
+  color: #0D2B5B !important;
+}
+
+.pc-sidebar .b-brand .theme-version,
+.pc-sidebar .b-brand .badge.theme-version {
+  display: none !important;
+}
+
+/* Admin sidebar menu sync with dashboard_anasayfa */
+.pc-sidebar .pc-caption label,
+.pc-sidebar .pc-link,
+.pc-sidebar .pc-link .pc-mtext,
+.pc-sidebar .pc-link .pc-micon,
+.pc-sidebar .pc-link .pc-icon {
+  color: #0D2B5B !important;
+}
+
+.pc-sidebar .pc-link:hover {
+  background: rgba(13, 43, 91, 0.12) !important;
+  color: #0D2B5B !important;
+}
