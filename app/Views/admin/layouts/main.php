@@ -2,9 +2,11 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc($title ?? 'Admin Panel') ?></title>
   <?= $this->include('admin/partials/head_css') ?>
+  <?= $this->renderSection('styles') ?>
 </head>
 <body
   data-pc-preset="preset-6"

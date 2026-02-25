@@ -5,73 +5,22 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<?php $authors = $authors ?? []; ?>
-<div class="card mb-3">
-    <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Ürünler</h5>
-            <a href="<?= site_url('admin/products/create') ?>" class="btn btn-primary btn-sm">Yeni Ürün</a>
-        </div>
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Ürünler</h5>
+        <a href="<?= site_url('admin/products/create') ?>" class="btn btn-primary btn-sm">Yeni Ürün</a>
     </div>
     <div class="card-body">
         <?php if (session()->getFlashdata('success')): ?>
             <div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
         <?php endif; ?>
 
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Arama</label>
-                <input type="text" id="filterQ" class="form-control" placeholder="Ürün adı, kategori veya yazar ara">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Tür</label>
-                <select id="filterType" class="form-select">
-                    <option value="">Tümü</option>
-                    <option value="basili">Basılı</option>
-                    <option value="dijital">Dijital</option>
-                    <option value="paket">Paket</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Aktiflik</label>
-                <select id="filterActive" class="form-select">
-                    <option value="">Tümü</option>
-                    <option value="1">Aktif</option>
-                    <option value="0">Pasif</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Stok Aralığı</label>
-                <select id="filterStockRange" class="form-select">
-                    <option value="">Tümü</option>
-                    <option value="low">0-5</option>
-                    <option value="mid">6-20</option>
-                    <option value="high">21-100</option>
-                    <option value="over100">100+</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Yazar</label>
-                <select id="filterAuthor" class="form-select">
-                    <option value="">Tümü</option>
-                    <?php foreach ($authors as $author): ?>
-                        <option value="<?= esc((string) ($author['id'] ?? '')) ?>"><?= esc((string) ($author['name'] ?? '-')) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-        </div>
+        <?php if (session()->getFlashdata('error')): ?>
+            <div class="alert alert-danger"><?= esc(session()->getFlashdata('error')) ?></div>
+        <?php endif; ?>
 
-        <div class="d-flex justify-content-end gap-2 mt-3">
-            <button type="button" id="btnClearFilters" class="btn btn-light">Temizle</button>
-            <button type="button" id="btnApplyFilters" class="btn btn-primary">Filtrele</button>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table id="productsTable" class="table table-hover align-middle mb-0 w-100">
+        <div class="dt-responsive table-responsive">
+            <table id="productsTable" class="table table-hover table-striped align-middle mb-0 w-100">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -80,8 +29,10 @@
                         <th>Tür</th>
                         <th>Kategori</th>
                         <th>Fiyat</th>
-                        <th>Stok Durumu</th>
-                        <th>Aktif</th>
+                        <th>Stok</th>
+                        <th>Rezerve</th>
+                        <th>Satılabilir</th>
+                        <th>Durum</th>
                         <th>İşlem</th>
                     </tr>
                 </thead>
@@ -93,71 +44,49 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="<?= base_url('assets/admin/js/plugins/dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/admin/js/plugins/dataTables.bootstrap5.min.js') ?>"></script>
 <script>
   (function () {
-    const table = $('#productsTable').DataTable({
+    $('#productsTable').DataTable({
       processing: true,
       serverSide: true,
-      searching: false,
       pageLength: 10,
-      order: [[0, 'desc']],
+      lengthMenu: [10, 25, 50, 100],
+      order: [[1, 'asc']],
+      dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
       ajax: {
-        url: "<?= site_url('admin/products/datatables') ?>",
-        type: 'GET',
-        data: function (d) {
-          d.q = $('#filterQ').val();
-          d.type = $('#filterType').val();
-          d.is_active = $('#filterActive').val();
-          d.stock_range = $('#filterStockRange').val();
-          d.author_id = $('#filterAuthor').val();
-        }
+        url: "<?= site_url('admin/api/products') ?>",
+        type: 'GET'
       },
       columns: [
-        { data: 'id' },
-        { data: 'product_name' },
-        { data: 'author_name' },
-        { data: 'type' },
-        { data: 'category_name' },
-        { data: 'price' },
-        { data: 'stock_overview', orderable: false, searchable: false },
+        { data: 'id', name: 'id' },
+        { data: 'title', name: 'title' },
+        { data: 'author_name', name: 'author_name' },
+        { data: 'type', name: 'type' },
+        { data: 'category_name', name: 'category_name' },
+        { data: 'price', name: 'price' },
+        { data: 'stock_total', name: 'stock_total' },
+        { data: 'stock_reserved', name: 'stock_reserved' },
+        { data: 'stock_available', name: 'stock_available' },
         { data: 'is_active', orderable: false, searchable: false },
         { data: 'actions', orderable: false, searchable: false }
       ],
       language: {
-        processing: 'Yükleniyor...',
         lengthMenu: '_MENU_ kayıt göster',
+        search: 'Ara:',
         zeroRecords: 'Kayıt bulunamadı',
         info: '_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor',
-        infoEmpty: 'Kayıt yok',
+        infoEmpty: '0 kayıttan 0 - 0 arası gösteriliyor',
         infoFiltered: '(_MAX_ kayıt içinden filtrelendi)',
         paginate: {
           first: 'İlk',
           last: 'Son',
           next: 'Sonraki',
           previous: 'Önceki'
-        }
-      }
-    });
-
-    $('#btnApplyFilters').on('click', function () {
-      table.ajax.reload();
-    });
-
-    $('#btnClearFilters').on('click', function () {
-      $('#filterQ').val('');
-      $('#filterType').val('');
-      $('#filterActive').val('');
-      $('#filterStockRange').val('');
-      $('#filterAuthor').val('');
-      table.ajax.reload();
-    });
-
-    $('#filterQ').on('keypress', function (e) {
-      if (e.which === 13) {
-        table.ajax.reload();
+        },
+        processing: 'Yükleniyor...'
       }
     });
   })();

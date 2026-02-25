@@ -444,7 +444,7 @@ class ProductsModel extends BaseUuidModel
             $stock,
             $stock,
             'order_reserved',
-            'Sipariş rezervasyonu: ' . $qty,
+            'SipariÅŸ rezervasyonu: ' . $qty,
             (string) $actorUserId,
             null,
             $orderId
@@ -494,7 +494,7 @@ class ProductsModel extends BaseUuidModel
             $stock,
             $stock,
             'order_cancelled',
-            'Sipariş iptali rezervasyon çözümü: ' . $qty,
+            'SipariÅŸ iptali rezervasyon Ã§Ã¶zÃ¼mÃ¼: ' . $qty,
             (string) $actorUserId,
             null,
             $orderId
@@ -548,7 +548,7 @@ class ProductsModel extends BaseUuidModel
             $oldStock,
             $newStock,
             'order_shipped',
-            'Sipariş kargoya verildi: ' . $qty,
+            'SipariÅŸ kargoya verildi: ' . $qty,
             (string) $actorUserId,
             null,
             $orderId
@@ -607,7 +607,7 @@ class ProductsModel extends BaseUuidModel
     public function datatablesList(array $params): array
     {
         $baseBuilder = $this->db->table('products')
-            ->select('products.id, products.product_name, products.type, products.price, products.stock_count, products.reserved_count, GREATEST(products.stock_count - products.reserved_count, 0) AS available_stock, products.is_active, categories.category_name, authors.name AS author_name')
+            ->select('products.id, products.product_name AS title, products.type, products.price, products.stock_count AS stock_total, products.reserved_count AS stock_reserved, GREATEST(products.stock_count - products.reserved_count, 0) AS stock_available, products.is_active, categories.category_name, authors.name AS author_name')
             ->join('categories', 'categories.id = products.category_id', 'left')
             ->join('authors', 'authors.id = products.author_id', 'left')
             ->where('products.deleted_at', null);
@@ -618,27 +618,32 @@ class ProductsModel extends BaseUuidModel
         $this->applyDatatablesFilters($filteredBuilder, $params);
         $recordsFiltered = (clone $filteredBuilder)->countAllResults();
 
-        $columnMap = [
-            0 => 'products.id',
-            1 => 'products.product_name',
-            2 => 'authors.name',
-            3 => 'products.type',
-            4 => 'categories.category_name',
-            5 => 'products.price',
-            6 => 'products.stock_count',
-            7 => 'products.is_active',
+        $columnDbMap = [
+            'id' => 'products.id',
+            'title' => 'products.product_name',
+            'author_name' => 'authors.name',
+            'type' => 'products.type',
+            'category_name' => 'categories.category_name',
+            'price' => 'products.price',
+            'stock_total' => 'products.stock_count',
+            'stock_reserved' => 'products.reserved_count',
+            'stock_available' => 'GREATEST(products.stock_count - products.reserved_count, 0)',
+            'is_active' => 'products.is_active',
         ];
 
         $orderIndex = (int) ($params['order'][0]['column'] ?? 0);
-        $orderDirRaw = strtolower((string) ($params['order'][0]['dir'] ?? 'desc'));
-        $orderDir = $orderDirRaw === 'asc' ? 'ASC' : 'DESC';
-        $orderColumn = $columnMap[$orderIndex] ?? 'products.id';
+        $orderDirRaw = strtolower((string) ($params['order'][0]['dir'] ?? 'asc'));
+        $orderDir = $orderDirRaw === 'desc' ? 'DESC' : 'ASC';
+
+        $columnName = (string) ($params['columns'][$orderIndex]['data'] ?? 'title');
+        $orderColumn = $columnDbMap[$columnName] ?? 'products.product_name';
         $filteredBuilder->orderBy($orderColumn, $orderDir);
 
         $length = (int) ($params['length'] ?? 10);
-        $start = (int) ($params['start'] ?? 0);
-        if ($length > 0) {
-            $filteredBuilder->limit($length, max(0, $start));
+        $start = max(0, (int) ($params['start'] ?? 0));
+        if ($length !== -1) {
+            $length = max(1, min(100, $length));
+            $filteredBuilder->limit($length, $start);
         }
 
         $rows = $filteredBuilder->get()->getResultArray();
@@ -652,44 +657,14 @@ class ProductsModel extends BaseUuidModel
 
     private function applyDatatablesFilters(\CodeIgniter\Database\BaseBuilder $builder, array $params): void
     {
-        $q = trim((string) ($params['q'] ?? ''));
-        $globalSearch = trim((string) ($params['search']['value'] ?? ''));
-        $searchTerm = $q !== '' ? $q : $globalSearch;
+        $searchTerm = trim((string) ($params['search']['value'] ?? ''));
         if ($searchTerm !== '') {
             $builder->groupStart()
                 ->like('products.product_name', $searchTerm)
-                ->orLike('categories.category_name', $searchTerm)
                 ->orLike('authors.name', $searchTerm)
+                ->orLike('categories.category_name', $searchTerm)
+                ->orLike('products.type', $searchTerm)
                 ->groupEnd();
-        }
-
-        $type = trim((string) ($params['type'] ?? ''));
-        if ($type !== '') {
-            $builder->where('products.type', $type);
-        }
-
-        $isActive = trim((string) ($params['is_active'] ?? ''));
-        if ($isActive === '0' || $isActive === '1') {
-            $builder->where('products.is_active', (int) $isActive);
-        }
-
-        $authorId = trim((string) ($params['author_id'] ?? ''));
-        if ($authorId !== '') {
-            $builder->where('products.author_id', $authorId);
-        }
-
-        $stockRange = trim((string) ($params['stock_range'] ?? ''));
-        if ($stockRange === 'low') {
-            $builder->where('GREATEST(products.stock_count - products.reserved_count, 0) >=', 0)
-                ->where('GREATEST(products.stock_count - products.reserved_count, 0) <=', 5);
-        } elseif ($stockRange === 'mid') {
-            $builder->where('GREATEST(products.stock_count - products.reserved_count, 0) >=', 6)
-                ->where('GREATEST(products.stock_count - products.reserved_count, 0) <=', 20);
-        } elseif ($stockRange === 'high') {
-            $builder->where('GREATEST(products.stock_count - products.reserved_count, 0) >=', 21)
-                ->where('GREATEST(products.stock_count - products.reserved_count, 0) <=', 100);
-        } elseif ($stockRange === 'over100') {
-            $builder->where('GREATEST(products.stock_count - products.reserved_count, 0) >', 100);
         }
     }
 }

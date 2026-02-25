@@ -9,13 +9,17 @@ class StockMove extends BaseController
 {
     private const REASONS = [
         'depo_girisi',
-        'fire_hasar',
-        'iade_girisi',
-        'sayim_duzeltme',
+        'depo_transferi',
+        'iade_alindi',
+        'tedarikci_girisi',
+        'hasarli_urun',
+        'kayip_urun',
+        'kampanya_promosyon',
         'manuel_duzeltme',
+        'hediye_gonderimi',
+        'sayim_duzeltme',
     ];
-
-    public function __construct(
+public function __construct(
         private ?ProductsService $productsService = null
     ) {
         $this->productsService = $this->productsService ?? new ProductsService();
@@ -37,7 +41,7 @@ class StockMove extends BaseController
 
         $messages = [
             'direction' => [
-                'in_list' => 'Yön alanı Giriş/Çıkış olmalıdır.',
+                'in_list' => 'YÃ¶n alanÄ± GiriÅŸ/Ã‡Ä±kÄ±ÅŸ olmalÄ±dÄ±r.',
             ],
         ];
 
@@ -45,24 +49,24 @@ class StockMove extends BaseController
             return redirect()->back()
                 ->withInput()
                 ->with('validation', $this->validator)
-                ->with('error', 'Lütfen form alanlarını kontrol edin.');
+                ->with('error', 'LÃ¼tfen form alanlarÄ±nÄ± kontrol edin.');
         }
 
         $user = session()->get('user') ?? [];
         $role = (string) ($user['role'] ?? '');
         $actorUserId = trim((string) (session()->get('user_id') ?? ($user['id'] ?? '')));
         if ($actorUserId === '') {
-            return redirect()->back()->withInput()->with('error', 'Kullanıcı oturumu doğrulanamadı.');
+            return redirect()->back()->withInput()->with('error', 'KullanÄ±cÄ± oturumu doÄŸrulanamadÄ±.');
         }
 
         $reason = trim((string) $this->request->getPost('reason'));
         if ($reason === 'manuel_duzeltme' && $role !== 'admin') {
-            return $this->response->setStatusCode(403, 'Bu işlem için yetkiniz yok.');
+            return $this->response->setStatusCode(403, 'Bu iÅŸlem iÃ§in yetkiniz yok.');
         }
 
         $snapshot = $this->productsService->getProductStockSnapshot($productId);
         if (empty($snapshot)) {
-            return redirect()->to(site_url('admin/stock'))->with('error', 'Ürün bulunamadı.');
+            return redirect()->to(site_url('admin/stock'))->with('error', 'ÃœrÃ¼n bulunamadÄ±.');
         }
 
         $direction = (string) $this->request->getPost('direction');
@@ -73,7 +77,7 @@ class StockMove extends BaseController
         $stockCount = (int) ($snapshot['stock_count'] ?? 0);
         $sellable = (int) ($snapshot['sellable'] ?? 0);
         if ($direction === 'out' && ($quantity > $sellable || $quantity > $stockCount)) {
-            return redirect()->back()->withInput()->with('error', 'Stok çıkışı için satılabilir stok yetersiz.');
+            return redirect()->back()->withInput()->with('error', 'Stok Ã§Ä±kÄ±ÅŸÄ± iÃ§in satÄ±labilir stok yetersiz.');
         }
 
         $saved = $this->productsService->applyStockMove($productId, $delta, [
@@ -89,6 +93,7 @@ class StockMove extends BaseController
         }
 
         return redirect()->to(site_url('admin/stock/moves') . '?product_id=' . urlencode($productId) . '#stock-detail')
-            ->with('success', 'Stok hareketi başarıyla kaydedildi.');
+            ->with('success', 'Stok hareketi baÅŸarÄ±yla kaydedildi.');
     }
 }
+

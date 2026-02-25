@@ -3,7 +3,7 @@
 
 <?php
 $typeOptions = ['basili', 'dijital', 'paket'];
-if (!empty($types ?? [])) {
+if (! empty($types ?? [])) {
     $typeOptions = [];
     foreach ($types as $typeRow) {
         $rawType = strtolower(trim((string) ($typeRow['name'] ?? '')));
@@ -16,6 +16,8 @@ if (!empty($types ?? [])) {
         $typeOptions = ['basili', 'dijital', 'paket'];
     }
 }
+$selectedCategory = old('category_id', (string) (session()->getFlashdata('new_category_id') ?? ''));
+$returnToCreateUrl = site_url('admin/products/create');
 ?>
 
 <div class="row">
@@ -32,9 +34,7 @@ if (!empty($types ?? [])) {
 <?php endif; ?>
 
 <?php if (isset($validation) && $validation->getErrors()): ?>
-    <div class="alert alert-danger">
-        <?= $validation->listErrors() ?>
-    </div>
+    <div class="alert alert-danger"><?= $validation->listErrors() ?></div>
 <?php endif; ?>
 
 <div class="row">
@@ -57,7 +57,7 @@ if (!empty($types ?? [])) {
                             <label class="form-label">Yazar</label>
                             <select name="author_id" id="authorSelect" class="form-select">
                                 <option value="">Yazar seçin</option>
-                                <option value="__new__" <?= old('author_id') === '__new__' ? 'selected' : '' ?>>➕ Yeni yazar ekle</option>
+                                <option value="__new__" <?= old('author_id') === '__new__' ? 'selected' : '' ?>>+ Yeni yazar ekle</option>
                                 <?php foreach (($authors ?? []) as $author): ?>
                                     <?php $id = (string) ($author['id'] ?? ''); ?>
                                     <option value="<?= esc($id) ?>" <?= old('author_id') === $id ? 'selected' : '' ?>>
@@ -74,24 +74,16 @@ if (!empty($types ?? [])) {
 
                         <div class="col-md-6">
                             <label class="form-label">Kategori</label>
-                            <div class="d-flex align-items-center gap-2">
-                                <select name="category_id" id="categorySelect" class="form-select" <?= old('new_category_name') ? '' : 'required' ?>>
-                                    <option value="">Kategori Seçin</option>
-                                    <?php foreach (($categories ?? []) as $category): ?>
-                                        <?php $categoryId = (string) ($category['id'] ?? ''); ?>
-                                        <option value="<?= esc($categoryId) ?>" <?= old('category_id') === $categoryId ? 'selected' : '' ?>>
-                                            <?= esc($category['category_name'] ?? '-') ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <button type="button" id="toggleNewCategoryBtn" class="btn btn-sm btn-outline-secondary text-nowrap">+ Kategori Ekle</button>
-                            </div>
-                            <div class="mt-2 <?= old('new_category_name') ? '' : 'd-none' ?>" id="newCategoryWrap">
-                                <div class="input-group">
-                                    <input type="text" name="new_category_name" id="newCategoryInput" class="form-control" placeholder="Yeni kategori adı" value="<?= esc(old('new_category_name')) ?>">
-                                    <button type="button" id="applyNewCategoryBtn" class="btn btn-outline-primary">Ekle</button>
-                                </div>
-                            </div>
+                            <select name="category_id" id="categorySelect" class="form-select" required>
+                                <option value="">Kategori seçin</option>
+                                <option value="__new__">+ Yeni kategori ekle</option>
+                                <?php foreach (($categories ?? []) as $category): ?>
+                                    <?php $categoryId = (string) ($category['id'] ?? ''); ?>
+                                    <option value="<?= esc($categoryId) ?>" <?= $selectedCategory === $categoryId ? 'selected' : '' ?>>
+                                        <?= esc($category['category_name'] ?? '-') ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
 
                         <div class="col-md-6">
@@ -151,10 +143,7 @@ if (!empty($types ?? [])) {
     const newAuthorWrap = document.getElementById('newAuthorWrap');
     const newAuthorInput = document.getElementById('newAuthorInput');
     const categorySelect = document.getElementById('categorySelect');
-    const newCategoryWrap = document.getElementById('newCategoryWrap');
-    const newCategoryInput = document.getElementById('newCategoryInput');
-    const toggleNewCategoryBtn = document.getElementById('toggleNewCategoryBtn');
-    const applyNewCategoryBtn = document.getElementById('applyNewCategoryBtn');
+    const categoryCreateUrl = "<?= site_url('admin/categories/create') ?>?return=<?= rawurlencode($returnToCreateUrl) ?>";
 
     function syncStockField() {
       if (!typeSelect) return;
@@ -177,68 +166,19 @@ if (!empty($types ?? [])) {
       }
     }
 
-    function syncCategoryField() {
-      if (!categorySelect || !newCategoryInput) return;
-      const hasNewCategory = newCategoryInput.value.trim() !== '';
-
-      if (hasNewCategory) {
-        categorySelect.value = '';
+    function syncCategorySelection() {
+      if (!categorySelect) return;
+      if (categorySelect.value === '__new__') {
+        window.location.href = categoryCreateUrl;
       }
-
-      categorySelect.required = !hasNewCategory;
-    }
-
-    function showNewCategoryField() {
-      if (!newCategoryWrap) return;
-      newCategoryWrap.classList.remove('d-none');
-      if (newCategoryInput) {
-        newCategoryInput.focus();
-      }
-      syncCategoryField();
-    }
-
-    function toggleNewCategoryField() {
-      if (!newCategoryWrap || !newCategoryInput) return;
-      const isHidden = newCategoryWrap.classList.contains('d-none');
-
-      if (isHidden) {
-        showNewCategoryField();
-        return;
-      }
-
-      newCategoryWrap.classList.add('d-none');
-      newCategoryInput.value = '';
-      syncCategoryField();
     }
 
     typeSelect.addEventListener('change', syncStockField);
     authorSelect.addEventListener('change', syncNewAuthorField);
-
-    if (toggleNewCategoryBtn) {
-      toggleNewCategoryBtn.addEventListener('click', toggleNewCategoryField);
-    }
-
-    if (applyNewCategoryBtn) {
-      applyNewCategoryBtn.addEventListener('click', showNewCategoryField);
-    }
-
-    if (newCategoryInput) {
-      newCategoryInput.addEventListener('input', syncCategoryField);
-    }
-
-    if (categorySelect && newCategoryInput && newCategoryWrap) {
-      categorySelect.addEventListener('change', function () {
-        if (categorySelect.value !== '') {
-          newCategoryInput.value = '';
-          newCategoryWrap.classList.add('d-none');
-        }
-        syncCategoryField();
-      });
-    }
+    categorySelect.addEventListener('change', syncCategorySelection);
 
     syncStockField();
     syncNewAuthorField();
-    syncCategoryField();
   })();
 </script>
 <?= $this->endSection() ?>

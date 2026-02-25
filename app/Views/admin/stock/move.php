@@ -6,6 +6,18 @@ $product = $product ?? [];
 $logs = $logs ?? [];
 $reasons = $reasons ?? [];
 $validation = $validation ?? null;
+$reasonLabels = [
+    'depo_girisi' => 'Depo Girişi',
+    'depo_transferi' => 'Depo Transferi',
+    'iade_alindi' => 'İade Alındı',
+    'tedarikci_girisi' => 'Tedarikçi Girişi',
+    'hasarli_urun' => 'Hasarlı Ürün',
+    'kayip_urun' => 'Kayıp Ürün',
+    'kampanya_promosyon' => 'Kampanya / Promosyon',
+    'manuel_duzeltme' => 'Manuel Düzeltme',
+    'hediye_gonderimi' => 'Hediye Gönderimi',
+    'sayim_duzeltme' => 'Sayım Düzeltme',
+];
 
 $stock = (int) ($product['stock_count'] ?? 0);
 $reserved = (int) ($product['reserved_count'] ?? 0);
@@ -68,12 +80,12 @@ $sellable = (int) ($product['sellable'] ?? max(0, $stock - $reserved));
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Sebep</label>
+                        <label class="form-label">Hareket Türü</label>
                         <select name="reason" class="form-select" required>
-                            <option value="">Sebep seçin</option>
+                            <option value="">Hareket türü seçin</option>
                             <?php foreach ($reasons as $reason): ?>
                                 <option value="<?= esc($reason) ?>" <?= old('reason') === $reason ? 'selected' : '' ?>>
-                                    <?= esc($reason) ?>
+                                    <?= esc($reasonLabels[$reason] ?? $reason) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -105,7 +117,7 @@ $sellable = (int) ($product['sellable'] ?? max(0, $stock - $reserved));
                                 <tr>
                                     <th>Tarih</th>
                                     <th>İşlem</th>
-                                    <th>Sebep</th>
+                                    <th>Hareket Türü</th>
                                     <th>Not</th>
                                     <th>Kim Yaptı</th>
                                     <th>Order ID / Ref No</th>
@@ -118,6 +130,9 @@ $sellable = (int) ($product['sellable'] ?? max(0, $stock - $reserved));
                                     $actorName = trim((string) ($log['actor_name'] ?? ''));
                                     $actorEmail = trim((string) ($log['actor_email'] ?? ''));
                                     $actorText = $actorName !== '' ? $actorName : ($actorEmail !== '' ? $actorEmail : '-');
+                                    $orderId = trim((string) ($log['related_order_id'] ?? ''));
+                                    $refNo = trim((string) ($log['ref_no'] ?? ''));
+                                    $reason = (string) ($log['reason'] ?? '');
                                     ?>
                                     <tr>
                                         <td><?= esc((string) ($log['created_at'] ?? '-')) ?></td>
@@ -128,15 +143,11 @@ $sellable = (int) ($product['sellable'] ?? max(0, $stock - $reserved));
                                                 <span class="badge bg-light-danger text-danger"><?= esc($delta) ?></span>
                                             <?php endif; ?>
                                         </td>
-                                        <td><?= esc((string) ($log['reason'] ?? '-')) ?></td>
+                                        <td><?= esc($reasonLabels[$reason] ?? ($reason !== '' ? $reason : '-')) ?></td>
                                         <td><?= esc((string) ($log['note'] ?? '-')) ?></td>
                                         <td><?= esc($actorText) ?></td>
                                         <td>
-                                            <?php
-                                            $orderId = trim((string) ($log['related_order_id'] ?? ''));
-                                            $refNo = trim((string) ($log['ref_no'] ?? ''));
-                                            echo esc($orderId !== '' ? $orderId : ($refNo !== '' ? $refNo : '-'));
-                                            ?>
+                                            <?= esc($orderId !== '' ? $orderId : ($refNo !== '' ? $refNo : '-')) ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
