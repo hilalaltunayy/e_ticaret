@@ -48,6 +48,171 @@ class Orders extends BaseController
         ]);
     }
 
+    public function analytics()
+    {
+        if (! $this->canManageOrders()) {
+            $payload = [
+                'success' => false,
+                'message' => 'Yetkisiz istek.',
+            ];
+
+            return $this->response
+                ->setStatusCode(403)
+                ->setHeader('Content-Type', 'application/json; charset=utf-8')
+                ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        }
+
+        $range = strtolower(trim((string) ($this->request->getGet('range') ?? 'daily')));
+        if (! in_array($range, ['daily', 'weekly', 'monthly'], true)) {
+            $range = 'daily';
+        }
+
+        $db = db_connect();
+        $today = new \DateTimeImmutable('today');
+        $categories = [];
+        $rowsByLabel = [];
+        $labelExpr = "DATE_FORMAT(DATE(COALESCE(order_date, created_at)), '%Y-%m-%d')";
+        $fromDate = $today->modify('-29 days')->format('Y-m-d');
+
+        if ($range === 'weekly') {
+            $labelExpr = "DATE_FORMAT(DATE_SUB(DATE(COALESCE(order_date, created_at)), INTERVAL WEEKDAY(DATE(COALESCE(order_date, created_at))) DAY), '%Y-%m-%d')";
+            $weekStart = $today->modify('-11 weeks')->modify('monday this week');
+            $fromDate = $weekStart->format('Y-m-d');
+
+            for ($i = 0; $i < 12; $i++) {
+                $categories[] = $weekStart->modify('+' . $i . ' week')->format('Y-m-d');
+            }
+        } elseif ($range === 'monthly') {
+            $labelExpr = "DATE_FORMAT(DATE(COALESCE(order_date, created_at)), '%Y-%m')";
+            $monthStart = $today->modify('first day of this month')->modify('-11 months');
+            $fromDate = $monthStart->format('Y-m-d');
+
+            for ($i = 0; $i < 12; $i++) {
+                $categories[] = $monthStart->modify('+' . $i . ' month')->format('Y-m');
+            }
+        } else {
+            for ($i = 0; $i < 30; $i++) {
+                $categories[] = $today->modify('-' . (29 - $i) . ' days')->format('Y-m-d');
+            }
+        }
+
+        $rows = $db->table('orders')
+            ->select($labelExpr . ' AS period_label', false)
+            ->select('COALESCE(SUM(total_amount), 0) AS total_amount', false)
+            ->where("DATE(COALESCE(order_date, created_at)) >= " . $db->escape($fromDate), null, false)
+            ->groupBy('period_label')
+            ->orderBy('period_label', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        foreach ($rows as $row) {
+            $key = trim((string) ($row['period_label'] ?? ''));
+            if ($key === '') {
+                continue;
+            }
+
+            $rowsByLabel[$key] = round((float) ($row['total_amount'] ?? 0), 2);
+        }
+
+        $seriesData = [];
+        foreach ($categories as $label) {
+            $seriesData[] = $rowsByLabel[$label] ?? 0;
+        }
+
+        $payload = [
+            'success' => true,
+            'range' => $range,
+            'categories' => $categories,
+            'series' => [[
+                'name' => 'Toplam Tutar',
+                'data' => $seriesData,
+            ]],
+            'currency' => '&#8378;',
+            'csrf' => [
+                'token' => csrf_token(),
+                'hash' => csrf_hash(),
+            ],
+        ];
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/json; charset=utf-8')
+            ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+
+    public function statusDistribution()
+    {
+        if (! $this->canManageOrders()) {
+            $payload = [
+                'success' => false,
+                'message' => 'Yetkisiz istek.',
+            ];
+
+            return $this->response
+                ->setStatusCode(403)
+                ->setHeader('Content-Type', 'application/json; charset=utf-8')
+                ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        }
+
+        $range = strtolower(trim((string) ($this->request->getGet('range') ?? 'weekly')));
+        if ($range !== 'weekly') {
+            $range = 'weekly';
+        }
+
+        $statuses = [
+            'pending' => 'Beklemede',
+            'preparing' => 'Hazırlanıyor',
+            'packed' => 'Paketlendi',
+            'shipped' => 'Kargoya Verildi',
+            'delivered' => 'Teslim Edildi',
+            'cancelled' => 'İptal Edildi',
+            'return_in_progress' => 'İade Sürecinde',
+            'return_done' => 'İade Tamamlandı',
+        ];
+
+        $dateFrom = (new \DateTimeImmutable('today'))->modify('-6 days')->format('Y-m-d');
+        $db = db_connect();
+        $rows = $db->table('orders')
+            ->select('COALESCE(NULLIF(order_status, \'\'), status) AS normalized_status', false)
+            ->select('COUNT(*) AS total_count', false)
+            ->where("DATE(COALESCE(order_date, created_at)) >= " . $db->escape($dateFrom), null, false)
+            ->groupBy('normalized_status')
+            ->get()
+            ->getResultArray();
+
+        $countsByStatus = [];
+        foreach ($rows as $row) {
+            $key = trim((string) ($row['normalized_status'] ?? ''));
+            if ($key === '') {
+                continue;
+            }
+
+            $countsByStatus[$key] = (int) ($row['total_count'] ?? 0);
+        }
+
+        $series = [];
+        foreach ($statuses as $statusKey => $label) {
+            $series[] = [
+                'name' => $label,
+                'data' => [$countsByStatus[$statusKey] ?? 0],
+            ];
+        }
+
+        $payload = [
+            'success' => true,
+            'range' => $range,
+            'categories' => ['Son 7 Gün'],
+            'series' => $series,
+            'csrf' => [
+                'token' => csrf_token(),
+                'hash' => csrf_hash(),
+            ],
+        ];
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/json; charset=utf-8')
+            ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+
     public function datatables()
     {
         $params = $this->request->getGet();

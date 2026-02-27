@@ -6,6 +6,9 @@
   .summary-card-clickable { cursor: pointer; transition: all .2s ease; }
   .summary-card-clickable:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.1); }
   .summary-card-active { outline: 2px solid rgba(13,110,253,.35); }
+  .orders-trend-range .btn.active { background-color: #0d6efd; color: #fff; border-color: #0d6efd; }
+  #ordersTrendChart { min-height: 320px; }
+  #ordersStatusDistributionChart { min-height: 320px; }
 </style>
 <?= $this->endSection() ?>
 
@@ -70,6 +73,29 @@
         <h4 class="mb-0" id="summary-returned-cancelled"><?= esc((string) ((int) ($summary['returned'] ?? 0) + (int) ($summary['cancelled'] ?? 0))) ?></h4>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h5 class="mb-0">Sipariş Trendi</h5>
+    <div class="btn-group orders-trend-range" role="group" aria-label="Sipariş trend aralığı">
+      <button type="button" class="btn btn-sm btn-outline-primary js-orders-trend-range active" data-range="daily">Günlük</button>
+      <button type="button" class="btn btn-sm btn-outline-primary js-orders-trend-range" data-range="weekly">Haftalık</button>
+      <button type="button" class="btn btn-sm btn-outline-primary js-orders-trend-range" data-range="monthly">Aylık</button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div id="ordersTrendChart"></div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header">
+    <h5 class="mb-0">Haftalık Sipariş Durum Dağılımı</h5>
+  </div>
+  <div class="card-body">
+    <div id="ordersStatusDistributionChart"></div>
   </div>
 </div>
 
@@ -193,10 +219,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="<?= base_url('assets/admin/js/plugins/dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/admin/js/plugins/dataTables.bootstrap5.min.js') ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
   (function () {
     var csrfTokenName = '<?= csrf_token() ?>';
     var csrfHash = '<?= csrf_hash() ?>';
+    var activeTrendRange = 'daily';
+    var trendChart = null;
+    var trendPollTimer = null;
+    var statusDistributionChart = null;
+    var tlSymbol = $('<textarea/>').html('&#8378;').text();
 
     function updateCsrf(payload) {
       if (payload && payload.csrf && payload.csrf.hash) {
@@ -220,6 +252,172 @@
           updateCsrf(res);
         }
       });
+    }
+
+    function setActiveTrendButton(range) {
+      $('.js-orders-trend-range').removeClass('active');
+      $('.js-orders-trend-range[data-range="' + range + '"]').addClass('active');
+    }
+
+    function startTrendPolling() {
+      if (trendPollTimer) {
+        clearInterval(trendPollTimer);
+        trendPollTimer = null;
+      }
+
+      if (activeTrendRange !== 'daily') {
+        return;
+      }
+
+      trendPollTimer = setInterval(function () {
+        fetchTrendData('daily', true);
+      }, 30000);
+    }
+
+    function fetchTrendData(range, keepRange) {
+      var requestedRange = range || activeTrendRange;
+
+      $.get("<?= site_url('admin/api/orders/analytics') ?>", { range: requestedRange }, function (res) {
+        if (!res || !res.success || !trendChart) {
+          return;
+        }
+
+        updateCsrf(res);
+
+        if (!keepRange) {
+          activeTrendRange = res.range || requestedRange;
+        }
+
+        trendChart.updateOptions({
+          xaxis: {
+            categories: res.categories || []
+          }
+        }, false, false, false);
+
+        trendChart.updateSeries(res.series || [{ name: 'Toplam Tutar', data: [] }], true);
+        setActiveTrendButton(activeTrendRange);
+        startTrendPolling();
+      });
+    }
+
+    function initTrendChart() {
+      var el = document.querySelector('#ordersTrendChart');
+      if (!el || typeof ApexCharts === 'undefined') {
+        return;
+      }
+
+      trendChart = new ApexCharts(el, {
+        chart: {
+          type: 'line',
+          height: 320,
+          toolbar: { show: false },
+          animations: { enabled: true }
+        },
+        stroke: {
+          curve: 'smooth',
+          width: 3
+        },
+        series: [{
+          name: 'Toplam Tutar',
+          data: []
+        }],
+        xaxis: {
+          categories: [],
+          labels: {
+            rotate: -35
+          }
+        },
+        yaxis: {
+          labels: {
+            formatter: function (value) {
+              return Number(value || 0).toLocaleString('tr-TR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              }) + ' ' + tlSymbol;
+            }
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: function (value) {
+              return Number(value || 0).toLocaleString('tr-TR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              }) + ' ' + tlSymbol;
+            }
+          }
+        },
+        noData: {
+          text: 'Veri yükleniyor...'
+        }
+      });
+
+      trendChart.render();
+      fetchTrendData('daily');
+    }
+
+    function fetchStatusDistribution() {
+      $.get("<?= site_url('admin/api/orders/status-distribution') ?>", { range: 'weekly' }, function (res) {
+        if (!res || !res.success || !statusDistributionChart) {
+          return;
+        }
+
+        updateCsrf(res);
+
+        statusDistributionChart.updateOptions({
+          xaxis: {
+            categories: res.categories || ['Son 7 Gün']
+          }
+        }, false, false, false);
+
+        statusDistributionChart.updateSeries(res.series || [], true);
+      });
+    }
+
+    function initStatusDistributionChart() {
+      var el = document.querySelector('#ordersStatusDistributionChart');
+      if (!el || typeof ApexCharts === 'undefined') {
+        return;
+      }
+
+      statusDistributionChart = new ApexCharts(el, {
+        chart: {
+          type: 'bar',
+          height: 320,
+          stacked: true,
+          toolbar: { show: false }
+        },
+        plotOptions: {
+          bar: {
+            horizontal: true,
+            borderRadius: 4
+          }
+        },
+        series: [],
+        xaxis: {
+          categories: ['Son 7 Gün'],
+          title: {
+            text: 'Sipariş Adedi'
+          }
+        },
+        yaxis: {
+          title: {
+            text: 'Dönem'
+          }
+        },
+        legend: {
+          position: 'bottom'
+        },
+        dataLabels: {
+          enabled: false
+        },
+        noData: {
+          text: 'Veri yükleniyor...'
+        }
+      });
+
+      statusDistributionChart.render();
+      fetchStatusDistribution();
     }
 
     var table = $('#ordersTable').DataTable({
@@ -319,6 +517,16 @@
       applySmartFilter(key);
     });
 
+    $(document).on('click', '.js-orders-trend-range', function () {
+      var range = ($(this).data('range') || '').toString();
+      if (!range || range === activeTrendRange) {
+        return;
+      }
+
+      activeTrendRange = range;
+      fetchTrendData(range);
+    });
+
     $(document).on('click', '.js-inline-status-item', function (e) {
       e.preventDefault();
       var $item = $(this);
@@ -341,6 +549,7 @@
         }
 
         table.ajax.reload(null, false);
+        fetchStatusDistribution();
         if (res.summary) {
           refreshSummaryCards(res.summary);
         } else {
@@ -354,6 +563,8 @@
     });
 
     setActiveSummaryCard('all');
+    initTrendChart();
+    initStatusDistributionChart();
   })();
 </script>
 <?= $this->endSection() ?>

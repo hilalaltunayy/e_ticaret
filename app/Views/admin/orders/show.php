@@ -1,5 +1,51 @@
 <?= $this->extend('admin/layouts/main') ?>
 
+<?= $this->section('styles') ?>
+<style>
+    .order-timeline {
+        position: relative;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .order-timeline-item {
+        position: relative;
+        padding-left: 28px;
+        padding-bottom: 18px;
+    }
+
+    .order-timeline-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .order-timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 9px;
+        top: 24px;
+        bottom: -8px;
+        width: 2px;
+        background: #e9ecef;
+    }
+
+    .order-timeline-item:last-child::before {
+        display: none;
+    }
+
+    .order-timeline-dot {
+        position: absolute;
+        left: 4px;
+        top: 6px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+    }
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 <?php
 $order = $order ?? [];
@@ -15,6 +61,22 @@ $formatDate = static function (?string $value): string {
     $v = trim((string) $value);
     return $v !== '' ? $v : '-';
 };
+
+$timelineActionMap = [
+    'order_created' => 'Sipariş oluşturuldu',
+    'payment_updated' => 'Ödeme durumu güncellendi',
+    'payment_status_changed' => 'Ödeme durumu güncellendi',
+    'status_updated' => 'Sipariş durumu güncellendi',
+    'status_changed' => 'Sipariş durumu güncellendi',
+    'shipping_updated' => 'Kargo bilgisi güncellendi',
+    'admin_note_added' => 'Admin notu eklendi',
+    'cancelled' => 'Sipariş iptal edildi',
+    'order_cancelled' => 'Sipariş iptal edildi',
+    'return_started' => 'İade başlatıldı',
+    'return_completed' => 'İade tamamlandı',
+];
+
+$timelineLogs = array_slice($logs, 0, 8);
 ?>
 
 <div class="page-header">
@@ -46,8 +108,9 @@ $formatDate = static function (?string $value): string {
     <div class="alert alert-danger"><?= esc(session()->getFlashdata('error')) ?></div>
 <?php endif; ?>
 
+<div class="container-fluid px-0">
 <div class="row g-3">
-    <div class="col-12 col-xl-8">
+    <div class="col-12 col-xl-7">
         <div class="card">
             <div class="card-header"><h5 class="mb-0">Sipariş Bilgisi</h5></div>
             <div class="card-body">
@@ -70,6 +133,66 @@ $formatDate = static function (?string $value): string {
                         <strong><?= esc(number_format((float) ($order['total_amount'] ?? 0), 2, ',', '.')) ?> &#8378;</strong>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Sipariş Zaman Çizelgesi</h5>
+            </div>
+            <div class="card-body">
+                <?php if ($timelineLogs === []): ?>
+                    <p class="text-muted mb-0">Henüz kayıtlı işlem geçmişi yok.</p>
+                <?php else: ?>
+                    <ul class="order-timeline">
+                        <?php foreach ($timelineLogs as $timelineLog): ?>
+                            <?php
+                            $action = trim((string) ($timelineLog['action'] ?? ''));
+                            $title = $timelineActionMap[$action] ?? 'İşlem';
+                            $message = trim((string) ($timelineLog['message'] ?? ''));
+                            $fromStatus = trim((string) ($timelineLog['from_status'] ?? ''));
+                            $toStatus = trim((string) ($timelineLog['to_status'] ?? ''));
+                            $metaText = '';
+                            $metaRaw = trim((string) ($timelineLog['meta_json'] ?? ''));
+                            if ($metaRaw !== '') {
+                                $meta = json_decode($metaRaw, true);
+                                if (is_array($meta) && $meta !== []) {
+                                    $metaParts = [];
+                                    foreach ($meta as $metaKey => $metaValue) {
+                                        if (is_scalar($metaValue) && trim((string) $metaValue) !== '') {
+                                            $metaParts[] = $metaKey . ': ' . (string) $metaValue;
+                                        }
+                                    }
+                                    $metaText = implode(' | ', $metaParts);
+                                }
+                            }
+
+                            $detailParts = [];
+                            if ($message !== '') {
+                                $detailParts[] = $message;
+                            }
+                            if ($fromStatus !== '' || $toStatus !== '') {
+                                $detailParts[] = ($fromStatus !== '' ? $fromStatus : '-') . ' -> ' . ($toStatus !== '' ? $toStatus : '-');
+                            }
+                            if ($metaText !== '') {
+                                $detailParts[] = $metaText;
+                            }
+                            $detail = $detailParts !== [] ? implode(' | ', $detailParts) : '-';
+                            ?>
+                            <li class="order-timeline-item">
+                                <span class="order-timeline-dot" aria-hidden="true"></span>
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <strong><?= esc($title) ?></strong>
+                                    <span class="text-muted small text-nowrap"><?= esc((string) ($timelineLog['created_at'] ?? '-')) ?></span>
+                                </div>
+                                <div class="text-muted small mt-1"><?= esc($detail) ?></div>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <div class="mt-3">
+                        <a href="#order-history" class="btn btn-link btn-sm p-0">Tüm geçmişe git</a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -117,7 +240,7 @@ $formatDate = static function (?string $value): string {
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" id="order-history">
             <div class="card-header"><h5 class="mb-0">Sipariş Geçmişi</h5></div>
             <div class="card-body">
                 <?php if ($logs === []): ?>
@@ -149,7 +272,7 @@ $formatDate = static function (?string $value): string {
         </div>
     </div>
 
-    <div class="col-12 col-xl-4">
+    <div class="col-12 col-xl-5">
         <div class="card">
             <div class="card-header"><h5 class="mb-0">Ödeme Bilgisi</h5></div>
             <div class="card-body">
@@ -263,5 +386,6 @@ $formatDate = static function (?string $value): string {
             </div>
         </div>
     </div>
+</div>
 </div>
 <?= $this->endSection() ?>

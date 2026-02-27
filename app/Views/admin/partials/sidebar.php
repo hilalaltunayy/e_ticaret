@@ -1,4 +1,10 @@
-﻿<nav class="pc-sidebar">
+<?php
+$currentPath = trim(service('uri')->getPath(), '/');
+$isActive = static function (string $path) use ($currentPath): string {
+  return $currentPath === trim($path, '/') ? ' active' : '';
+};
+?>
+<nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
       <a href="<?= site_url('admin/dashboard') ?>" class="b-brand d-flex align-items-center">
@@ -45,7 +51,7 @@
           <label>Admin Erişim</label>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
             <span class="pc-micon">
               <svg class="pc-icon"><use xlink:href="#custom-status-up"></use></svg>
             </span>
@@ -57,7 +63,7 @@
           <label>Ürün Yönetimi</label>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/products') ?>" class="pc-link">
+          <a href="<?= site_url('admin/products') ?>" class="pc-link<?= $isActive('admin/products') ?>">
             <span class="pc-micon">
               <svg class="pc-icon"><use xlink:href="#custom-shopping-bag"></use></svg>
             </span>
@@ -69,7 +75,7 @@
           <label>Stok Yönetimi</label>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/stock') ?>" class="pc-link">
+          <a href="<?= site_url('admin/stock') ?>" class="pc-link<?= $isActive('admin/stock') ?>">
             <span class="pc-micon">
               <svg class="pc-icon"><use xlink:href="#custom-box-1"></use></svg>
             </span>
@@ -81,7 +87,7 @@
           <label>Sipariş Yönetimi</label>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/orders') ?>" class="pc-link">
+          <a href="<?= site_url('admin/orders') ?>" class="pc-link<?= $isActive('admin/orders') ?>">
             <span class="pc-micon">
               <svg class="pc-icon"><use xlink:href="#custom-bill"></use></svg>
             </span>
@@ -89,11 +95,67 @@
           </a>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/orders/statuses') ?>" class="pc-link">
+          <a href="<?= site_url('admin/shipping') ?>" class="pc-link<?= $isActive('admin/shipping') ?>">
             <span class="pc-micon">
-              <svg class="pc-icon"><use xlink:href="#custom-clipboard-text"></use></svg>
+              <i class="ti ti-truck"></i>
             </span>
-            <span class="pc-mtext">Sipariş Durumları</span>
+            <span class="pc-mtext">Kargo Takip</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/shipping/automation') ?>" class="pc-link<?= $isActive('admin/shipping/automation') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-truck"></i>
+            </span>
+            <span class="pc-mtext">Kargo Optimizasyonu</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>OPERASYON</label>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/pricing') ?>" class="pc-link<?= $isActive('admin/pricing') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-percentage"></i>
+            </span>
+            <span class="pc-mtext">Kampanya / Fiyat Paneli</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/customers') ?>" class="pc-link<?= $isActive('admin/customers') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-users"></i>
+            </span>
+            <span class="pc-mtext">Müşteri Operasyonu</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/automation') ?>" class="pc-link<?= $isActive('admin/automation') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-adjustments-automation"></i>
+            </span>
+            <span class="pc-mtext">Otomasyon & Akıllı Kurallar</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>SİSTEM</label>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/notifications') ?>" class="pc-link<?= $isActive('admin/notifications') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-bell"></i>
+            </span>
+            <span class="pc-mtext">Bildirim Yönetimi</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/settings') ?>" class="pc-link<?= $isActive('admin/settings') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-settings"></i>
+            </span>
+            <span class="pc-mtext">Ayarlar</span>
           </a>
         </li>
       </ul>
