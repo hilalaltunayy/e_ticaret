@@ -106,8 +106,18 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_orders'], function ($routes) {
 
     $routes->get('orders', 'Admin\Orders::index');
+    $routes->get('api/orders', 'Admin\Orders::datatables');
+    $routes->get('orders/summary', 'Admin\Orders::summary');
+    $routes->get('orders/statuses', 'Admin\OrderStatuses::index');
+    $routes->get('orders/(:segment)', 'Admin\Orders::show/$1');
     $routes->post('orders/create', 'Admin\Orders::create');
+    $routes->post('orders/update-status', 'Admin\Orders::inlineStatusUpdate');
+    $routes->post('orders/update-status/(:segment)', 'Admin\Orders::updateStatus/$1');
+    $routes->post('orders/update-shipping/(:segment)', 'Admin\Orders::updateShipping/$1');
+    $routes->post('orders/add-note/(:segment)', 'Admin\Orders::addNote/$1');
     $routes->post('orders/ship/(:segment)', 'Admin\Orders::ship/$1');
     $routes->post('orders/cancel/(:segment)', 'Admin\Orders::cancel/$1');
     $routes->post('orders/return/(:segment)', 'Admin\Orders::return/$1');
+    $routes->post('orders/return/start/(:segment)', 'Admin\Orders::startReturn/$1');
+    $routes->post('orders/return/complete/(:segment)', 'Admin\Orders::completeReturn/$1');
 });

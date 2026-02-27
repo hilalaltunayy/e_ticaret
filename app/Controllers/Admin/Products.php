@@ -25,7 +25,6 @@ class Products extends BaseController
             'userRole' => $user['role'] ?? '',
         ]);
     }
-
     public function datatables()
     {
         $params = $this->request->getGet();
@@ -52,22 +51,25 @@ class Products extends BaseController
                 'stock_reserved' => (int) ($row['stock_reserved'] ?? 0),
                 'stock_available' => (int) ($row['stock_available'] ?? 0),
                 'is_active' => $isActive,
-                'actions' => '<a href="' . esc($editHref) . '" class="btn btn-sm btn-outline-primary me-1">DÃ¼zenle</a>'
+                'actions' => '<a href="' . esc($editHref) . '" class="btn btn-sm btn-outline-primary me-1">Düzenle</a>'
                     . '<form method="post" action="' . esc($deactivateHref) . '" class="d-inline">'
                     . csrf_field()
-                    . '<button type="submit" class="btn btn-sm btn-outline-danger">SatÄ±ÅŸtan kaldÄ±r</button>'
+                    . '<button type="submit" class="btn btn-sm btn-outline-danger">Satıştan kaldır</button>'
                     . '</form>',
             ];
         }, $rows);
 
-        return $this->response->setJSON([
+        $payload = [
             'draw' => (int) ($params['draw'] ?? 0),
             'recordsTotal' => (int) ($result['recordsTotal'] ?? 0),
             'recordsFiltered' => (int) ($result['recordsFiltered'] ?? 0),
             'data' => $data,
-        ]);
-    }
+        ];
 
+        return $this->response
+            ->setHeader('Content-Type', 'application/json; charset=utf-8')
+            ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
     public function create()
     {
         $user = session()->get('user') ?? [];
@@ -311,6 +313,7 @@ class Products extends BaseController
             ->with('new_category_id', $categoryId);
     }
 }
+
 
 
 

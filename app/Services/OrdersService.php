@@ -57,4 +57,9 @@ class OrdersService
     {
         return $this->orderModel->returnOrder($orderId, $actorUserId);
     }
+
+    public function datatablesList(array $params): array
+    {
+        return $this->orderModel->datatablesList($params);
+    }
 }

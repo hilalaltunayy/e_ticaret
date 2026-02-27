@@ -88,6 +88,14 @@
             <span class="pc-mtext">Siparişler</span>
           </a>
         </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/orders/statuses') ?>" class="pc-link">
+            <span class="pc-micon">
+              <svg class="pc-icon"><use xlink:href="#custom-clipboard-text"></use></svg>
+            </span>
+            <span class="pc-mtext">Sipariş Durumları</span>
+          </a>
+        </li>
       </ul>
     </div>
   </div>
