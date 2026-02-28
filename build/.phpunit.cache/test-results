@@ -1,0 +1,1 @@
+{"version":2,"defects":[],"times":{"ShippingSimulationServiceTest::testCodFiltering":0.004,"ShippingSimulationServiceTest::testCityMatchWithNullFallback":0,"ShippingSimulationServiceTest::testDesiRangeControl":0.003,"ShippingSimulationServiceTest::testSlaCriteria":0,"ShippingSimulationServiceTest::testTieBreakerOrder":0}}

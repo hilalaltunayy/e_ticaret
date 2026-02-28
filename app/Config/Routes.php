@@ -75,12 +75,6 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('dashboard', 'Admin\Dashboard::index');
     $routes->get('stock', 'Admin\Stock::index');
     $routes->get('shipping', 'Admin\Shipping::index');
-    $routes->get('shipping/automation', 'Admin\ShippingAutomation::index');
-    $routes->get('shipping/automation/rules', 'Admin\ShippingAutomation::rules');
-    $routes->post('shipping/automation/rules', 'Admin\ShippingAutomation::create');
-    $routes->post('shipping/automation/rules/(:segment)', 'Admin\ShippingAutomation::update/$1');
-    $routes->post('shipping/automation/rules/(:segment)/toggle', 'Admin\ShippingAutomation::toggle/$1');
-    $routes->post('shipping/automation/rules/(:segment)/delete', 'Admin\ShippingAutomation::delete/$1');
     $routes->get('shipping/companies/create', 'Admin\ShippingCompanies::create');
     $routes->post('shipping/companies/store', 'Admin\ShippingCompanies::store');
     $routes->get('pricing', 'Admin\Pricing::index');
@@ -88,6 +82,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('automation', 'Admin\Automation::index');
     $routes->get('notifications', 'Admin\Notifications::index');
     $routes->get('settings', 'Admin\Settings::index');
+    $routes->get('settings/permissions', 'Admin\SettingsPermissionsController::index');
+    $routes->post('settings/permissions/update', 'Admin\SettingsPermissionsController::update');
     $routes->get('stock/moves', 'Admin\Stock::moves');
     $routes->get('stock/move/(:segment)', 'Admin\StockMove::create/$1');
     $routes->post('stock/move/(:segment)', 'Admin\StockMove::store/$1');
@@ -113,6 +109,15 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     // (ileride)
     // $routes->get('users', 'Admin\Users::index');
     // $routes->get('roles', 'Admin\Roles::index');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_shipping'], function ($routes) {
+    $routes->get('shipping/automation', 'Admin\ShippingAutomationController::index');
+    $routes->get('shipping/automation/rules', 'Admin\ShippingAutomationController::rules');
+    $routes->get('shipping/automation/rules/show/(:segment)', 'Admin\ShippingAutomationController::show/$1');
+    $routes->post('shipping/automation/rules/create', 'Admin\ShippingAutomationController::create');
+    $routes->post('shipping/automation/rules/update/(:segment)', 'Admin\ShippingAutomationController::update/$1');
+    $routes->post('shipping/automation/simulate', 'Admin\ShippingAutomationController::simulate');
 });
 
 // ----------------------------------------------------

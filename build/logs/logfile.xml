@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="ShippingSimulationServiceTest" file="C:\code\e_ticaret\tests\unit\ShippingSimulationServiceTest.php" tests="5" assertions="6" errors="0" failures="0" skipped="0" time="0.023888">
+    <testcase name="testCodFiltering" file="C:\code\e_ticaret\tests\unit\ShippingSimulationServiceTest.php" line="22" class="ShippingSimulationServiceTest" classname="ShippingSimulationServiceTest" assertions="2" time="0.016922"/>
+    <testcase name="testCityMatchWithNullFallback" file="C:\code\e_ticaret\tests\unit\ShippingSimulationServiceTest.php" line="54" class="ShippingSimulationServiceTest" classname="ShippingSimulationServiceTest" assertions="1" time="0.001236"/>
+    <testcase name="testDesiRangeControl" file="C:\code\e_ticaret\tests\unit\ShippingSimulationServiceTest.php" line="91" class="ShippingSimulationServiceTest" classname="ShippingSimulationServiceTest" assertions="1" time="0.003900"/>
+    <testcase name="testSlaCriteria" file="C:\code\e_ticaret\tests\unit\ShippingSimulationServiceTest.php" line="128" class="ShippingSimulationServiceTest" classname="ShippingSimulationServiceTest" assertions="1" time="0.000938"/>
+    <testcase name="testTieBreakerOrder" file="C:\code\e_ticaret\tests\unit\ShippingSimulationServiceTest.php" line="163" class="ShippingSimulationServiceTest" classname="ShippingSimulationServiceTest" assertions="1" time="0.000892"/>
+  </testsuite>
+</testsuites>

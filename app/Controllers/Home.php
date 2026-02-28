@@ -4,7 +4,12 @@ namespace App\Controllers;
 
 class Home extends BaseController
 {
-    public function index() {
+    public function index()
+    {
+        $session = session();
+        $sessionUser = $session->get('user');
+        $sessionUserData = $session->get('userData');
+
         $db = \Config\Database::connect();
         
         // 1. Sadece BasÄ±lÄ± ÃœrÃ¼nlerin Ä°statistikleri
@@ -28,7 +33,10 @@ class Home extends BaseController
                                 ->groupBy('products.category_id')
                                 ->get()->getResult();
 
+        $data['userName'] = (string) ($sessionUser['name'] ?? $sessionUserData['name'] ?? 'Kullanıcı');
+        $data['roleName'] = (string) ($sessionUser['role'] ?? $sessionUserData['role'] ?? 'kullanıcı');
+        $data['permissions'] = $session->get('permissions') ?? [];
+
         return view('site/home/index', $data);
     }
 }
-

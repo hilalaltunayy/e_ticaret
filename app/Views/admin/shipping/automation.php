@@ -3,7 +3,6 @@
 <?= $this->section('content') ?>
 <?php
 $companies = is_array($companies ?? null) ? $companies : [];
-$initialRules = is_array($initialRules ?? null) ? $initialRules : [];
 $initialType = (string) ($initialType ?? 'city');
 $kpi = is_array($kpi ?? null) ? $kpi : [];
 ?>
@@ -14,12 +13,12 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
         <ul class="breadcrumb">
           <li class="breadcrumb-item"><a href="<?= site_url('admin/dashboard') ?>">Yönetim</a></li>
           <li class="breadcrumb-item"><a href="<?= site_url('admin/shipping') ?>">Kargo Takip</a></li>
-          <li class="breadcrumb-item" aria-current="page">Kargo Optimizasyonu</li>
+          <li class="breadcrumb-item" aria-current="page">Kargo Otomasyon Kuralları</li>
         </ul>
       </div>
       <div class="col-sm-6">
         <div class="page-header-title">
-          <h2 class="mb-0"><?= esc($title ?? 'Kargo Optimizasyonu') ?></h2>
+          <h2 class="mb-0"><?= esc($title ?? 'Kargo Otomasyon Kuralları') ?></h2>
         </div>
       </div>
     </div>
@@ -31,7 +30,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
     <div class="card statistics-card-1 overflow-hidden">
       <div class="card-body">
         <h6 class="mb-1 text-muted">Aktif Kural</h6>
-        <h4 class="mb-0" id="kpiActiveRule"><?= (int) ($kpi['active_rule'] ?? 0) ?></h4>
+        <h4 class="mb-0"><?= (int) ($kpi['active_rule'] ?? 0) ?></h4>
       </div>
     </div>
   </div>
@@ -39,7 +38,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
     <div class="card statistics-card-1 overflow-hidden">
       <div class="card-body">
         <h6 class="mb-1 text-muted">Otomatik Atama (7g)</h6>
-        <h4 class="mb-0" id="kpiAutoAssignment"><?= (int) ($kpi['auto_assignment_7d'] ?? 0) ?></h4>
+        <h4 class="mb-0"><?= (int) ($kpi['auto_assignment_7d'] ?? 0) ?></h4>
       </div>
     </div>
   </div>
@@ -47,7 +46,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
     <div class="card statistics-card-1 overflow-hidden">
       <div class="card-body">
         <h6 class="mb-1 text-muted">SLA Uyum %</h6>
-        <h4 class="mb-0" id="kpiSlaCompliance"><?= (int) ($kpi['sla_compliance'] ?? 0) ?>%</h4>
+        <h4 class="mb-0"><?= (int) ($kpi['sla_compliance'] ?? 0) ?>%</h4>
       </div>
     </div>
   </div>
@@ -55,7 +54,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
     <div class="card statistics-card-1 overflow-hidden">
       <div class="card-body">
         <h6 class="mb-1 text-muted">Ortalama Teslim Süresi</h6>
-        <h4 class="mb-0" id="kpiAvgDelivery"><?= esc((string) ($kpi['avg_delivery_days'] ?? '0.0')) ?> gün</h4>
+        <h4 class="mb-0"><?= esc((string) ($kpi['avg_delivery_days'] ?? '0.0')) ?> gün</h4>
       </div>
     </div>
   </div>
@@ -77,10 +76,11 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
         <button class="nav-link" id="tab-sla" data-bs-toggle="tab" data-bs-target="#pane-sla" data-rule-type="sla" type="button" role="tab">SLA Optimizasyonu</button>
       </li>
     </ul>
-    <button type="button" class="btn btn-primary btn-sm" id="btnNewRule" data-action="new-rule">Yeni kural</button>
+    <button type="button" class="btn btn-primary btn-sm" id="btnNewRule">Kural Ekle</button>
   </div>
   <div class="card-body">
-    <div id="ruleAlert" class="alert d-none mb-3" role="alert"></div>
+    <div id="pageAlert" class="alert d-none mb-3" role="alert"></div>
+
     <div class="tab-content">
       <div class="tab-pane fade show active" id="pane-city" role="tabpanel" aria-labelledby="tab-city">
         <div class="table-responsive">
@@ -88,34 +88,14 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
             <thead>
               <tr>
                 <th>Şehir</th>
-                <th>Öncelikli firma</th>
-                <th>İkincil firma</th>
+                <th>Öncelikli Firma</th>
+                <th>İkincil Firma</th>
                 <th>Durum</th>
                 <th class="text-end">İşlemler</th>
               </tr>
             </thead>
-            <tbody id="body-city">
-              <?php if ($initialRules === []): ?>
-                <tr><td colspan="5" class="text-center text-muted py-4">Henüz kural yok.</td></tr>
-              <?php else: ?>
-                <?php foreach ($initialRules as $rule): ?>
-                  <tr data-rule-id="<?= esc((string) ($rule['id'] ?? '')) ?>">
-                    <td><?= esc((string) ($rule['city'] ?? '-')) ?></td>
-                    <td><?= esc((string) ($rule['primary_company_name'] ?? '-')) ?></td>
-                    <td><?= esc((string) ($rule['secondary_company_name'] ?? '-')) ?></td>
-                    <td>
-                      <?php $active = (int) ($rule['is_active'] ?? 0) === 1; ?>
-                      <span class="badge <?= $active ? 'bg-light-success text-success' : 'bg-light-secondary text-secondary' ?>"><?= $active ? 'Aktif' : 'Pasif' ?></span>
-                    </td>
-                    <td class="text-end">
-                      <div class="btn-group btn-group-sm">
-                        <button type="button" class="btn btn-outline-primary" data-action="edit-rule" data-id="<?= esc((string) ($rule['id'] ?? '')) ?>">Düzenle</button>
-                        <button type="button" class="btn btn-outline-danger" data-action="delete-rule" data-id="<?= esc((string) ($rule['id'] ?? '')) ?>">Sil</button>
-                      </div>
-                    </td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php endif; ?>
+            <tbody id="rulesBodyCity">
+              <tr><td colspan="5" class="text-center text-muted py-4">Henüz kural yok.</td></tr>
             </tbody>
           </table>
         </div>
@@ -128,13 +108,14 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
               <tr>
                 <th>Desi Min</th>
                 <th>Desi Max</th>
-                <th>Firma</th>
+                <th>Öncelikli Firma</th>
+                <th>İkincil Firma</th>
                 <th>Durum</th>
                 <th class="text-end">İşlemler</th>
               </tr>
             </thead>
-            <tbody id="body-desi">
-              <tr><td colspan="5" class="text-center text-muted py-4">Henüz kural yok.</td></tr>
+            <tbody id="rulesBodyDesi">
+              <tr><td colspan="6" class="text-center text-muted py-4">Henüz kural yok.</td></tr>
             </tbody>
           </table>
         </div>
@@ -145,13 +126,13 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
           <table class="table table-striped table-hover align-middle mb-0">
             <thead>
               <tr>
-                <th>Kapıda ödeme</th>
-                <th>Firma</th>
+                <th>Kapıda Ödeme</th>
+                <th>Öncelikli Firma</th>
                 <th>Durum</th>
                 <th class="text-end">İşlemler</th>
               </tr>
             </thead>
-            <tbody id="body-cod">
+            <tbody id="rulesBodyCod">
               <tr><td colspan="4" class="text-center text-muted py-4">Henüz kural yok.</td></tr>
             </tbody>
           </table>
@@ -164,13 +145,13 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
             <thead>
               <tr>
                 <th>Şehir</th>
-                <th>SLA hedef gün</th>
-                <th>Firma</th>
+                <th>SLA Hedef Gün</th>
+                <th>Öncelikli Firma</th>
                 <th>Durum</th>
                 <th class="text-end">İşlemler</th>
               </tr>
             </thead>
-            <tbody id="body-sla">
+            <tbody id="rulesBodySla">
               <tr><td colspan="5" class="text-center text-muted py-4">Henüz kural yok.</td></tr>
             </tbody>
           </table>
@@ -180,131 +161,185 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
   </div>
 </div>
 
+<div class="card mb-3">
+  <div class="card-header">
+    <h5 class="mb-0">Simülasyon Motoru</h5>
+  </div>
+  <div class="card-body">
+    <form id="simulationForm" class="row g-3">
+      <?= csrf_field() ?>
+      <div class="col-md-3">
+        <label for="sim_city" class="form-label">Şehir</label>
+        <input type="text" class="form-control" id="sim_city" name="city" required>
+      </div>
+      <div class="col-md-2">
+        <label for="sim_sla_days" class="form-label">SLA (Gün)</label>
+        <input type="number" class="form-control" id="sim_sla_days" name="sla_days" min="0" max="30" required>
+      </div>
+      <div class="col-md-2">
+        <label for="sim_desi" class="form-label">Desi</label>
+        <input type="number" class="form-control" id="sim_desi" name="desi" step="0.01" min="0" max="999" required>
+      </div>
+      <div class="col-md-3 d-flex align-items-end">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="sim_cod" name="cod" value="1">
+          <label class="form-check-label" for="sim_cod">Kapıda Ödeme</label>
+        </div>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Simüle Et</button>
+      </div>
+    </form>
+
+    <div id="simulationAlert" class="alert alert-danger d-none mt-3" role="alert"></div>
+
+    <div id="simulationResult" class="d-none mt-3">
+      <div class="card border">
+        <div class="card-body">
+          <h6 class="mb-2">Seçilen Firma</h6>
+          <h4 class="mb-3" id="simSelectedCompany">-</h4>
+          <ul class="mb-3" id="simReasonList"></ul>
+          <h6 class="mb-2">Uygun Adaylar (Top 3)</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>Firma</th>
+                  <th>Maliyet</th>
+                  <th>SLA</th>
+                  <th>Öncelik</th>
+                </tr>
+              </thead>
+              <tbody id="simCandidatesBody">
+                <tr><td colspan="4" class="text-center text-muted py-3">Sonuç yok.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="ruleModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog">
     <div class="modal-content">
-      <form id="ruleForm" method="post" action="<?= site_url('admin/shipping/automation/rules') ?>">
+      <form id="ruleForm" method="post" action="#">
         <div class="modal-header">
-          <h5 class="modal-title" id="ruleModalTitle">Yeni Kural Ekle</h5>
+          <h5 class="modal-title" id="ruleModalTitle">Kural Ekle</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
         </div>
         <div class="modal-body">
           <?= csrf_field() ?>
           <input type="hidden" id="ruleId" value="">
-          <div id="ruleFormAlert" class="alert alert-danger d-none"></div>
+          <input type="hidden" id="ruleTypeInput" name="rule_type" value="city">
 
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label" for="rule_type">Kural tipi</label>
-              <select class="form-select" id="rule_type" name="rule_type">
-                <option value="city">city</option>
-                <option value="desi">desi</option>
-                <option value="cod">cod</option>
-                <option value="sla">sla</option>
-              </select>
-            </div>
-            <div class="col-md-6 d-flex align-items-end">
-              <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
-                <label class="form-check-label" for="is_active">aktif_mi</label>
-              </div>
-            </div>
-          </div>
+          <div id="modalAlert" class="alert alert-danger d-none mb-3" role="alert"></div>
 
-          <div class="row g-3 mt-1" id="group-city">
-            <div class="col-md-4">
-              <label class="form-label" for="city">Şehir</label>
+          <div class="row g-3" id="cityFields">
+            <div class="col-12">
+              <label for="city" class="form-label">Şehir</label>
               <input type="text" class="form-control" id="city" name="city">
             </div>
-            <div class="col-md-4">
-              <label class="form-label" for="city_primary_company">Öncelikli firma</label>
-              <select class="form-select company-picker" id="city_primary_company" data-role="primary">
+            <div class="col-12">
+              <label for="cityPrimaryCompany" class="form-label">Öncelikli Firma</label>
+              <select class="form-select" id="cityPrimaryCompany">
                 <option value="">Seçiniz</option>
-                <?php foreach ($companies as $company): ?><option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option><?php endforeach; ?>
+                <?php foreach ($companies as $company): ?>
+                  <option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
-            <div class="col-md-4">
-              <label class="form-label" for="secondary_company_id">İkincil firma</label>
-              <select class="form-select" id="secondary_company_id" name="secondary_company_id">
+            <div class="col-12">
+              <label for="citySecondaryCompany" class="form-label">İkincil Firma</label>
+              <select class="form-select" id="citySecondaryCompany">
                 <option value="">Seçiniz</option>
-                <?php foreach ($companies as $company): ?><option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option><?php endforeach; ?>
+                <?php foreach ($companies as $company): ?>
+                  <option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
           </div>
 
-          <div class="row g-3 mt-1 d-none" id="group-desi">
-            <div class="col-md-4">
-              <label class="form-label" for="desi_min">Min desi</label>
+          <div class="row g-3 d-none" id="desiFields">
+            <div class="col-6">
+              <label for="desi_min" class="form-label">Desi Min</label>
               <input type="number" class="form-control" id="desi_min" name="desi_min" step="0.01" min="0">
             </div>
-            <div class="col-md-4">
-              <label class="form-label" for="desi_max">Max desi</label>
+            <div class="col-6">
+              <label for="desi_max" class="form-label">Desi Max</label>
               <input type="number" class="form-control" id="desi_max" name="desi_max" step="0.01" min="0">
             </div>
-            <div class="col-md-4">
-              <label class="form-label" for="desi_primary_company">Firma</label>
-              <select class="form-select company-picker" id="desi_primary_company" data-role="primary">
+            <div class="col-12">
+              <label for="desiPrimaryCompany" class="form-label">Öncelikli Firma</label>
+              <select class="form-select" id="desiPrimaryCompany">
                 <option value="">Seçiniz</option>
-                <?php foreach ($companies as $company): ?><option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option><?php endforeach; ?>
+                <?php foreach ($companies as $company): ?>
+                  <option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="desiSecondaryCompany" class="form-label">İkincil Firma</label>
+              <select class="form-select" id="desiSecondaryCompany">
+                <option value="">Seçiniz</option>
+                <?php foreach ($companies as $company): ?>
+                  <option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
           </div>
 
-          <div class="row g-3 mt-1 d-none" id="group-cod">
-            <div class="col-md-4">
-              <label class="form-label">Kapıda ödeme</label>
-              <input class="form-control" type="text" value="Evet" disabled>
-            </div>
-            <div class="col-md-8">
-              <label class="form-label" for="cod_primary_company">Firma</label>
-              <select class="form-select company-picker" id="cod_primary_company" data-role="primary">
+          <div class="row g-3 d-none" id="codFields">
+            <div class="col-12">
+              <label for="codPrimaryCompany" class="form-label">Öncelikli Firma</label>
+              <select class="form-select" id="codPrimaryCompany">
                 <option value="">Seçiniz</option>
-                <?php foreach ($companies as $company): ?><option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option><?php endforeach; ?>
+                <?php foreach ($companies as $company): ?>
+                  <option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
           </div>
 
-          <div class="row g-3 mt-1 d-none" id="group-sla">
-            <div class="col-md-4">
-              <label class="form-label" for="sla_city">Şehir (opsiyonel)</label>
+          <div class="row g-3 d-none" id="slaFields">
+            <div class="col-12">
+              <label for="sla_city" class="form-label">Şehir</label>
               <input type="text" class="form-control" id="sla_city">
             </div>
-            <div class="col-md-4">
-              <label class="form-label" for="sla_days">SLA hedef gün</label>
-              <input type="number" class="form-control" id="sla_days" name="sla_days" min="1">
+            <div class="col-12">
+              <label for="sla_days" class="form-label">SLA Hedef Gün</label>
+              <input type="number" class="form-control" id="sla_days" name="sla_days" min="1" step="1">
             </div>
-            <div class="col-md-4">
-              <label class="form-label" for="sla_primary_company">Firma</label>
-              <select class="form-select company-picker" id="sla_primary_company" data-role="primary">
+            <div class="col-12">
+              <label for="slaPrimaryCompany" class="form-label">Öncelikli Firma</label>
+              <select class="form-select" id="slaPrimaryCompany">
                 <option value="">Seçiniz</option>
-                <?php foreach ($companies as $company): ?><option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option><?php endforeach; ?>
+                <?php foreach ($companies as $company): ?>
+                  <option value="<?= esc((string) ($company['id'] ?? '')) ?>"><?= esc((string) ($company['name'] ?? '')) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-1">
+            <div class="col-12">
+              <label for="is_active" class="form-label">Durum</label>
+              <select class="form-select" id="is_active" name="is_active">
+                <option value="1">Aktif</option>
+                <option value="0">Pasif</option>
               </select>
             </div>
           </div>
 
           <input type="hidden" id="primary_company_id" name="primary_company_id" value="">
+          <input type="hidden" id="secondary_company_id" name="secondary_company_id" value="">
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">İptal</button>
+          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Vazgeç</button>
           <button type="submit" class="btn btn-primary">Kaydet</button>
         </div>
       </form>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="deleteRuleModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Kuralı Sil</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">Bu kuralı silmek istediğinize emin misiniz?</div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Vazgeç</button>
-        <button type="button" class="btn btn-danger" id="confirmDeleteRule">Sil</button>
-      </div>
     </div>
   </div>
 </div>
@@ -313,35 +348,56 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
 <?= $this->section('pageScripts') ?>
 <script>
   (function () {
-    var apiBase = "<?= site_url('admin/shipping/automation/rules') ?>";
-    var currentType = "<?= esc($initialType) ?>";
-    var loadedTypes = { city: true, desi: false, cod: false, sla: false };
-    var ruleMap = {};
-    var deleteRuleId = '';
+    var allowedTypes = ['city', 'desi', 'cod', 'sla'];
+    var initType = "<?= esc($initialType) ?>";
+    var activeType = allowedTypes.indexOf(initType) !== -1 ? initType : 'city';
 
-    var ruleForm = document.getElementById('ruleForm');
-    var ruleType = document.getElementById('rule_type');
-    var ruleModal = (typeof bootstrap !== 'undefined') ? new bootstrap.Modal(document.getElementById('ruleModal')) : null;
-    var deleteModal = (typeof bootstrap !== 'undefined') ? new bootstrap.Modal(document.getElementById('deleteRuleModal')) : null;
+    var listEndpoint = "<?= site_url('admin/shipping/automation/rules') ?>";
+    var showEndpointBase = "<?= site_url('admin/shipping/automation/rules/show') ?>";
+    var createEndpoint = "<?= site_url('admin/shipping/automation/rules/create') ?>";
+    var updateEndpointBase = "<?= site_url('admin/shipping/automation/rules/update') ?>";
+    var simulateEndpoint = "<?= site_url('admin/shipping/automation/simulate') ?>";
 
-    function esc(v) {
-      return String(v === null || v === undefined ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#039;');
+    var modalEl = document.getElementById('ruleModal');
+    var modal = typeof bootstrap !== 'undefined' ? new bootstrap.Modal(modalEl) : null;
+    var form = document.getElementById('ruleForm');
+    var simulationForm = document.getElementById('simulationForm');
+
+    function esc(value) {
+      return String(value === null || value === undefined ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
-    function flash(message, type) {
-      var alertBox = document.getElementById('ruleAlert');
+    function showPageAlert(message, type) {
+      var alertBox = document.getElementById('pageAlert');
       if (!alertBox) return;
       if (!message) {
         alertBox.className = 'alert d-none mb-3';
         alertBox.textContent = '';
         return;
       }
-      alertBox.className = 'alert alert-' + (type || 'info') + ' mb-3';
+      alertBox.className = 'alert alert-' + (type || 'danger') + ' mb-3';
       alertBox.textContent = message;
     }
 
-    function formError(message) {
-      var box = document.getElementById('ruleFormAlert');
+    function showModalAlert(message) {
+      var alertBox = document.getElementById('modalAlert');
+      if (!alertBox) return;
+      if (!message) {
+        alertBox.classList.add('d-none');
+        alertBox.textContent = '';
+        return;
+      }
+      alertBox.classList.remove('d-none');
+      alertBox.textContent = message;
+    }
+
+    function showSimulationAlert(message) {
+      var box = document.getElementById('simulationAlert');
       if (!box) return;
       if (!message) {
         box.classList.add('d-none');
@@ -352,272 +408,319 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
       box.textContent = message;
     }
 
+    function renderSimulationResult(payload) {
+      var resultBox = document.getElementById('simulationResult');
+      var selected = payload && payload.selected ? payload.selected : null;
+      var candidates = payload && payload.top_candidates ? payload.top_candidates : [];
+      var selectedCompany = document.getElementById('simSelectedCompany');
+      var reasonList = document.getElementById('simReasonList');
+      var candidatesBody = document.getElementById('simCandidatesBody');
+
+      if (!resultBox || !selectedCompany || !reasonList || !candidatesBody) return;
+
+      if (!selected) {
+        selectedCompany.textContent = 'Uygun firma bulunamadı.';
+        reasonList.innerHTML = '<li>Girilen kriterlere uygun aktif kural bulunmadı.</li>';
+      } else {
+        selectedCompany.textContent = selected.company_name || '-';
+        var reason = selected.reason || {};
+        reasonList.innerHTML =
+          '<li>Şehir uyumu: ' + (reason.city_match ? 'Evet' : 'Hayır') + '</li>' +
+          '<li>SLA uyumu: ' + (reason.sla_match ? 'Evet' : 'Hayır') + '</li>' +
+          '<li>Kapıda ödeme uyumu: ' + (reason.cod_match ? 'Evet' : 'Hayır') + '</li>' +
+          '<li>Desi uyumu: ' + (reason.desi_match ? 'Evet' : 'Hayır') + '</li>' +
+          '<li>Maliyet: ' + esc(reason.cost || '-') + '</li>' +
+          '<li>SLA: ' + esc(reason.sla || '-') + '</li>' +
+          '<li>Öncelik: ' + esc(reason.priority || '-') + '</li>';
+      }
+
+      if (!candidates.length) {
+        candidatesBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Sonuç yok.</td></tr>';
+      } else {
+        var html = '';
+        candidates.forEach(function (item) {
+          html += '<tr>'
+            + '<td>' + esc(item.company_name || '-') + '</td>'
+            + '<td>' + esc(item.cost || '-') + '</td>'
+            + '<td>' + esc(item.sla || '-') + '</td>'
+            + '<td>' + esc(item.priority || '-') + '</td>'
+            + '</tr>';
+        });
+        candidatesBody.innerHTML = html;
+      }
+
+      resultBox.classList.remove('d-none');
+    }
+
+    function statusText(isActive) {
+      return Number(isActive) === 1 ? 'Aktif' : 'Pasif';
+    }
+
+    function statusClass(isActive) {
+      return Number(isActive) === 1 ? 'badge bg-light-success text-success' : 'badge bg-light-secondary text-secondary';
+    }
+
     function emptyRow(type) {
-      var colspan = type === 'cod' ? 4 : 5;
-      return '<tr><td colspan="' + colspan + '" class="text-center text-muted py-4">Henüz kural yok.</td></tr>';
+      if (type === 'city') return '<tr><td colspan="5" class="text-center text-muted py-4">Henüz kural yok.</td></tr>';
+      if (type === 'desi') return '<tr><td colspan="6" class="text-center text-muted py-4">Henüz kural yok.</td></tr>';
+      if (type === 'cod') return '<tr><td colspan="4" class="text-center text-muted py-4">Henüz kural yok.</td></tr>';
+      return '<tr><td colspan="5" class="text-center text-muted py-4">Henüz kural yok.</td></tr>';
     }
 
-    function statusBadge(active) {
-      if (Number(active) === 1) return '<span class="badge bg-light-success text-success">Aktif</span>';
-      return '<span class="badge bg-light-secondary text-secondary">Pasif</span>';
-    }
-
-    function actionButtons(id) {
-      return '<div class="btn-group btn-group-sm">'
-        + '<button type="button" class="btn btn-outline-primary" data-action="edit-rule" data-id="' + esc(id) + '">Düzenle</button>'
-        + '<button type="button" class="btn btn-outline-danger" data-action="delete-rule" data-id="' + esc(id) + '">Sil</button>'
-        + '</div>';
-    }
-
-    function rowHtml(type, rule) {
-      var id = rule.id || '';
-      if (type === 'city') return '<tr><td>' + esc(rule.city || '-') + '</td><td>' + esc(rule.primary_company_name || '-') + '</td><td>' + esc(rule.secondary_company_name || '-') + '</td><td>' + statusBadge(rule.is_active) + '</td><td class="text-end">' + actionButtons(id) + '</td></tr>';
-      if (type === 'desi') return '<tr><td>' + esc(rule.desi_min || '-') + '</td><td>' + esc(rule.desi_max || '-') + '</td><td>' + esc(rule.primary_company_name || '-') + '</td><td>' + statusBadge(rule.is_active) + '</td><td class="text-end">' + actionButtons(id) + '</td></tr>';
-      if (type === 'cod') return '<tr><td>Evet</td><td>' + esc(rule.primary_company_name || '-') + '</td><td>' + statusBadge(rule.is_active) + '</td><td class="text-end">' + actionButtons(id) + '</td></tr>';
-      return '<tr><td>' + esc(rule.city || '-') + '</td><td>' + esc(rule.sla_days || '-') + '</td><td>' + esc(rule.primary_company_name || '-') + '</td><td>' + statusBadge(rule.is_active) + '</td><td class="text-end">' + actionButtons(id) + '</td></tr>';
-    }
-
-    function renderType(type, rows) {
-      var body = document.getElementById('body-' + type);
+    function renderRules(type, rows) {
+      var bodyMap = {
+        city: 'rulesBodyCity',
+        desi: 'rulesBodyDesi',
+        cod: 'rulesBodyCod',
+        sla: 'rulesBodySla'
+      };
+      var body = document.getElementById(bodyMap[type] || '');
       if (!body) return;
+
       if (!rows || rows.length === 0) {
         body.innerHTML = emptyRow(type);
         return;
       }
+
       var html = '';
-      rows.forEach(function (rule) {
-        ruleMap[String(rule.id || '')] = rule;
-        html += rowHtml(type, rule);
+      rows.forEach(function (row) {
+        var id = esc(row.id || '');
+        var editBtn = '<button type="button" class="btn btn-outline-primary btn-sm" data-action="edit" data-id="' + id + '">Düzenle</button>';
+
+        if (type === 'city') {
+          html += '<tr><td>' + esc(row.city || '-') + '</td><td>' + esc(row.primary_company_name || '-') + '</td><td>' + esc(row.secondary_company_name || '-') + '</td><td><span class="' + statusClass(row.is_active) + '">' + statusText(row.is_active) + '</span></td><td class="text-end">' + editBtn + '</td></tr>';
+        } else if (type === 'desi') {
+          html += '<tr><td>' + esc(row.desi_min || '-') + '</td><td>' + esc(row.desi_max || '-') + '</td><td>' + esc(row.primary_company_name || '-') + '</td><td>' + esc(row.secondary_company_name || '-') + '</td><td><span class="' + statusClass(row.is_active) + '">' + statusText(row.is_active) + '</span></td><td class="text-end">' + editBtn + '</td></tr>';
+        } else if (type === 'cod') {
+          html += '<tr><td>Evet</td><td>' + esc(row.primary_company_name || '-') + '</td><td><span class="' + statusClass(row.is_active) + '">' + statusText(row.is_active) + '</span></td><td class="text-end">' + editBtn + '</td></tr>';
+        } else {
+          html += '<tr><td>' + esc(row.city || '-') + '</td><td>' + esc(row.sla_days || '-') + '</td><td>' + esc(row.primary_company_name || '-') + '</td><td><span class="' + statusClass(row.is_active) + '">' + statusText(row.is_active) + '</span></td><td class="text-end">' + editBtn + '</td></tr>';
+        }
       });
+
       body.innerHTML = html;
     }
 
-    function updateKpi(kpi) {
-      if (!kpi) return;
-      document.getElementById('kpiActiveRule').textContent = String(kpi.active_rule || 0);
-      document.getElementById('kpiAutoAssignment').textContent = String(kpi.auto_assignment_7d || 0);
-      document.getElementById('kpiSlaCompliance').textContent = String(kpi.sla_compliance || 0) + '%';
-      document.getElementById('kpiAvgDelivery').textContent = String(kpi.avg_delivery_days || '0.0') + ' gün';
-    }
-
-    function updateCsrf(csrf) {
-      if (!csrf || !csrf.name) return;
-      var input = ruleForm.querySelector('input[name="' + csrf.name + '"]');
-      if (input) input.value = csrf.hash || '';
-    }
-
-    function fetchType(type) {
-      return fetch(apiBase + '?type=' + encodeURIComponent(type), {
+    function loadRules(type) {
+      return fetch(listEndpoint + '?type=' + encodeURIComponent(type), {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      }).then(function (res) {
-        return res.json().then(function (json) {
-          if (!res.ok || !json.success) {
-            throw new Error((json && json.message) ? json.message : 'Kural listesi alınamadı.');
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (json) {
+          if (!json.ok) {
+            throw new Error(json.message || 'Kurallar alınamadı.');
           }
-          updateCsrf(json.csrf || {});
-          updateKpi(json.kpi || {});
-          renderType(type, json.rules || []);
-          loadedTypes[type] = true;
-          return json;
+          renderRules(type, json.data || []);
         });
-      });
     }
 
-    function syncPrimaryCompany() {
-      var selected = '';
-      var t = ruleType.value;
-      if (t === 'city') selected = document.getElementById('city_primary_company').value || '';
-      if (t === 'desi') selected = document.getElementById('desi_primary_company').value || '';
-      if (t === 'cod') selected = document.getElementById('cod_primary_company').value || '';
-      if (t === 'sla') selected = document.getElementById('sla_primary_company').value || '';
-      document.getElementById('primary_company_id').value = selected;
+    function clearTypeData() {
+      document.getElementById('city').value = '';
+      document.getElementById('desi_min').value = '';
+      document.getElementById('desi_max').value = '';
+      document.getElementById('sla_days').value = '';
+      document.getElementById('sla_city').value = '';
+      document.getElementById('cityPrimaryCompany').value = '';
+      document.getElementById('desiPrimaryCompany').value = '';
+      document.getElementById('codPrimaryCompany').value = '';
+      document.getElementById('slaPrimaryCompany').value = '';
+      document.getElementById('citySecondaryCompany').value = '';
+      document.getElementById('desiSecondaryCompany').value = '';
+      document.getElementById('primary_company_id').value = '';
+      document.getElementById('secondary_company_id').value = '';
     }
 
-    function setGroups() {
-      var t = ruleType.value;
-      document.getElementById('group-city').classList.toggle('d-none', t !== 'city');
-      document.getElementById('group-desi').classList.toggle('d-none', t !== 'desi');
-      document.getElementById('group-cod').classList.toggle('d-none', t !== 'cod');
-      document.getElementById('group-sla').classList.toggle('d-none', t !== 'sla');
+    function setTypeFields(type) {
+      document.getElementById('ruleTypeInput').value = type;
+      document.getElementById('cityFields').classList.toggle('d-none', type !== 'city');
+      document.getElementById('desiFields').classList.toggle('d-none', type !== 'desi');
+      document.getElementById('codFields').classList.toggle('d-none', type !== 'cod');
+      document.getElementById('slaFields').classList.toggle('d-none', type !== 'sla');
     }
 
-    function normalizeForm() {
-      var t = ruleType.value;
-      syncPrimaryCompany();
-      if (t === 'sla') {
-        document.getElementById('city').value = document.getElementById('sla_city').value || '';
+    function syncCompanyFields(type) {
+      var primary = '';
+      var secondary = '';
+
+      if (type === 'city') {
+        primary = document.getElementById('cityPrimaryCompany').value || '';
+        secondary = document.getElementById('citySecondaryCompany').value || '';
+      } else if (type === 'desi') {
+        primary = document.getElementById('desiPrimaryCompany').value || '';
+        secondary = document.getElementById('desiSecondaryCompany').value || '';
+      } else if (type === 'cod') {
+        primary = document.getElementById('codPrimaryCompany').value || '';
+      } else {
+        primary = document.getElementById('slaPrimaryCompany').value || '';
       }
-      if (t !== 'sla' && t !== 'city') {
-        document.getElementById('city').value = '';
-      }
-      if (t !== 'city') {
-        document.getElementById('secondary_company_id').value = '';
-      }
-      if (t !== 'desi') {
-        document.getElementById('desi_min').value = '';
-        document.getElementById('desi_max').value = '';
-      }
-      if (t !== 'sla') {
-        document.getElementById('sla_days').value = '';
-      }
+
+      document.getElementById('primary_company_id').value = primary;
+      document.getElementById('secondary_company_id').value = secondary;
+    }
+
+    function resetForm(type) {
+      form.reset();
+      clearTypeData();
+      document.getElementById('ruleId').value = '';
+      document.getElementById('ruleModalTitle').textContent = 'Kural Ekle';
+      document.getElementById('is_active').value = '1';
+      setTypeFields(type);
+      syncCompanyFields(type);
+      showModalAlert('');
     }
 
     function openCreateModal() {
-      ruleForm.reset();
-      formError('');
-      document.getElementById('ruleId').value = '';
-      document.getElementById('ruleModalTitle').textContent = 'Yeni Kural Ekle';
-      ruleType.value = currentType;
-      document.getElementById('is_active').checked = true;
-      setGroups();
-      syncPrimaryCompany();
-      if (ruleModal) ruleModal.show();
+      resetForm(activeType);
+      if (modal) modal.show();
+    }
+
+    function fillEditForm(type, data) {
+      document.getElementById('ruleId').value = String(data.id || '');
+      document.getElementById('ruleModalTitle').textContent = 'Kural Düzenle';
+      document.getElementById('is_active').value = Number(data.is_active) === 1 ? '1' : '0';
+
+      if (type === 'city') {
+        document.getElementById('city').value = data.city || '';
+        document.getElementById('cityPrimaryCompany').value = data.primary_company_id || '';
+        document.getElementById('citySecondaryCompany').value = data.secondary_company_id || '';
+      } else if (type === 'desi') {
+        document.getElementById('desi_min').value = data.desi_min || '';
+        document.getElementById('desi_max').value = data.desi_max || '';
+        document.getElementById('desiPrimaryCompany').value = data.primary_company_id || '';
+        document.getElementById('desiSecondaryCompany').value = data.secondary_company_id || '';
+      } else if (type === 'cod') {
+        document.getElementById('codPrimaryCompany').value = data.primary_company_id || '';
+      } else {
+        document.getElementById('sla_city').value = data.city || '';
+        document.getElementById('city').value = data.city || '';
+        document.getElementById('sla_days').value = data.sla_days || '';
+        document.getElementById('slaPrimaryCompany').value = data.primary_company_id || '';
+      }
+
+      setTypeFields(type);
+      syncCompanyFields(type);
     }
 
     function openEditModal(id) {
-      var rule = ruleMap[id];
-      if (!rule) return;
-      formError('');
-      document.getElementById('ruleId').value = String(rule.id || '');
-      document.getElementById('ruleModalTitle').textContent = 'Kural Düzenle';
-      ruleType.value = String(rule.rule_type || 'city');
-      document.getElementById('is_active').checked = Number(rule.is_active || 0) === 1;
-      document.getElementById('city').value = String(rule.city || '');
-      document.getElementById('sla_city').value = String(rule.city || '');
-      document.getElementById('desi_min').value = rule.desi_min || '';
-      document.getElementById('desi_max').value = rule.desi_max || '';
-      document.getElementById('sla_days').value = rule.sla_days || '';
-      document.getElementById('secondary_company_id').value = String(rule.secondary_company_id || '');
-      document.getElementById('city_primary_company').value = String(rule.primary_company_id || '');
-      document.getElementById('desi_primary_company').value = String(rule.primary_company_id || '');
-      document.getElementById('cod_primary_company').value = String(rule.primary_company_id || '');
-      document.getElementById('sla_primary_company').value = String(rule.primary_company_id || '');
-      setGroups();
-      syncPrimaryCompany();
-      if (ruleModal) ruleModal.show();
+      showModalAlert('');
+      fetch(showEndpointBase + '/' + encodeURIComponent(id), {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (json) {
+          if (!json.ok || !json.data) {
+            throw new Error(json.message || 'Kural bilgisi alınamadı.');
+          }
+
+          var type = allowedTypes.indexOf(json.data.rule_type) !== -1 ? json.data.rule_type : 'city';
+          fillEditForm(type, json.data);
+          if (modal) modal.show();
+        })
+        .catch(function (err) {
+          showPageAlert(err.message || 'Kural bilgisi alınamadı.', 'danger');
+        });
     }
 
-    function post(url, formData) {
-      return fetch(url, {
+    function submitForm(event) {
+      event.preventDefault();
+      showModalAlert('');
+      showPageAlert('');
+
+      var type = document.getElementById('ruleTypeInput').value;
+      syncCompanyFields(type);
+
+      if (type === 'sla') {
+        document.getElementById('city').value = document.getElementById('sla_city').value || '';
+      }
+      if (type !== 'city' && type !== 'sla') {
+        document.getElementById('city').value = '';
+      }
+
+      var id = document.getElementById('ruleId').value || '';
+      var url = id ? (updateEndpointBase + '/' + encodeURIComponent(id)) : createEndpoint;
+      var formData = new FormData(form);
+
+      fetch(url, {
         method: 'POST',
         body: formData,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      }).then(function (res) {
-        return res.json().then(function (json) {
-          if (!res.ok || !json.success) {
-            var error = new Error((json && json.message) ? json.message : 'İşlem başarısız.');
-            error.payload = json;
-            throw error;
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (json) {
+          if (!json.ok) {
+            throw new Error(json.message || 'İşlem başarısız.');
           }
-          return json;
+
+          showModalAlert('');
+          if (modal) modal.hide();
+          return loadRules(activeType);
+        })
+        .catch(function (err) {
+          showModalAlert(err.message || 'İşlem başarısız.');
         });
-      });
     }
 
-    document.addEventListener('click', function (event) {
-      var target = event.target.closest('[data-action]');
-      if (!target) return;
-
-      var action = target.getAttribute('data-action');
-      var id = target.getAttribute('data-id') || '';
-
-      if (action === 'new-rule') {
-        event.preventDefault();
-        openCreateModal();
-        return;
-      }
-      if (action === 'edit-rule' && id !== '') {
-        event.preventDefault();
-        openEditModal(id);
-        return;
-      }
-      if (action === 'delete-rule' && id !== '') {
-        event.preventDefault();
-        deleteRuleId = id;
-        if (deleteModal) deleteModal.show();
-      }
-    });
-
-    ruleType.addEventListener('change', setGroups);
-    document.querySelectorAll('.company-picker').forEach(function (el) {
-      el.addEventListener('change', syncPrimaryCompany);
-    });
-    document.getElementById('sla_city').addEventListener('input', function () {
-      if (ruleType.value === 'sla') {
-        document.getElementById('city').value = this.value;
-      }
+    document.getElementById('btnNewRule').addEventListener('click', function () {
+      openCreateModal();
     });
 
     document.getElementById('shippingAutomationTabs').addEventListener('shown.bs.tab', function (event) {
-      var type = event.target.getAttribute('data-rule-type');
-      if (!type) return;
-      currentType = type;
-      if (!loadedTypes[type]) {
-        fetchType(type).catch(function (err) {
-          flash(err.message || 'Liste alınamadı.', 'danger');
-        });
-      }
+      var nextType = event.target.getAttribute('data-rule-type') || 'city';
+      activeType = allowedTypes.indexOf(nextType) !== -1 ? nextType : 'city';
+      loadRules(activeType).catch(function (err) {
+        showPageAlert(err.message || 'Kurallar alınamadı.', 'danger');
+      });
     });
 
-    ruleForm.addEventListener('submit', function (event) {
-      event.preventDefault();
-      formError('');
-      normalizeForm();
+    document.addEventListener('click', function (event) {
+      var btn = event.target.closest('[data-action="edit"]');
+      if (!btn) return;
+      var id = btn.getAttribute('data-id') || '';
+      if (id === '') return;
+      openEditModal(id);
+    });
 
-      var formData = new FormData(ruleForm);
-      formData.set('rule_type', ruleType.value);
-      formData.set('is_active', document.getElementById('is_active').checked ? '1' : '0');
-      formData.set('city', document.getElementById('city').value || '');
-      formData.set('desi_min', document.getElementById('desi_min').value || '');
-      formData.set('desi_max', document.getElementById('desi_max').value || '');
-      formData.set('sla_days', document.getElementById('sla_days').value || '');
-      formData.set('primary_company_id', document.getElementById('primary_company_id').value || '');
-      formData.set('secondary_company_id', document.getElementById('secondary_company_id').value || '');
+    document.getElementById('cityPrimaryCompany').addEventListener('change', function () { syncCompanyFields('city'); });
+    document.getElementById('desiPrimaryCompany').addEventListener('change', function () { syncCompanyFields('desi'); });
+    document.getElementById('codPrimaryCompany').addEventListener('change', function () { syncCompanyFields('cod'); });
+    document.getElementById('slaPrimaryCompany').addEventListener('change', function () { syncCompanyFields('sla'); });
 
-      var id = document.getElementById('ruleId').value || '';
-      var url = id ? (apiBase + '/' + encodeURIComponent(id)) : apiBase;
+    form.addEventListener('submit', submitForm);
 
-      post(url, formData)
-        .then(function (json) {
-          updateCsrf(json.csrf || {});
-          updateKpi(json.kpi || {});
-          renderType(json.type || currentType, json.rules || []);
-          loadedTypes[json.type || currentType] = true;
-          flash(json.message || 'Kaydedildi.', 'success');
-          if (ruleModal) ruleModal.hide();
+    if (simulationForm) {
+      simulationForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        showSimulationAlert('');
+
+        var formData = new FormData(simulationForm);
+        if (!document.getElementById('sim_cod').checked) {
+          formData.set('cod', '0');
+        }
+
+        fetch(simulateEndpoint, {
+          method: 'POST',
+          body: formData,
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
-        .catch(function (err) {
-          var message = err.message || 'Kayıt yapılamadı.';
-          if (err.payload && err.payload.errors) {
-            var key = Object.keys(err.payload.errors)[0];
-            if (key) message += ' ' + err.payload.errors[key];
-          }
-          formError(message);
-        });
-    });
+          .then(function (res) { return res.json(); })
+          .then(function (json) {
+            if (!json.ok) {
+              throw new Error(json.message || 'Simülasyon başarısız.');
+            }
+            renderSimulationResult(json.data || {});
+          })
+          .catch(function (err) {
+            showSimulationAlert(err.message || 'Simülasyon hesaplanamadı.');
+          });
+      });
+    }
 
-    document.getElementById('confirmDeleteRule').addEventListener('click', function () {
-      if (deleteRuleId === '') return;
-      var fd = new FormData(ruleForm);
-      fd.set('rule_type', currentType);
-      post(apiBase + '/' + encodeURIComponent(deleteRuleId) + '/delete', fd)
-        .then(function (json) {
-          updateCsrf(json.csrf || {});
-          updateKpi(json.kpi || {});
-          renderType(json.type || currentType, json.rules || []);
-          loadedTypes[json.type || currentType] = true;
-          flash(json.message || 'Silindi.', 'success');
-          deleteRuleId = '';
-          if (deleteModal) deleteModal.hide();
-        })
-        .catch(function (err) {
-          flash(err.message || 'Silme işlemi başarısız.', 'danger');
-        });
-    });
-
-    fetchType(currentType).catch(function (err) {
-      flash(err.message || 'Liste alınamadı.', 'danger');
+    setTypeFields(activeType);
+    loadRules(activeType).catch(function (err) {
+      showPageAlert(err.message || 'Kurallar alınamadı.', 'danger');
     });
   })();
 </script>
 <?= $this->endSection() ?>
+
+

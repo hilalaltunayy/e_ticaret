@@ -12,31 +12,29 @@ class RoleFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         $session = session();
-        // login yapmamışsa
         $user = $session->get('user');
-        if (!$user) {
+
+        if (! $user) {
             return redirect()->to(base_url('login'));
         }
 
-        $role   = is_array($user) ? (string)($user['role'] ?? '') : '';
-        $userId = is_array($user) ? (string)($user['id'] ?? ($user['user_id'] ?? '')) : '';
+        $role = is_array($user) ? strtolower(trim((string) ($user['role'] ?? ''))) : '';
+        $userId = is_array($user) ? trim((string) ($user['id'] ?? ($user['user_id'] ?? ''))) : '';
 
         if ($userId === '' || $role === '') {
-           return redirect()->to(base_url('login'));
+            return redirect()->to(base_url('login'));
         }
 
-        // Argüman parse: ör. ['admin|perm:manage_products'] veya ['admin,secretary']
         $allowedRoles = [];
         $requiredPerm = null;
 
-        if (!empty($arguments)) {
-            $flat  = implode(',', $arguments);
-            $parts = preg_split('/\|/', $flat);
+        if (! empty($arguments)) {
+            $flat = implode(',', $arguments);
+            $parts = preg_split('/\|/', $flat) ?: [];
 
             foreach ($parts as $p) {
-                $p = trim($p);
+                $p = trim((string) $p);
 
-                // "role:admin" yazarsan diye tolerans ekleyelim
                 if (str_starts_with($p, 'role:')) {
                     $p = trim(substr($p, 5));
                 }
@@ -47,7 +45,7 @@ class RoleFilter implements FilterInterface
                 }
 
                 foreach (explode(',', $p) as $r) {
-                    $r = trim($r);
+                    $r = strtolower(trim($r));
                     if ($r !== '') {
                         $allowedRoles[] = $r;
                     }
@@ -55,51 +53,46 @@ class RoleFilter implements FilterInterface
             }
         }
 
-        // Role check
-        if (!empty($allowedRoles) && !in_array($role, $allowedRoles, true)) {
+        if ($allowedRoles !== [] && ! in_array($role, $allowedRoles, true)) {
             return $this->deny($request);
         }
 
-        // Permission check (opsiyonel)
-        if (!empty($requiredPerm)) {
-
-            // Admin her şeyi geçsin
+        if ($requiredPerm !== null && $requiredPerm !== '') {
             if ($role === 'admin') {
                 return null;
             }
 
             $upm = new UserPermissionModel();
-
-            // UUID string gönder
-            $allowed = $upm->isAllowed($userId, $requiredPerm);
-
-            if (!$allowed) {
+            $allowed = $upm->isAllowed($userId, $requiredPerm, $role);
+            if (! $allowed) {
                 return $this->deny($request);
             }
         }
 
+        return null;
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // no-op
     }
 
-    private function deny(RequestInterface $request)
+    private function deny(RequestInterface $request): ResponseInterface
     {
         $accept = strtolower($request->getHeaderLine('Accept'));
-        $xrw    = strtolower($request->getHeaderLine('X-Requested-With'));
+        $xrw = strtolower($request->getHeaderLine('X-Requested-With'));
 
-        $wantsJson =
-            str_contains($accept, 'application/json') ||
-            $xrw === 'xmlhttprequest';
+        $wantsJson = str_contains($accept, 'application/json') || $xrw === 'xmlhttprequest';
+        $response = service('response');
 
         if ($wantsJson) {
-            return service('response')
+            return $response
                 ->setStatusCode(403)
-                ->setJSON(['error' => 'forbidden']);
+                ->setJSON(['ok' => false, 'message' => 'forbidden']);
         }
 
-        return service('response')->setStatusCode(403, 'Forbidden');
+        return $response
+            ->setStatusCode(403, 'Forbidden')
+            ->setContentType('text/html', 'utf-8')
+            ->setBody(view('errors/html/error_403'));
     }
 }

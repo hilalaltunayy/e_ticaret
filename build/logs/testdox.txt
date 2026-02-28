@@ -1,0 +1,7 @@
+Shipping Simulation Service
+ [x] Cod filtering
+ [x] City match with null fallback
+ [x] Desi range control
+ [x] Sla criteria
+ [x] Tie breaker order
+

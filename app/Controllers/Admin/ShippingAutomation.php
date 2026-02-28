@@ -4,8 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Services\ShippingAutomationService;
-use InvalidArgumentException;
-use RuntimeException;
+use DomainException;
 use Throwable;
 
 class ShippingAutomation extends BaseController
@@ -18,157 +17,121 @@ class ShippingAutomation extends BaseController
     public function index()
     {
         return view('admin/shipping/automation', [
-            'title' => 'Kargo Optimizasyonu',
+            'title' => 'Kargo Otomasyon Kuralları',
             'companies' => $this->service->getCompanies(),
             'initialType' => 'city',
-            'initialRules' => $this->service->listRulesByType('city'),
-            'kpi' => $this->service->getKpi(),
+            'kpi' => [
+                'active_rule' => $this->service->countActiveRules(),
+                'auto_assignment_7d' => $this->service->countAutoAssignmentsLast7Days(),
+                'sla_compliance' => $this->service->calculateSlaRate(),
+                'avg_delivery_days' => $this->service->calculateAverageDeliveryTime(),
+            ],
         ]);
     }
 
     public function rules()
     {
-        $type = trim((string) $this->request->getGet('type'));
-        if ($type === '') {
-            $type = 'city';
-        }
+        $type = (string) ($this->request->getGet('type') ?? 'city');
 
         try {
-            $rules = $this->service->listRulesByType($type);
-        } catch (InvalidArgumentException $e) {
-            return $this->jsonError($e->getMessage(), 422);
+            return $this->response->setJSON([
+                'ok' => true,
+                'data' => $this->service->list($type),
+            ]);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => $e->getMessage(),
+            ]);
+        } catch (Throwable) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'ok' => false,
+                'message' => 'Kurallar alınamadı.',
+            ]);
         }
+    }
 
-        return $this->response->setJSON([
-            'success' => true,
-            'type' => $type,
-            'rules' => $rules,
-            'kpi' => $this->service->getKpi(),
-            'csrf' => $this->csrfPayload(),
-        ]);
+    public function show(string $id)
+    {
+        try {
+            return $this->response->setJSON([
+                'ok' => true,
+                'data' => $this->service->find($id),
+            ]);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => $e->getMessage(),
+            ]);
+        } catch (Throwable) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'ok' => false,
+                'message' => 'Kural alınamadı.',
+            ]);
+        }
     }
 
     public function create()
     {
-        $payload = (array) $this->request->getPost();
+        $type = (string) ($this->request->getPost('rule_type') ?? $this->request->getPost('type') ?? '');
 
         try {
-            $id = $this->service->createRule($payload);
-            $type = trim((string) ($payload['rule_type'] ?? 'city'));
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Kural kaydedildi.',
-                'id' => $id,
-                'type' => $type,
-                'rules' => $this->service->listRulesByType($type),
-                'kpi' => $this->service->getKpi(),
-                'csrf' => $this->csrfPayload(),
+            $this->service->create($type, [
+                'rule_type' => $type,
+                'city' => $this->request->getPost('city'),
+                'desi_min' => $this->request->getPost('desi_min'),
+                'desi_max' => $this->request->getPost('desi_max'),
+                'sla_days' => $this->request->getPost('sla_days'),
+                'primary_company_id' => $this->request->getPost('primary_company_id'),
+                'secondary_company_id' => $this->request->getPost('secondary_company_id'),
+                'is_active' => $this->request->getPost('is_active'),
             ]);
-        } catch (InvalidArgumentException $e) {
-            return $this->jsonError($e->getMessage(), 422);
-        } catch (RuntimeException $e) {
-            return $this->jsonError($e->getMessage(), 400);
-        } catch (Throwable $e) {
-            return $this->jsonError('Kural kaydedilemedi.', 500);
+
+            return $this->response->setJSON([
+                'ok' => true,
+            ]);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => $e->getMessage(),
+            ]);
+        } catch (Throwable) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'ok' => false,
+                'message' => 'Kural kaydedilemedi.',
+            ]);
         }
     }
 
     public function update(string $id)
     {
-        $payload = (array) $this->request->getPost();
+        $type = (string) ($this->request->getPost('rule_type') ?? $this->request->getPost('type') ?? '');
 
         try {
-            $this->service->updateRule($id, $payload);
-            $type = trim((string) ($payload['rule_type'] ?? 'city'));
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Kural güncellendi.',
-                'type' => $type,
-                'rules' => $this->service->listRulesByType($type),
-                'kpi' => $this->service->getKpi(),
-                'csrf' => $this->csrfPayload(),
+            $this->service->update($type, $id, [
+                'rule_type' => $type,
+                'city' => $this->request->getPost('city'),
+                'desi_min' => $this->request->getPost('desi_min'),
+                'desi_max' => $this->request->getPost('desi_max'),
+                'sla_days' => $this->request->getPost('sla_days'),
+                'primary_company_id' => $this->request->getPost('primary_company_id'),
+                'secondary_company_id' => $this->request->getPost('secondary_company_id'),
+                'is_active' => $this->request->getPost('is_active'),
             ]);
-        } catch (InvalidArgumentException $e) {
-            return $this->jsonError($e->getMessage(), 422);
-        } catch (RuntimeException $e) {
-            return $this->jsonError($e->getMessage(), 400);
-        } catch (Throwable $e) {
-            return $this->jsonError('Kural güncellenemedi.', 500);
-        }
-    }
-
-    public function toggle(string $id)
-    {
-        try {
-            $this->service->toggleRule($id);
-            $type = trim((string) $this->request->getPost('rule_type'));
-            if ($type === '') {
-                $type = trim((string) $this->request->getGet('type'));
-            }
-            if ($type === '') {
-                $type = 'city';
-            }
 
             return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Kural durumu güncellendi.',
-                'type' => $type,
-                'rules' => $this->service->listRulesByType($type),
-                'kpi' => $this->service->getKpi(),
-                'csrf' => $this->csrfPayload(),
+                'ok' => true,
             ]);
-        } catch (InvalidArgumentException $e) {
-            return $this->jsonError($e->getMessage(), 422);
-        } catch (RuntimeException $e) {
-            return $this->jsonError($e->getMessage(), 400);
-        } catch (Throwable $e) {
-            return $this->jsonError('Kural durumu güncellenemedi.', 500);
-        }
-    }
-
-    public function delete(string $id)
-    {
-        try {
-            $this->service->deleteRule($id);
-            $type = trim((string) $this->request->getPost('rule_type'));
-            if ($type === '') {
-                $type = trim((string) $this->request->getGet('type'));
-            }
-            if ($type === '') {
-                $type = 'city';
-            }
-
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Kural silindi.',
-                'type' => $type,
-                'rules' => $this->service->listRulesByType($type),
-                'kpi' => $this->service->getKpi(),
-                'csrf' => $this->csrfPayload(),
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'ok' => false,
+                'message' => $e->getMessage(),
             ]);
-        } catch (InvalidArgumentException $e) {
-            return $this->jsonError($e->getMessage(), 422);
-        } catch (RuntimeException $e) {
-            return $this->jsonError($e->getMessage(), 400);
-        } catch (Throwable $e) {
-            return $this->jsonError('Kural silinemedi.', 500);
+        } catch (Throwable) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'ok' => false,
+                'message' => 'Kural güncellenemedi.',
+            ]);
         }
-    }
-
-    private function jsonError(string $message, int $status)
-    {
-        return $this->response->setStatusCode($status)->setJSON([
-            'success' => false,
-            'message' => $message,
-            'csrf' => $this->csrfPayload(),
-        ]);
-    }
-
-    private function csrfPayload(): array
-    {
-        return [
-            'name' => csrf_token(),
-            'hash' => csrf_hash(),
-        ];
     }
 }

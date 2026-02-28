@@ -30,7 +30,11 @@
     </div>
 
     <?= $this->include("layouts/header") ?>
-    <?= $this->include("layouts/sidebar") ?>
+    <?= view('partials/sidebar', [
+        'userName' => $userName ?? null,
+        'roleName' => $roleName ?? null,
+        'permissions' => $permissions ?? null,
+    ]) ?>
 
     <?= $this->renderSection("content") ?>
 
