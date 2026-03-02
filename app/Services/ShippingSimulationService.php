@@ -110,7 +110,7 @@ class ShippingSimulationService
         $cityPass = ($ruleCitySlug === '' || $ruleCitySlug === $request->citySlug);
 
         $maxSla = $this->resolveSla($rule);
-        $slaPass = ($maxSla === null || $maxSla >= $request->slaDays);
+        $slaPass = ($request->slaDays <= $maxSla);
 
         $supportsCod = $this->resolveSupportsCod($rule);
         $codPass = ($supportsCod === $request->cod);
@@ -128,10 +128,8 @@ class ShippingSimulationService
 
     public function scoreRule(array $rule, ShippingSimulationRequestDTO $request): array
     {
-        unset($request);
-
-        $cost = $this->resolveCost($rule);
-        $sla = $this->resolveSla($rule) ?? 999;
+        $cost = $this->resolveCost($rule, $request->desi);
+        $sla = $this->resolveSla($rule);
         $priority = $this->resolvePriority($rule);
 
         return [
@@ -176,7 +174,7 @@ class ShippingSimulationService
         return false;
     }
 
-    private function resolveSla(array $rule): ?int
+    private function resolveSla(array $rule): int
     {
         foreach (['sla_max_days', 'sla_days'] as $field) {
             if (! array_key_exists($field, $rule)) {
@@ -186,15 +184,21 @@ class ShippingSimulationService
             if ($value === null || $value === '') {
                 continue;
             }
-            return (int) $value;
+            $intValue = (int) $value;
+            if ($intValue > 0) {
+                return $intValue;
+            }
         }
 
         $config = $this->readConfig($rule);
         if (isset($config['sla_max_days']) && is_numeric((string) $config['sla_max_days'])) {
-            return (int) $config['sla_max_days'];
+            $intValue = (int) $config['sla_max_days'];
+            if ($intValue > 0) {
+                return $intValue;
+            }
         }
 
-        return null;
+        return 7;
     }
 
     private function resolvePriority(array $rule): int
@@ -211,20 +215,21 @@ class ShippingSimulationService
         return 0;
     }
 
-    private function resolveCost(array $rule): float
+    private function resolveCost(array $rule, float $desi): int
     {
         if (isset($rule['estimated_cost']) && is_numeric((string) $rule['estimated_cost'])) {
-            return (float) $rule['estimated_cost'];
+            return (int) round((float) $rule['estimated_cost']);
         }
 
         $config = $this->readConfig($rule);
-        foreach (['cost', 'estimated_cost'] as $field) {
-            if (isset($config[$field]) && is_numeric((string) $config[$field])) {
-                return (float) $config[$field];
-            }
-        }
+        $baseCost = (isset($config['base_cost']) && is_numeric((string) $config['base_cost']))
+            ? (float) $config['base_cost']
+            : 60.0;
+        $costPerDesi = (isset($config['cost_per_desi']) && is_numeric((string) $config['cost_per_desi']))
+            ? (float) $config['cost_per_desi']
+            : 12.0;
 
-        return 999999.0;
+        return (int) round($baseCost + ($desi * $costPerDesi));
     }
 
     private function readConfig(array $rule): array

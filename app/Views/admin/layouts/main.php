@@ -15,11 +15,7 @@
   data-pc-direction="ltr"
   data-pc-theme="light"
 >
-  <?= view('partials/sidebar', [
-    'userName' => $userName ?? null,
-    'roleName' => $roleName ?? null,
-    'permissions' => $permissions ?? null,
-  ]) ?>
+  <?= $this->include('admin/partials/sidebar') ?>
   <?= $this->include('admin/partials/topbar') ?>
 
   <div class="pc-container">

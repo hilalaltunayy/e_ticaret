@@ -1,6 +1,7 @@
 <?= $this->extend('admin/layouts/main') ?>
 
 <?= $this->section('content') ?>
+<div id="__viewMarker" style="display:none">VIEW=admin/shipping/automation.php</div>
 <?php
 $companies = is_array($companies ?? null) ? $companies : [];
 $initialType = (string) ($initialType ?? 'city');
@@ -187,7 +188,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
         </div>
       </div>
       <div class="col-md-2 d-flex align-items-end">
-        <button type="submit" class="btn btn-primary w-100">Simüle Et</button>
+        <button type="button" class="btn btn-primary w-100 js-simulate" id="simulateBtn" data-action="simulate">Simüle Et</button>
       </div>
     </form>
 
@@ -362,6 +363,24 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
     var modal = typeof bootstrap !== 'undefined' ? new bootstrap.Modal(modalEl) : null;
     var form = document.getElementById('ruleForm');
     var simulationForm = document.getElementById('simulationForm');
+    var simulateBtn = document.getElementById('simulateBtn');
+
+    if (!simulateBtn && simulationForm) {
+      var btnCol = document.createElement('div');
+      btnCol.className = 'col-md-2 d-flex align-items-end';
+      btnCol.innerHTML = '<button type="button" class="btn btn-primary w-100 js-simulate" id="simulateBtn" data-action="simulate">Simüle Et</button>';
+      simulationForm.appendChild(btnCol);
+      simulateBtn = document.getElementById('simulateBtn');
+    }
+
+    if (simulateBtn) {
+      var style = window.getComputedStyle(simulateBtn);
+      if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+        simulateBtn.style.display = 'inline-flex';
+        simulateBtn.style.visibility = 'visible';
+        simulateBtn.style.opacity = '1';
+      }
+    }
 
     function esc(value) {
       return String(value === null || value === undefined ? '' : value)
@@ -431,7 +450,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
           '<li>Desi uyumu: ' + (reason.desi_match ? 'Evet' : 'Hayır') + '</li>' +
           '<li>Maliyet: ' + esc(reason.cost || '-') + '</li>' +
           '<li>SLA: ' + esc(reason.sla || '-') + '</li>' +
-          '<li>Öncelik: ' + esc(reason.priority || '-') + '</li>';
+          '<li>Öncelik: ' + esc(reason.priority ?? 0) + '</li>';
       }
 
       if (!candidates.length) {
@@ -443,7 +462,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
             + '<td>' + esc(item.company_name || '-') + '</td>'
             + '<td>' + esc(item.cost || '-') + '</td>'
             + '<td>' + esc(item.sla || '-') + '</td>'
-            + '<td>' + esc(item.priority || '-') + '</td>'
+            + '<td>' + esc(item.priority ?? 0) + '</td>'
             + '</tr>';
         });
         candidatesBody.innerHTML = html;
@@ -715,6 +734,16 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
       });
     }
 
+    if (simulateBtn && simulationForm) {
+      simulateBtn.addEventListener('click', function () {
+        if (typeof simulationForm.requestSubmit === 'function') {
+          simulationForm.requestSubmit();
+          return;
+        }
+        simulationForm.dispatchEvent(new Event('submit', { cancelable: true }));
+      });
+    }
+
     setTypeFields(activeType);
     loadRules(activeType).catch(function (err) {
       showPageAlert(err.message || 'Kurallar alınamadı.', 'danger');
@@ -722,5 +751,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
   })();
 </script>
 <?= $this->endSection() ?>
+
+
 
 
