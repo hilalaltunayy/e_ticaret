@@ -20,54 +20,77 @@ class Shipping extends BaseController
     public function datatables()
     {
         $params = $this->request->getGet();
-        $result = (new ShippingModel())->datatablesList($params);
-        $rows = $result['data'] ?? [];
 
-        $data = array_map(function (array $row) {
-            $id = trim((string) ($row['id'] ?? ''));
-            $orderNo = trim((string) ($row['order_no'] ?? ''));
-            if ($orderNo === '' && $id !== '') {
-                $orderNo = '#' . strtoupper(substr(str_replace('-', '', $id), 0, 8));
-            }
-            if ($orderNo === '') {
-                $orderNo = '-';
-            }
+        try {
+            $result = (new ShippingModel())->datatablesList($params);
+            $rows = $result['data'] ?? [];
 
-            $customer = trim((string) ($row['customer_name'] ?? ''));
-            $shippingCompany = trim((string) ($row['shipping_company'] ?? ''));
-            $trackingNo = trim((string) ($row['tracking_no'] ?? ''));
-            $updatedAt = trim((string) ($row['updated_at'] ?? ''));
-            $shippingStatus = trim((string) ($row['shipping_status'] ?? 'not_shipped'));
-            $shippedDate = trim((string) ($row['shipped_date'] ?? ''));
-            $deliveredDate = trim((string) ($row['delivered_date'] ?? ''));
-            $statusGroup = $this->statusGroup($shippingStatus);
+            $data = array_map(function (array $row) {
+                $id = trim((string) ($row['id'] ?? ''));
+                $orderNo = trim((string) ($row['order_no'] ?? ''));
+                if ($orderNo === '' && $id !== '') {
+                    $orderNo = '#' . strtoupper(substr(str_replace('-', '', $id), 0, 8));
+                }
+                if ($orderNo === '') {
+                    $orderNo = '-';
+                }
 
-            $detailHref = $id !== '' ? site_url('admin/orders/' . $id) : '#';
+                $customer = trim((string) ($row['customer_name'] ?? ''));
+                $shippingCompany = trim((string) ($row['shipping_company'] ?? ''));
+                $trackingNo = trim((string) ($row['tracking_no'] ?? ''));
+                $updatedAt = trim((string) ($row['updated_at'] ?? ''));
+                $shippingStatus = trim((string) ($row['shipping_status'] ?? 'not_shipped'));
+                $shippedDate = trim((string) ($row['shipped_date'] ?? ''));
+                $deliveredDate = trim((string) ($row['delivered_date'] ?? ''));
+                $statusGroup = $this->statusGroup($shippingStatus);
 
-            return [
-                'order_no' => esc($orderNo),
-                'customer_name' => esc($customer !== '' ? $customer : '-'),
-                'shipping_company' => esc($shippingCompany !== '' ? $shippingCompany : '-'),
-                'tracking_no' => esc($trackingNo !== '' ? $trackingNo : '-'),
-                'shipping_status' => $this->shippingStatusBadge($shippingStatus),
-                'updated_at' => esc($updatedAt !== '' ? $updatedAt : '-'),
-                'shipping_status_raw' => esc($statusGroup),
-                'shipped_date' => esc($shippedDate),
-                'delivered_filter' => ($deliveredDate !== '' || $statusGroup === 'delivered') ? '1' : '0',
-                'problem_filter' => $statusGroup === 'delayed' ? '1' : '0',
-                'actions' => '<div class="d-flex gap-1">'
-                    . '<a href="#" class="btn btn-sm btn-light-secondary">Takip Gör</a>'
-                    . '<a href="' . esc($detailHref) . '" class="btn btn-sm btn-outline-primary">Sipariş Detayı</a>'
-                    . '</div>',
+                $detailHref = $id !== '' ? site_url('admin/orders/' . $id) : '#';
+
+                return [
+                    'order_no' => esc($orderNo),
+                    'customer_name' => esc($customer !== '' ? $customer : '-'),
+                    'shipping_company' => esc($shippingCompany !== '' ? $shippingCompany : '-'),
+                    'tracking_no' => esc($trackingNo !== '' ? $trackingNo : '-'),
+                    'shipping_status' => $this->shippingStatusBadge($shippingStatus),
+                    'updated_at' => esc($updatedAt !== '' ? $updatedAt : '-'),
+                    'shipping_status_raw' => esc($statusGroup),
+                    'shipped_date' => esc($shippedDate),
+                    'delivered_filter' => ($deliveredDate !== '' || $statusGroup === 'delivered') ? '1' : '0',
+                    'problem_filter' => $statusGroup === 'delayed' ? '1' : '0',
+                    'actions' => '<div class="d-flex gap-1">'
+                        . '<a href="#" class="btn btn-sm btn-light-secondary">Takip Gör</a>'
+                        . '<a href="' . esc($detailHref) . '" class="btn btn-sm btn-outline-primary">Sipariş Detayı</a>'
+                        . '</div>',
+                ];
+            }, $rows);
+
+            $payload = [
+                'draw' => (int) ($params['draw'] ?? 0),
+                'recordsTotal' => (int) ($result['recordsTotal'] ?? 0),
+                'recordsFiltered' => (int) ($result['recordsFiltered'] ?? 0),
+                'data' => $data,
             ];
-        }, $rows);
+        } catch (\Throwable $e) {
+            log_message('error', '[shipping-api] ' . $e->getMessage());
+            log_message('error', $e->getTraceAsString());
 
-        $payload = [
-            'draw' => (int) ($params['draw'] ?? 0),
-            'recordsTotal' => (int) ($result['recordsTotal'] ?? 0),
-            'recordsFiltered' => (int) ($result['recordsFiltered'] ?? 0),
-            'data' => $data,
-        ];
+            try {
+                $lastQuery = db_connect()->getLastQuery();
+                if ($lastQuery !== null) {
+                    log_message('error', '[shipping-api] last_query: ' . (string) $lastQuery);
+                }
+            } catch (\Throwable $queryError) {
+                log_message('error', '[shipping-api] last_query_unavailable: ' . $queryError->getMessage());
+            }
+
+            $payload = [
+                'draw' => (int) ($params['draw'] ?? 0),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'error' => 'Kargo verileri alınırken bir hata oluştu.',
+            ];
+        }
 
         return $this->response
             ->setHeader('Content-Type', 'application/json; charset=utf-8')

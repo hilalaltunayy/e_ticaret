@@ -80,6 +80,11 @@ class ShippingModel
 
     private function applyDatatablesFilters(\CodeIgniter\Database\BaseBuilder $builder, array $params): void
     {
+        $kpiFilter = trim((string) ($params['kpi_filter'] ?? ''));
+        if ($kpiFilter !== '') {
+            $this->applyKpiFilter($builder, $kpiFilter);
+        }
+
         $searchTerm = trim((string) ($params['search']['value'] ?? ''));
         if ($searchTerm !== '') {
             $hasAny = false;
@@ -150,6 +155,48 @@ class ShippingModel
                 }
                 continue;
             }
+        }
+    }
+
+    private function applyKpiFilter(\CodeIgniter\Database\BaseBuilder $builder, string $kpiFilter): void
+    {
+        $filter = strtolower($kpiFilter);
+
+        if ($filter === 'shipped_today') {
+            if ($this->hasField('shipped_at')) {
+                $builder->where('DATE(o.shipped_at)', date('Y-m-d'));
+            } else {
+                $builder->where('1 = 0', null, false);
+            }
+            return;
+        }
+
+        if ($filter === 'in_transit') {
+            if ($this->hasField('shipping_status')) {
+                $statuses = ['not_shipped', 'preparing', 'ready', 'shipped', 'delayed', 'cancelled'];
+                $builder->groupStart()
+                    ->where('o.shipping_status IS NULL', null, false)
+                    ->orWhere('o.shipping_status', '')
+                    ->orWhereIn('o.shipping_status', $statuses)
+                    ->groupEnd();
+            } else {
+                $builder->where('1 = 0', null, false);
+            }
+
+            if ($this->hasField('delivered_at')) {
+                $builder->where('o.delivered_at', null);
+            }
+
+            return;
+        }
+
+        if ($filter === 'delivered') {
+            $this->applyDeliveredFilter($builder);
+            return;
+        }
+
+        if ($filter === 'problem') {
+            $this->applyProblemFilter($builder);
         }
     }
 
@@ -349,7 +396,7 @@ class ShippingModel
     private function applyProblemFilter(\CodeIgniter\Database\BaseBuilder $builder): void
     {
         if ($this->hasField('shipping_status')) {
-            $builder->whereIn('LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\'))', ['delayed', 'cancelled'], false);
+            $builder->whereIn('o.shipping_status', ['delayed', 'cancelled']);
             return;
         }
 

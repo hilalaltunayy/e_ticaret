@@ -349,3 +349,515 @@ DEBUG - 2026-03-02 19:42:14 --> Session: Class initialized using 'CodeIgniter\Se
 DEBUG - 2026-03-02 19:42:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2026-03-02 19:42:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2026-03-02 19:42:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:49:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:49:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:49:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-03-02 19:49:09 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)' at line 4 in C:\code\e_ticaret\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\code\e_ticaret\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*)...', 0)
+#1 C:\code\e_ticaret\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*)...')
+#2 C:\code\e_ticaret\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*)...')
+#3 C:\code\e_ticaret\system\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\code\e_ticaret\app\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+#5 C:\code\e_ticaret\app\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList(Array)
+#6 C:\code\e_ticaret\system\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+#7 C:\code\e_ticaret\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+#8 C:\code\e_ticaret\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\code\e_ticaret\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#10 C:\code\e_ticaret\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\code\e_ticaret\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\code\e_ticaret\system\rewrite.php(44): require_once('C:\\code\\e_ticar...')
+#13 {main}
+CRITICAL - 2026-03-02 19:49:09 --> CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)' at line 4
+[Method: GET, Route: admin/api/shipping]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):', [...], false)
+ 2 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 3 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:49:09 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):', [...], false)
+ 4 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 5 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:49:09 --> [Caused by] mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):', [...], false)
+ 5 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+DEBUG - 2026-03-02 19:49:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:49:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:49:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-03-02 19:49:30 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4 in C:\code\e_ticaret\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\code\e_ticaret\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*)...', 0)
+#1 C:\code\e_ticaret\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*)...')
+#2 C:\code\e_ticaret\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*)...')
+#3 C:\code\e_ticaret\system\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\code\e_ticaret\app\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+#5 C:\code\e_ticaret\app\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList(Array)
+#6 C:\code\e_ticaret\system\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+#7 C:\code\e_ticaret\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+#8 C:\code\e_ticaret\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\code\e_ticaret\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#10 C:\code\e_ticaret\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\code\e_ticaret\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\code\e_ticaret\system\rewrite.php(44): require_once('C:\\code\\e_ticar...')
+#13 {main}
+CRITICAL - 2026-03-02 19:49:30 --> CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+[Method: GET, Route: admin/api/shipping]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):
+AND `o`.`delivered_at` IS NULL', [...], false)
+ 2 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 3 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:49:30 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):
+AND `o`.`delivered_at` IS NULL', [...], false)
+ 4 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 5 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:49:30 --> [Caused by] mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):
+AND `o`.`delivered_at` IS NULL', [...], false)
+ 5 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+DEBUG - 2026-03-02 19:49:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:51:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-03-02 19:51:39 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)' at line 4 in C:\code\e_ticaret\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\code\e_ticaret\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*)...', 0)
+#1 C:\code\e_ticaret\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*)...')
+#2 C:\code\e_ticaret\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*)...')
+#3 C:\code\e_ticaret\system\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\code\e_ticaret\app\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+#5 C:\code\e_ticaret\app\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList(Array)
+#6 C:\code\e_ticaret\system\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+#7 C:\code\e_ticaret\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+#8 C:\code\e_ticaret\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\code\e_ticaret\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#10 C:\code\e_ticaret\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\code\e_ticaret\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\code\e_ticaret\system\rewrite.php(44): require_once('C:\\code\\e_ticar...')
+#13 {main}
+CRITICAL - 2026-03-02 19:51:39 --> CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)' at line 4
+[Method: GET, Route: admin/api/shipping]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):', [...], false)
+ 2 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 3 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:51:39 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):', [...], false)
+ 4 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 5 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:51:39 --> [Caused by] mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (delayed,cancelled)')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):', [...], false)
+ 5 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+DEBUG - 2026-03-02 19:52:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-03-02 19:52:07 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4 in C:\code\e_ticaret\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\code\e_ticaret\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*)...', 0)
+#1 C:\code\e_ticaret\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*)...')
+#2 C:\code\e_ticaret\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*)...')
+#3 C:\code\e_ticaret\system\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\code\e_ticaret\app\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+#5 C:\code\e_ticaret\app\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList(Array)
+#6 C:\code\e_ticaret\system\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+#7 C:\code\e_ticaret\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+#8 C:\code\e_ticaret\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\code\e_ticaret\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#10 C:\code\e_ticaret\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\code\e_ticaret\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\code\e_ticaret\system\rewrite.php(44): require_once('C:\\code\\e_ticar...')
+#13 {main}
+CRITICAL - 2026-03-02 19:52:07 --> CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+[Method: GET, Route: admin/api/shipping]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):
+AND `o`.`delivered_at` IS NULL', [...], false)
+ 2 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 3 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:52:07 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):
+AND `o`.`delivered_at` IS NULL', [...], false)
+ 4 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 5 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:52:07 --> [Caused by] mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):
+AND `o`.`delivered_at` IS NULL', [...], false)
+ 5 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+DEBUG - 2026-03-02 19:52:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:54:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:54:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:54:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-03-02 19:54:18 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4 in C:\code\e_ticaret\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\code\e_ticaret\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*)...', 0)
+#1 C:\code\e_ticaret\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*)...')
+#2 C:\code\e_ticaret\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*)...')
+#3 C:\code\e_ticaret\system\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\code\e_ticaret\app\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+#5 C:\code\e_ticaret\app\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList(Array)
+#6 C:\code\e_ticaret\system\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+#7 C:\code\e_ticaret\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+#8 C:\code\e_ticaret\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\code\e_ticaret\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#10 C:\code\e_ticaret\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\code\e_ticaret\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\code\e_ticaret\system\rewrite.php(44): require_once('C:\\code\\e_ticar...')
+#13 {main}
+CRITICAL - 2026-03-02 19:54:18 --> CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+[Method: GET, Route: admin/api/shipping]
+in SYSTEMPATH\Database\BaseConnection.php on line 684.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):
+AND `o`.`delivered_at` IS NULL', [...], false)
+ 2 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 3 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:54:18 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 332.
+ 1 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 2 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):
+AND `o`.`delivered_at` IS NULL', [...], false)
+ 4 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 5 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 7 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 8 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-03-02 19:54:18 --> [Caused by] mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 327.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 3 SYSTEMPATH\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')) IN :LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\')):
+AND `o`.`delivered_at` IS NULL', [...], false)
+ 5 APPPATH\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 APPPATH\Controllers\Admin\Shipping.php(23): App\Models\ShippingModel->datatablesList([...])
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+DEBUG - 2026-03-02 19:54:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:54:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 19:54:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:21:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:21:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:21:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:21:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-03-02 20:21:18 --> mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4 in C:\code\e_ticaret\system\Database\MySQLi\Connection.php:327
+Stack trace:
+#0 C:\code\e_ticaret\system\Database\MySQLi\Connection.php(327): mysqli->query('SELECT COUNT(*)...', 0)
+#1 C:\code\e_ticaret\system\Database\BaseConnection.php(729): CodeIgniter\Database\MySQLi\Connection->execute('SELECT COUNT(*)...')
+#2 C:\code\e_ticaret\system\Database\BaseConnection.php(646): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT COUNT(*)...')
+#3 C:\code\e_ticaret\system\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\code\e_ticaret\app\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+#5 C:\code\e_ticaret\app\Controllers\Admin\Shipping.php(25): App\Models\ShippingModel->datatablesList(Array)
+#6 C:\code\e_ticaret\system\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+#7 C:\code\e_ticaret\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+#8 C:\code\e_ticaret\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\code\e_ticaret\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#10 C:\code\e_ticaret\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\code\e_ticaret\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 C:\code\e_ticaret\system\rewrite.php(44): require_once('C:\\code\\e_ticar...')
+#13 {main}
+ERROR - 2026-03-02 20:21:18 --> [shipping-api] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'delayed,cancelled)
+AND `o`.`delivered_at` IS NULL' at line 4
+ERROR - 2026-03-02 20:21:18 --> #0 C:\code\e_ticaret\system\Database\BaseBuilder.php(1733): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#1 C:\code\e_ticaret\app\Models\ShippingModel.php(44): CodeIgniter\Database\BaseBuilder->countAllResults()
+#2 C:\code\e_ticaret\app\Controllers\Admin\Shipping.php(25): App\Models\ShippingModel->datatablesList(Array)
+#3 C:\code\e_ticaret\system\CodeIgniter.php(933): App\Controllers\Admin\Shipping->datatables()
+#4 C:\code\e_ticaret\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Admin\Shipping))
+#5 C:\code\e_ticaret\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#6 C:\code\e_ticaret\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#7 C:\code\e_ticaret\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#8 C:\code\e_ticaret\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#9 C:\code\e_ticaret\system\rewrite.php(44): require_once('C:\\code\\e_ticar...')
+#10 {main}
+ERROR - 2026-03-02 20:21:18 --> [shipping-api] last_query: SELECT COUNT(*) AS `numrows`
+FROM `orders` `o`
+WHERE `o`.`deleted_at` IS NULL
+AND LOWER(COALESCE(NULLIF(o.shipping_status, ''), 'not_shipped')) IN (not_shipped,preparing,ready,shipped,delayed,cancelled)
+AND `o`.`delivered_at` IS NULL
+DEBUG - 2026-03-02 20:28:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:28:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:28:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:28:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:28:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:28:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:28:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:28:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 20:28:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 21:12:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-03-02 21:12:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

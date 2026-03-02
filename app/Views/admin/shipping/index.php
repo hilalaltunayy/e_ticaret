@@ -233,7 +233,7 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
 <script>
   (function () {
     function initShippingPage() {
-      var todayDate = "<?= esc(date('Y-m-d')) ?>";
+      var activeKpiFilter = '';
 
       var table = $('#shippingTable').DataTable({
         processing: true,
@@ -245,7 +245,14 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
         dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
         ajax: {
           url: "<?= site_url('admin/api/shipping') ?>",
-          type: 'GET'
+          type: 'GET',
+          data: function (d) {
+            if (activeKpiFilter !== '') {
+              d.kpi_filter = activeKpiFilter;
+            } else if (Object.prototype.hasOwnProperty.call(d, 'kpi_filter')) {
+              delete d.kpi_filter;
+            }
+          }
         },
         columns: [
           { data: 'order_no', name: 'order_no' },
@@ -278,18 +285,8 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
 
       function applyKpiFilter(filterName) {
         clearAllSearches();
-
-        if (filterName === 'shipped_today') {
-          table.column(5).search(todayDate);
-        } else if (filterName === 'in_transit') {
-          table.column(4).search('Hazırlanıyor|Kargoda|Geciken', true, false);
-        } else if (filterName === 'delivered') {
-          table.column(4).search('Teslim');
-        } else if (filterName === 'problem') {
-          table.column(4).search('Geciken');
-        }
-
-        table.draw();
+        activeKpiFilter = filterName;
+        table.ajax.reload(null, false);
       }
 
       document.addEventListener('click', function (event) {
@@ -308,7 +305,7 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
 
       $('#btnShippingRefresh').on('click', function () {
         clearAllSearches();
-        table.draw();
+        activeKpiFilter = '';
         table.ajax.reload(null, false);
       });
 
