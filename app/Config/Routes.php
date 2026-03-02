@@ -142,4 +142,7 @@ $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_orders'],
     $routes->post('orders/return/(:segment)', 'Admin\Orders::return/$1');
     $routes->post('orders/return/start/(:segment)', 'Admin\Orders::startReturn/$1');
     $routes->post('orders/return/complete/(:segment)', 'Admin\Orders::completeReturn/$1');
+    $routes->post('orders/invoice/create/(:segment)', 'Admin\Orders::createInvoice/$1');
+    $routes->get('orders/invoice/view/(:segment)', 'Admin\Orders::viewInvoice/$1');
+    $routes->get('orders/invoice/download/(:segment)', 'Admin\Orders::downloadInvoice/$1');
 });

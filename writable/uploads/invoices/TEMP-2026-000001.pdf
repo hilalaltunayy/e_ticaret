@@ -1,0 +1,68 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 556 >>
+stream
+BT
+/F1 12 Tf
+50 800 Td
+14 TL
+(INVOICE) Tj
+T*
+(Invoice No: TEMP-2026-000001) Tj
+T*
+(Issue Date: 2026-03-02) Tj
+T*
+(Customer: demo_musteri_10) Tj
+T*
+(Order ID: 16b076c1-2c01-49f0-8721-34f798834168) Tj
+T*
+() Tj
+T*
+(Subtotal: 2626.00 TRY) Tj
+T*
+(Tax Total: 525.20 TRY) Tj
+T*
+(Grand Total: 3151.20 TRY) Tj
+T*
+() Tj
+T*
+(Items:) Tj
+T*
+(- Demo Basili Ürün 22 x1 = 435.00 TRY) Tj
+T*
+(- Demo Basili Ürün 25 x1 = 581.00 TRY) Tj
+T*
+(- Demo Basili Ürün 15 x2 = 594.00 TRY) Tj
+T*
+(- Demo Basili Ürün 10 x2 = 766.00 TRY) Tj
+T*
+(- Seker Portakali x1 = 250.00 TRY) Tj
+T*
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+918
+%%EOF

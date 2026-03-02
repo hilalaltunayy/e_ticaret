@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice>
+  <InvoiceNo>TEMP-2026-000006</InvoiceNo>
+  <IssueDate>2026-03-02</IssueDate>
+  <Seller><Name>E-Ticaret Demo</Name></Seller>
+  <Buyer><Name>demo_musteri_29</Name></Buyer>
+  <Currency>TRY</Currency>
+  <Totals>
+    <Subtotal>350.00</Subtotal>
+    <TaxTotal>70.00</TaxTotal>
+    <GrandTotal>420.00</GrandTotal>
+  </Totals>
+  <Lines>
+  <Line><ID>1</ID><Name>Kürk Mantolu Madonna</Name><Quantity>1</Quantity><LineTotal>350.00</LineTotal></Line>
+  </Lines>
+</Invoice>

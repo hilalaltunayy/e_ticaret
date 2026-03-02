@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice>
+  <InvoiceNo>TEMP-2026-000004</InvoiceNo>
+  <IssueDate>2026-03-02</IssueDate>
+  <Seller><Name>E-Ticaret Demo</Name></Seller>
+  <Buyer><Name>demo_musteri_17</Name></Buyer>
+  <Currency>TRY</Currency>
+  <Totals>
+    <Subtotal>2054.00</Subtotal>
+    <TaxTotal>410.80</TaxTotal>
+    <GrandTotal>2464.80</GrandTotal>
+  </Totals>
+  <Lines>
+  <Line><ID>1</ID><Name>Sefiller</Name><Quantity>3</Quantity><LineTotal>1200.00</LineTotal></Line>
+  <Line><ID>2</ID><Name>Demo Basılı Ürün 23</Name><Quantity>1</Quantity><LineTotal>344.00</LineTotal></Line>
+  <Line><ID>3</ID><Name>Demo Basılı Ürün 24</Name><Quantity>1</Quantity><LineTotal>510.00</LineTotal></Line>
+  </Lines>
+</Invoice>

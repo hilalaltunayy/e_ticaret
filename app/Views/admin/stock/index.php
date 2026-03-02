@@ -1,4 +1,7 @@
 <?= $this->extend('admin/layouts/main') ?>
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="<?= base_url('assets/admin/css/plugins/dataTables.bootstrap5.min.css') ?>">
+<?= $this->endSection() ?>
 <?= $this->section('content') ?>
 
 <?php
@@ -52,7 +55,7 @@ foreach ($selectedStockHistory as $point) {
                     <div class="alert alert-info mb-0">Kritik stoklu ürün yok</div>
                 <?php else: ?>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table id="criticalStockTable" class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th>Ürün</th>
@@ -170,7 +173,38 @@ foreach ($selectedStockHistory as $point) {
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.bootstrap5.min.js') ?>"></script>
 <script>
+  (function () {
+    if (typeof window.jQuery === 'undefined' || typeof jQuery.fn.DataTable === 'undefined') {
+      return;
+    }
+
+    jQuery('#criticalStockTable').DataTable({
+      searching: true,
+      paging: true,
+      info: true,
+      ordering: true,
+      pageLength: 10,
+      responsive: true,
+      columnDefs: [
+        { targets: 3, orderable: false }
+      ],
+      language: {
+        lengthMenu: '_MENU_ kayıt göster',
+        search: 'Ara:',
+        zeroRecords: 'Kayıt bulunamadı',
+        info: '_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor',
+        infoEmpty: '0 kayıttan 0 - 0 arası gösteriliyor',
+        infoFiltered: '(_MAX_ kayıt içinden filtrelendi)',
+        paginate: { first: 'İlk', last: 'Son', next: 'Sonraki', previous: 'Önceki' },
+        processing: 'Yükleniyor...'
+      }
+    });
+  })();
+
   (function () {
     const pieLabels = <?= json_encode($pieLabels, JSON_UNESCAPED_UNICODE) ?>;
     const pieSeries = <?= json_encode($pieSeries) ?>;

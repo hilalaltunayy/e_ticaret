@@ -51,6 +51,14 @@
 $order = $order ?? [];
 $items = $items ?? [];
 $logs = $logs ?? [];
+$invoice = $invoice ?? null;
+$hasInvoice = is_array($invoice) && $invoice !== [];
+$canCreateInvoice = isset($canCreateInvoice) ? (bool) $canCreateInvoice : true;
+$invoiceBlockMessage = trim((string) ($invoiceBlockMessage ?? ''));
+$disableCreateInvoice = $hasInvoice || ! $canCreateInvoice;
+$createInvoiceTitle = $hasInvoice
+    ? 'Bu sipariş için fatura zaten oluşturulmuş.'
+    : ($canCreateInvoice ? '' : $invoiceBlockMessage);
 
 $orderNo = trim((string) ($order['order_no'] ?? ''));
 if ($orderNo === '') {
@@ -61,6 +69,22 @@ $formatDate = static function (?string $value): string {
     $v = trim((string) $value);
     return $v !== '' ? $v : '-';
 };
+
+$paymentMethodRaw = trim((string) ($order['payment_method'] ?? ''));
+$paymentMethodMap = [
+    'bank_transfer' => 'Online Ödeme',
+    'cash_on_delivery' => 'Kapıda Ödeme',
+];
+$paymentMethodLabel = $paymentMethodMap[$paymentMethodRaw] ?? ($paymentMethodRaw !== '' ? $paymentMethodRaw : '-');
+
+$paymentStatusRaw = trim((string) ($order['payment_status'] ?? ''));
+$paymentStatusMap = [
+    'unpaid' => 'Ödenmedi',
+    'paid' => 'Ödendi',
+    'refunded' => 'İade Edildi',
+    'partially_paid' => 'Kısmi Ödeme',
+];
+$paymentStatusLabel = $paymentStatusMap[$paymentStatusRaw] ?? ($paymentStatusRaw !== '' ? $paymentStatusRaw : '-');
 
 $timelineActionMap = [
     'order_created' => 'Sipariş oluşturuldu',
@@ -276,8 +300,8 @@ $timelineLogs = array_slice($logs, 0, 8);
         <div class="card">
             <div class="card-header"><h5 class="mb-0">Ödeme Bilgisi</h5></div>
             <div class="card-body">
-                <p class="mb-1"><strong>Yöntem:</strong> <?= esc((string) ($order['payment_method'] ?? '-')) ?></p>
-                <p class="mb-1"><strong>Durum:</strong> <?= esc((string) ($order['payment_status'] ?? '-')) ?></p>
+                <p class="mb-1"><strong>Yöntem:</strong> <?= esc($paymentMethodLabel) ?></p>
+                <p class="mb-1"><strong>Durum:</strong> <?= esc($paymentStatusLabel) ?></p>
                 <p class="mb-0"><strong>Paid At:</strong> <?= esc($formatDate((string) ($order['paid_at'] ?? ''))) ?></p>
             </div>
         </div>
@@ -287,8 +311,8 @@ $timelineLogs = array_slice($logs, 0, 8);
             <div class="card-body">
                 <p class="mb-1"><strong>Firma:</strong> <?= esc((string) ($order['shipping_company'] ?? '-')) ?></p>
                 <p class="mb-1"><strong>Takip No:</strong> <?= esc((string) ($order['tracking_number'] ?? '-')) ?></p>
-                <p class="mb-1"><strong>Shipped At:</strong> <?= esc($formatDate((string) ($order['shipped_at'] ?? ''))) ?></p>
-                <p class="mb-0"><strong>Delivered At:</strong> <?= esc($formatDate((string) ($order['delivered_at'] ?? ''))) ?></p>
+                <p class="mb-1"><strong>Kargoya Verilme Tarihi:</strong> <?= esc($formatDate((string) ($order['shipped_at'] ?? ''))) ?></p>
+                <p class="mb-0"><strong>Teslim Tarihi:</strong> <?= esc($formatDate((string) ($order['delivered_at'] ?? ''))) ?></p>
             </div>
         </div>
 
@@ -382,7 +406,21 @@ $timelineLogs = array_slice($logs, 0, 8);
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-outline-dark w-100">İade Tamamla</button>
                 </form>
-                <button type="button" class="btn btn-outline-primary w-100" disabled>Fatura Oluştur (Yakında)</button>
+                <form method="post" action="<?= site_url('admin/orders/invoice/create/' . (string) ($order['id'] ?? '')) ?>">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn-outline-primary w-100" <?= $disableCreateInvoice ? 'disabled aria-disabled="true"' : '' ?> <?= $createInvoiceTitle !== '' ? 'title="' . esc($createInvoiceTitle, 'attr') . '"' : '' ?>>Fatura Oluştur</button>
+                </form>
+                <?php if (! $hasInvoice && ! $canCreateInvoice && $invoiceBlockMessage !== ''): ?>
+                    <div class="small text-muted mt-1"><?= esc($invoiceBlockMessage) ?></div>
+                <?php endif; ?>
+                <?php if ($hasInvoice): ?>
+                    <div class="small mt-1">
+                        <div class="text-muted mb-1">Bu sipariş için fatura zaten oluşturulmuş.</div>
+                        <a href="<?= site_url('admin/orders/invoice/view/' . (string) ($order['id'] ?? '')) ?>" class="btn btn-link btn-sm p-0">Görüntüle</a>
+                        <span class="text-muted mx-1">/</span>
+                        <a href="<?= site_url('admin/orders/invoice/download/' . (string) ($order['id'] ?? '')) ?>" class="btn btn-link btn-sm p-0">İndir</a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

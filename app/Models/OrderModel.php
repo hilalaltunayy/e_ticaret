@@ -295,7 +295,10 @@ class OrderModel extends BaseUuidModel
         }
 
         $status = (string) ($order['status'] ?? '');
-        if ($status !== 'shipped') {
+        $orderStatus = (string) ($order['order_status'] ?? '');
+        $canReturn = in_array($orderStatus, ['return_in_progress', 'shipped', 'delivered'], true)
+            || $status === 'shipped';
+        if (! $canReturn) {
             return false;
         }
 

@@ -72,6 +72,14 @@ $canManageAuthz = ($roleName === 'admin');
             <span class="pc-mtext">Dashboard</span>
           </a>
         </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-layout-grid"></i>
+            </span>
+            <span class="pc-mtext">Sayfa Yönetimi</span>
+          </a>
+        </li>
 
         <li class="pc-item pc-caption">
           <label>Ürün Yönetimi</label>
@@ -84,10 +92,6 @@ $canManageAuthz = ($roleName === 'admin');
             <span class="pc-mtext">Ürünler</span>
           </a>
         </li>
-
-        <li class="pc-item pc-caption">
-          <label>Stok Yönetimi</label>
-        </li>
         <li class="pc-item">
           <a href="<?= site_url('admin/stock') ?>" class="pc-link<?= $isActive('admin/stock') ?>">
             <span class="pc-micon">
@@ -95,10 +99,6 @@ $canManageAuthz = ($roleName === 'admin');
             </span>
             <span class="pc-mtext">Stok Takip Paneli</span>
           </a>
-        </li>
-
-        <li class="pc-item pc-caption">
-          <label>Sipariş Yönetimi</label>
         </li>
         <?php if ($canManageOrders): ?>
           <li class="pc-item">
@@ -110,6 +110,10 @@ $canManageAuthz = ($roleName === 'admin');
             </a>
           </li>
         <?php endif; ?>
+
+        <li class="pc-item pc-caption">
+          <label>Kargo Yönetimi</label>
+        </li>
         <li class="pc-item">
           <a href="<?= site_url('admin/shipping') ?>" class="pc-link<?= $isActive('admin/shipping') ?>">
             <span class="pc-micon">
@@ -130,30 +134,140 @@ $canManageAuthz = ($roleName === 'admin');
         <?php endif; ?>
 
         <li class="pc-item pc-caption">
-          <label>Operasyon</label>
+          <label>Pazarlama Yönetimi</label>
         </li>
         <li class="pc-item">
           <a href="<?= site_url('admin/pricing') ?>" class="pc-link<?= $isActive('admin/pricing') ?>">
             <span class="pc-micon">
               <i class="ti ti-percentage"></i>
             </span>
-            <span class="pc-mtext">Kampanya / Fiyat Paneli</span>
+            <span class="pc-mtext">Kampanya / Kupon / Fiyat Paneli</span>
           </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-mail"></i>
+            </span>
+            <span class="pc-mtext">E-posta / Sms Gönderimi</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-photo"></i>
+            </span>
+            <span class="pc-mtext">Banner Yönetimi</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Finans / Muhasebe Yönetimi</label>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/orders/summary') ?>" class="pc-link<?= $isActive('admin/orders/summary') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-report-money"></i>
+            </span>
+            <span class="pc-mtext">Ödeme Raporları</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/orders') ?>" class="pc-link<?= $isActive('admin/orders') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-receipt-refund"></i>
+            </span>
+            <span class="pc-mtext">İadeler</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Müşteri Yönetimi</label>
         </li>
         <li class="pc-item">
           <a href="<?= site_url('admin/customers') ?>" class="pc-link<?= $isActive('admin/customers') ?>">
             <span class="pc-micon">
               <i class="ti ti-users"></i>
             </span>
-            <span class="pc-mtext">Müşteri Operasyonu</span>
+            <span class="pc-mtext">Müşteriler</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/automation') ?>" class="pc-link<?= $isActive('admin/automation') ?>">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
             <span class="pc-micon">
-              <i class="ti ti-adjustments-automation"></i>
+              <i class="ti ti-message-circle"></i>
             </span>
-            <span class="pc-mtext">Otomasyon ve Akıllı Kurallar</span>
+            <span class="pc-mtext">Müşteri Not ve Mesajları</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Yorum / Değerlendirme</label>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-star"></i>
+            </span>
+            <span class="pc-mtext">Ürün Yorumları</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-alert-circle"></i>
+            </span>
+            <span class="pc-mtext">Şikayet Yönetimi</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Raporlama</label>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/orders/summary') ?>" class="pc-link<?= $isActive('admin/orders/summary') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-chart-bar"></i>
+            </span>
+            <span class="pc-mtext">Satış Raporları</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/products') ?>" class="pc-link<?= $isActive('admin/products') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-chart-histogram"></i>
+            </span>
+            <span class="pc-mtext">Ürün Performansı</span>
+          </a>
+        </li>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-activity"></i>
+            </span>
+            <span class="pc-mtext">Trafik Analizi</span>
+          </a>
+        </li>
+
+        <li class="pc-item pc-caption">
+          <label>Yetkilendirme</label>
+        </li>
+        <?php if ($canManageAuthz): ?>
+          <li class="pc-item">
+            <a href="<?= site_url('admin/settings/permissions') ?>" class="pc-link<?= $isActive('admin/settings/permissions') ?>">
+              <span class="pc-micon">
+                <i class="ti ti-shield-check"></i>
+              </span>
+              <span class="pc-mtext">Rol bazlı erişim</span>
+            </a>
+          </li>
+        <?php endif; ?>
+        <li class="pc-item">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+            <span class="pc-micon">
+              <i class="ti ti-file-text"></i>
+            </span>
+            <span class="pc-mtext">Log Kayıtları</span>
           </a>
         </li>
 
@@ -176,16 +290,6 @@ $canManageAuthz = ($roleName === 'admin');
             <span class="pc-mtext">Ayarlar</span>
           </a>
         </li>
-        <?php if ($canManageAuthz): ?>
-          <li class="pc-item">
-            <a href="<?= site_url('admin/settings/permissions') ?>" class="pc-link<?= $isActive('admin/settings/permissions') ?>">
-              <span class="pc-micon">
-                <i class="ti ti-shield-check"></i>
-              </span>
-              <span class="pc-mtext">Yetkilendirme</span>
-            </a>
-          </li>
-        <?php endif; ?>
       </ul>
     </div>
   </div>

@@ -1,0 +1,64 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding 6 0 R >>
+endobj
+5 0 obj
+<< /Length 400 >>
+stream
+BT
+/F1 12 Tf
+50 800 Td
+14 TL
+(FATURA) Tj
+T*
+(Fatura No: TEMP-2026-000003) Tj
+T*
+(Düzenleme Tarihi: 2026-03-02) Tj
+T*
+(Müþteri: demo_musteri_30) Tj
+T*
+(Sipariþ ID: ddc6f245-022d-46c0-b9ae-604bd4873b24) Tj
+T*
+() Tj
+T*
+(Ara Toplam: 300.00 TRY) Tj
+T*
+(KDV Toplamý: 60.00 TRY) Tj
+T*
+(Genel Toplam: 360.00 TRY) Tj
+T*
+() Tj
+T*
+(Kalemler:) Tj
+T*
+(- Demo Basýlý Ürün 14 \(Adet: 1\) Tutar: 300.00 TRY) Tj
+T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Encoding /BaseEncoding /WinAnsiEncoding /Differences [208 /Gbreve 221 /Idotaccent 222 /Scedilla 240 /gbreve 253 /dotlessi 254 /scedilla] >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000327 00000 n 
+0000000778 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+943
+%%EOF

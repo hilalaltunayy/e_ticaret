@@ -3,18 +3,22 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Models\InvoiceModel;
 use App\Models\OrderItemModel;
 use App\Models\OrderLogModel;
 use App\Models\OrderModel;
 use App\Models\ProductsModel;
+use App\Services\InvoiceService;
 use App\Services\OrdersService;
 
 class Orders extends BaseController
 {
     public function __construct(
-        private ?OrdersService $ordersService = null
+        private ?OrdersService $ordersService = null,
+        private ?InvoiceService $invoiceService = null
     ) {
         $this->ordersService = $this->ordersService ?? new OrdersService();
+        $this->invoiceService = $this->invoiceService ?? new InvoiceService();
     }
 
     public function index()
@@ -261,6 +265,7 @@ class Orders extends BaseController
             ->setHeader('Content-Type', 'application/json; charset=utf-8')
             ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     }
+
     public function inlineStatusUpdate()
     {
         if (! $this->canManageOrders()) {
@@ -351,7 +356,7 @@ class Orders extends BaseController
             }
 
             $orderModel->update((string) $order['id'], $update);
-            $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'status_changed', $fromStatus, $value, 'SipariÃƒâ€¦Ã…Â¸ durumu gÃƒÆ’Ã‚Â¼ncellendi.');
+            $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'status_changed', $fromStatus, $value, 'Sipariş durumu güncellendi.');
         } else {
             $fromStatus = (string) ($order['payment_status'] ?? '');
             $update['payment_status'] = $value;
@@ -381,7 +386,7 @@ class Orders extends BaseController
         $order = $orderModel->findByIdOrOrderNo($identifier);
 
         if (! $order) {
-            return redirect()->to(site_url('admin/orders'))->with('error', 'SipariÃƒâ€¦Ã…Â¸ bulunamadÃƒâ€Ã‚Â±.');
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
         }
 
         $items = $orderModel->getOrderItems((string) $order['id']);
@@ -398,6 +403,10 @@ class Orders extends BaseController
         }
 
         $logs = $orderModel->getOrderLogs((string) $order['id']);
+        $invoice = (new InvoiceModel())->findByOrderId((string) $order['id']);
+        $invoiceEligibility = $this->invoiceService->evaluateInvoiceEligibility($order);
+        $canCreateInvoice = (bool) ($invoiceEligibility['allowed'] ?? false);
+        $invoiceBlockMessage = (string) ($invoiceEligibility['message'] ?? '');
 
         return view('admin/orders/show', [
             'title' => 'Sipariş Detayı',
@@ -406,7 +415,117 @@ class Orders extends BaseController
             'order' => $order,
             'items' => $items,
             'logs' => $logs,
+            'invoice' => $invoice,
+            'canCreateInvoice' => $canCreateInvoice,
+            'invoiceBlockMessage' => $invoiceBlockMessage,
         ]);
+    }
+
+    public function createInvoice(string $identifier)
+    {
+        if (! $this->canManageOrders()) {
+            return redirect()->back()->with('error', 'Yetkisiz istek.');
+        }
+
+        $order = (new OrderModel())->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
+        }
+
+        $invoiceEligibility = $this->invoiceService->evaluateInvoiceEligibility($order);
+        if (! ($invoiceEligibility['allowed'] ?? false)) {
+            return redirect()
+                ->to(site_url('admin/orders/' . (string) $order['id']))
+                ->with('error', (string) ($invoiceEligibility['message'] ?? 'Bu sipariş için fatura oluşturulamaz.'));
+        }
+
+        $result = $this->invoiceService->createForOrder((string) $order['id']);
+        $invoice = is_array($result['invoice'] ?? null) ? $result['invoice'] : null;
+
+        if (($result['code'] ?? '') === 'already_exists') {
+            return redirect()
+                ->to(site_url('admin/orders/' . (string) $order['id']))
+                ->with('error', 'Bu sipariş için fatura zaten oluşturulmuş.');
+        }
+
+        if (! ($result['success'] ?? false)) {
+            return redirect()
+                ->to(site_url('admin/orders/' . (string) $order['id']))
+                ->with('error', (string) ($result['message'] ?? 'Fatura oluşturulamadı.'));
+        }
+
+        if ($invoice !== null) {
+            $actor = $this->getActor();
+            $this->logOrderAction(
+                (string) $order['id'],
+                $actor['id'],
+                $actor['role'],
+                'invoice_generated',
+                null,
+                null,
+                'Fatura oluşturuldu: ' . (string) ($invoice['invoice_no'] ?? '-')
+            );
+        }
+
+        return redirect()
+            ->to(site_url('admin/orders/' . (string) $order['id']))
+            ->with('success', 'Fatura oluşturuldu.');
+    }
+
+    public function viewInvoice(string $identifier)
+    {
+        if (! $this->canManageOrders()) {
+            return $this->response->setStatusCode(403)->setBody('Yetkisiz istek.');
+        }
+
+        $order = (new OrderModel())->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
+        }
+
+        $invoice = $this->invoiceService->findByOrderId((string) $order['id']);
+        if (! $invoice) {
+            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura bulunamadı.');
+        }
+
+        $pdfPath = $this->resolveInvoicePdfPath((string) ($invoice['pdf_path'] ?? ''));
+        if ($pdfPath === null) {
+            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura PDF dosyası bulunamadı.');
+        }
+
+        $fileName = basename($pdfPath);
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="' . $fileName . '"')
+            ->setBody((string) file_get_contents($pdfPath));
+    }
+
+    public function downloadInvoice(string $identifier)
+    {
+        if (! $this->canManageOrders()) {
+            return $this->response->setStatusCode(403)->setBody('Yetkisiz istek.');
+        }
+
+        $order = (new OrderModel())->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
+        }
+
+        $invoice = $this->invoiceService->findByOrderId((string) $order['id']);
+        if (! $invoice) {
+            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura bulunamadı.');
+        }
+
+        $pdfPath = $this->resolveInvoicePdfPath((string) ($invoice['pdf_path'] ?? ''));
+        if ($pdfPath === null) {
+            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura PDF dosyası bulunamadı.');
+        }
+
+        $fileName = basename($pdfPath);
+        return $this->response
+            ->setHeader('Content-Type', 'application/pdf')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+            ->setBody((string) file_get_contents($pdfPath));
     }
 
     public function create()
@@ -453,64 +572,92 @@ class Orders extends BaseController
         $this->upsertOrderItemSnapshot($orderId);
         $this->logOrderAction($orderId, $actor['id'], $actor['role'], 'order_created', null, 'pending', 'SipariÃƒâ€¦Ã…Â¸ oluÃƒâ€¦Ã…Â¸turuldu.');
 
-        return redirect()->back()->with('success', 'SipariÃƒâ€¦Ã…Â¸ rezerve edildi.');
+        return redirect()->back()->with('success', 'Sipariş rezerve edildi.');
     }
 
     public function ship(string $id)
     {
         $actor = $this->getActor();
         if ($actor['id'] === '') {
-            return redirect()->back()->with('error', 'KullanÃƒâ€Ã‚Â±cÃƒâ€Ã‚Â± oturumu bulunamadÃƒâ€Ã‚Â±.');
+            return redirect()->back()->with('error', 'Kullanıcı oturumu bulunamadı.');
         }
 
         $order = (new OrderModel())->findByIdOrOrderNo($id);
         $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
 
         if (! $this->ordersService->shipOrder($id, $actor['id'])) {
-            return redirect()->back()->with('error', 'SipariÃƒâ€¦Ã…Â¸ kargoya verilemedi.');
+            return redirect()->back()->with('error', 'Sipariş kargoya verilemedi.');
         }
 
-        $this->logOrderAction($id, $actor['id'], $actor['role'], 'order_shipped', $fromStatus, 'shipped', 'SipariÃƒâ€¦Ã…Â¸ kargoya verildi.');
+        $this->logOrderAction($id, $actor['id'], $actor['role'], 'order_shipped', $fromStatus, 'shipped', 'Sipariş kargoya verildi.');
 
-        return redirect()->back()->with('success', 'SipariÃƒâ€¦Ã…Â¸ kargoya verildi.');
+        return redirect()->back()->with('success', 'Sipariş kargoya verildi.');
     }
 
     public function cancel(string $id)
     {
         $actor = $this->getActor();
         if ($actor['id'] === '') {
-            return redirect()->back()->with('error', 'KullanÃƒâ€Ã‚Â±cÃƒâ€Ã‚Â± oturumu bulunamadÃƒâ€Ã‚Â±.');
+            return redirect()->back()->with('error', 'Kullanıcı oturumu bulunamadı.');
         }
 
-        $order = (new OrderModel())->findByIdOrOrderNo($id);
+        $orderModel = new OrderModel();
+        $order = $orderModel->findByIdOrOrderNo($id);
+        if (! $order) {
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
+        }
+
         $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
-
-        if (! $this->ordersService->cancelOrder($id, $actor['id'])) {
-            return redirect()->back()->with('error', 'SipariÃƒâ€¦Ã…Â¸ iptal edilemedi.');
+        if ($fromStatus === 'cancelled') {
+            return redirect()->back()->with('success', 'Sipariş zaten iptal edilmiş.');
         }
 
-        $this->logOrderAction($id, $actor['id'], $actor['role'], 'order_cancelled', $fromStatus, 'cancelled', 'SipariÃƒâ€¦Ã…Â¸ iptal edildi.');
+        if (in_array($fromStatus, ['delivered', 'return_in_progress', 'return_done', 'returned'], true)) {
+            return redirect()->back()->with('error', 'Teslim edilmiş veya iade sürecindeki sipariş iptal edilemez.');
+        }
 
-        return redirect()->back()->with('success', 'SipariÃƒâ€¦Ã…Â¸ iptal edildi.');
+        $cancelled = $this->ordersService->cancelOrder($id, $actor['id']);
+        if (! $cancelled) {
+            $now = date('Y-m-d H:i:s');
+            $cancelled = $orderModel->update((string) $order['id'], [
+                'status' => 'cancelled',
+                'order_status' => 'cancelled',
+                'shipping_status' => 'not_shipped',
+                'cancelled_at' => $now,
+                'updated_by' => $actor['id'],
+            ]);
+        }
+
+        if (! $cancelled) {
+            return redirect()->back()->with('error', 'Sipariş iptal edilemedi.');
+        }
+
+        $this->logOrderAction($id, $actor['id'], $actor['role'], 'order_cancelled', $fromStatus, 'cancelled', 'Sipariş iptal edildi.');
+
+        return redirect()->back()->with('success', 'Sipariş iptal edildi.');
     }
 
     public function return(string $id)
     {
         $actor = $this->getActor();
         if ($actor['id'] === '') {
-            return redirect()->back()->with('error', 'KullanÃƒâ€Ã‚Â±cÃƒâ€Ã‚Â± oturumu bulunamadÃƒâ€Ã‚Â±.');
+            return redirect()->back()->with('error', 'Kullanıcı oturumu bulunamadı.');
         }
 
         $order = (new OrderModel())->findByIdOrOrderNo($id);
+        if (! $order) {
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
+        }
+
         $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
 
         if (! $this->ordersService->returnOrder($id, $actor['id'])) {
-            return redirect()->back()->with('error', 'SipariÃƒâ€¦Ã…Â¸ iadesi iÃƒâ€¦Ã…Â¸lenemedi.');
+            return redirect()->back()->with('error', 'Sipariş iadesi işlenemedi.');
         }
 
-        $this->logOrderAction($id, $actor['id'], $actor['role'], 'return_completed', $fromStatus, 'return_done', 'Ãƒâ€Ã‚Â°ade tamamlandÃƒâ€Ã‚Â±.');
+        $this->logOrderAction($id, $actor['id'], $actor['role'], 'return_completed', $fromStatus, 'return_done', 'İade tamamlandı.');
 
-        return redirect()->back()->with('success', 'SipariÃƒâ€¦Ã…Â¸ iadesi iÃƒâ€¦Ã…Â¸lendi.');
+        return redirect()->back()->with('success', 'Sipariş iadesi işlendi.');
     }
 
     public function updateStatus(string $identifier)
@@ -520,14 +667,14 @@ class Orders extends BaseController
             'payment_status' => 'permit_empty|in_list[unpaid,paid,refunded,partial_refund,failed]',
         ];
         if (! $this->validate($rules)) {
-            return redirect()->back()->withInput()->with('error', 'Durum gÃƒÆ’Ã‚Â¼ncelleme verisi geÃƒÆ’Ã‚Â§ersiz.');
+            return redirect()->back()->withInput()->with('error', 'Durum güncelleme verisi geçersiz.');
         }
 
         $actor = $this->getActor();
         $orderModel = new OrderModel();
         $order = $orderModel->findByIdOrOrderNo($identifier);
         if (! $order) {
-            return redirect()->to(site_url('admin/orders'))->with('error', 'SipariÃƒâ€¦Ã…Â¸ bulunamadÃƒâ€Ã‚Â±.');
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
         }
 
         $toStatus = (string) $this->request->getPost('order_status');
@@ -567,13 +714,13 @@ class Orders extends BaseController
         }
 
         $orderModel->update((string) $order['id'], $update);
-        $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'status_changed', $fromStatus, $toStatus, 'SipariÃƒâ€¦Ã…Â¸ durumu gÃƒÆ’Ã‚Â¼ncellendi.');
+        $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'status_changed', $fromStatus, $toStatus, 'Sipariş durumu güncellendi.');
 
         if ($paymentStatus !== '' && $paymentStatus !== (string) ($order['payment_status'] ?? '')) {
-            $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'payment_status_changed', (string) ($order['payment_status'] ?? ''), $paymentStatus, 'ÃƒÆ’Ã¢â‚¬â€œdeme durumu gÃƒÆ’Ã‚Â¼ncellendi.');
+            $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'payment_status_changed', (string) ($order['payment_status'] ?? ''), $paymentStatus, 'Ödeme durumu güncellendi.');
         }
 
-        return redirect()->back()->with('success', 'SipariÃƒâ€¦Ã…Â¸ durumu gÃƒÆ’Ã‚Â¼ncellendi.');
+        return redirect()->back()->with('success', 'Sipariş durumu güncellendi.');
     }
 
     public function updateShipping(string $identifier)
@@ -584,14 +731,14 @@ class Orders extends BaseController
             'shipping_status' => 'permit_empty|in_list[not_shipped,shipped,delivered,returned]',
         ];
         if (! $this->validate($rules)) {
-            return redirect()->back()->withInput()->with('error', 'Kargo bilgileri geÃƒÆ’Ã‚Â§ersiz.');
+            return redirect()->back()->withInput()->with('error', 'Kargo bilgileri geçersiz.');
         }
 
         $actor = $this->getActor();
         $orderModel = new OrderModel();
         $order = $orderModel->findByIdOrOrderNo($identifier);
         if (! $order) {
-            return redirect()->to(site_url('admin/orders'))->with('error', 'SipariÃƒâ€¦Ã…Â¸ bulunamadÃƒâ€Ã‚Â±.');
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
         }
 
         $shippingCompany = trim((string) ($this->request->getPost('shipping_company') ?? ''));
@@ -636,28 +783,28 @@ class Orders extends BaseController
             'shipping_updated',
             (string) ($order['shipping_status'] ?? ''),
             $shippingStatus,
-            'Kargo bilgileri gÃƒÆ’Ã‚Â¼ncellendi.',
+            'Kargo bilgisi güncellendi.',
             [
                 'shipping_company' => $shippingCompany,
                 'tracking_number' => $trackingNumber,
             ]
         );
 
-        return redirect()->back()->with('success', 'Kargo bilgileri gÃƒÆ’Ã‚Â¼ncellendi.');
+        return redirect()->back()->with('success', 'Kargo bilgisi güncellendi.');
     }
 
     public function addNote(string $identifier)
     {
         $rules = ['note' => 'required|min_length[2]|max_length[2000]'];
         if (! $this->validate($rules)) {
-            return redirect()->back()->withInput()->with('error', 'Not alanÃƒâ€Ã‚Â± geÃƒÆ’Ã‚Â§ersiz.');
+            return redirect()->back()->withInput()->with('error', 'Not alanı geçersiz.');
         }
 
         $actor = $this->getActor();
         $orderModel = new OrderModel();
         $order = $orderModel->findByIdOrOrderNo($identifier);
         if (! $order) {
-            return redirect()->to(site_url('admin/orders'))->with('error', 'SipariÃƒâ€¦Ã…Â¸ bulunamadÃƒâ€Ã‚Â±.');
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
         }
 
         $note = trim((string) $this->request->getPost('note'));
@@ -672,19 +819,27 @@ class Orders extends BaseController
 
         $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'admin_note_added', null, null, $note);
 
-        return redirect()->back()->with('success', 'SipariÃƒâ€¦Ã…Â¸ notu eklendi.');
+        return redirect()->back()->with('success', 'Sipariş notu eklendi.');
     }
 
     public function startReturn(string $identifier)
     {
         $actor = $this->getActor();
+        if ($actor['id'] === '') {
+            return redirect()->back()->with('error', 'Kullanıcı oturumu bulunamadı.');
+        }
+
         $orderModel = new OrderModel();
         $order = $orderModel->findByIdOrOrderNo($identifier);
         if (! $order) {
-            return redirect()->to(site_url('admin/orders'))->with('error', 'SipariÃƒâ€¦Ã…Â¸ bulunamadÃƒâ€Ã‚Â±.');
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
         }
 
         $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
+        if ($fromStatus !== 'delivered') {
+            return redirect()->back()->with('error', 'Teslim edilmemiş sipariş için iade başlatılamaz.');
+        }
+
         $orderModel->update((string) $order['id'], [
             'order_status' => 'return_in_progress',
             'shipping_status' => 'returned',
@@ -692,23 +847,31 @@ class Orders extends BaseController
             'updated_by' => $actor['id'] !== '' ? $actor['id'] : null,
         ]);
 
-        $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'return_started', $fromStatus, 'return_in_progress', 'Ãƒâ€Ã‚Â°ade sÃƒÆ’Ã‚Â¼reci baÃƒâ€¦Ã…Â¸latÃƒâ€Ã‚Â±ldÃƒâ€Ã‚Â±.');
+        $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'return_started', $fromStatus, 'return_in_progress', 'İade süreci başlatıldı.');
 
-        return redirect()->back()->with('success', 'Ãƒâ€Ã‚Â°ade sÃƒÆ’Ã‚Â¼reci baÃƒâ€¦Ã…Â¸latÃƒâ€Ã‚Â±ldÃƒâ€Ã‚Â±.');
+        return redirect()->back()->with('success', 'İade süreci başlatıldı.');
     }
 
     public function completeReturn(string $identifier)
     {
         $actor = $this->getActor();
+        if ($actor['id'] === '') {
+            return redirect()->back()->with('error', 'Kullanıcı oturumu bulunamadı.');
+        }
+
         $orderModel = new OrderModel();
         $order = $orderModel->findByIdOrOrderNo($identifier);
         if (! $order) {
-            return redirect()->to(site_url('admin/orders'))->with('error', 'SipariÃƒâ€¦Ã…Â¸ bulunamadÃƒâ€Ã‚Â±.');
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Sipariş bulunamadı.');
         }
 
         $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
+        if ($fromStatus !== 'return_in_progress') {
+            return redirect()->back()->with('error', 'İade tamamlamak için sipariş iade sürecinde olmalıdır.');
+        }
+
         if (! $this->ordersService->returnOrder((string) $order['id'], $actor['id'])) {
-            return redirect()->back()->with('error', 'Ãƒâ€Ã‚Â°ade tamamlanamadÃƒâ€Ã‚Â±.');
+            return redirect()->back()->with('error', 'İade tamamlanamadı.');
         }
 
         $orderModel->update((string) $order['id'], [
@@ -717,9 +880,9 @@ class Orders extends BaseController
             'updated_by' => $actor['id'] !== '' ? $actor['id'] : null,
         ]);
 
-        $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'return_completed', $fromStatus, 'return_done', 'Ãƒâ€Ã‚Â°ade tamamlandÃƒâ€Ã‚Â±.');
+        $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'return_completed', $fromStatus, 'return_done', 'İade tamamlandı.');
 
-        return redirect()->back()->with('success', 'Ãƒâ€Ã‚Â°ade tamamlandÃƒâ€Ã‚Â±.');
+        return redirect()->back()->with('success', 'İade tamamlandı.');
     }
 
     private function upsertOrderItemSnapshot(string $orderId): void
@@ -757,6 +920,22 @@ class Orders extends BaseController
             'quantity' => $quantity,
             'line_total' => $lineTotal,
         ]);
+    }
+
+    private function resolveInvoicePdfPath(string $relativePath): ?string
+    {
+        $path = trim($relativePath);
+        if ($path === '') {
+            return null;
+        }
+
+        $normalized = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, ltrim($path, '/\\'));
+        $absolute = WRITEPATH . $normalized;
+        if (! is_file($absolute)) {
+            return null;
+        }
+
+        return $absolute;
     }
 
     private function getActor(): array
@@ -955,3 +1134,4 @@ class Orders extends BaseController
         ];
     }
 }
+

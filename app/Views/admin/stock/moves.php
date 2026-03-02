@@ -1,4 +1,7 @@
 <?= $this->extend('admin/layouts/main') ?>
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="<?= base_url('assets/admin/css/plugins/dataTables.bootstrap5.min.css') ?>">
+<?= $this->endSection() ?>
 <?= $this->section('content') ?>
 
 <?php
@@ -58,7 +61,7 @@ foreach ($selectedStockHistory as $point) {
                     <div class="alert alert-info mb-0">Aktif basılı ürün bulunamadı.</div>
                 <?php else: ?>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table id="printedProductsTable" class="table table-hover align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th>Ürün</th>
@@ -220,6 +223,9 @@ foreach ($selectedStockHistory as $point) {
 <?= $this->endSection() ?>
 
 <?= $this->section('pageScripts') ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.bootstrap5.min.js') ?>"></script>
 <?php if ($selectedProductId !== ''): ?>
 <script>
   window.addEventListener('load', function () {
@@ -231,6 +237,34 @@ foreach ($selectedStockHistory as $point) {
 </script>
 <?php endif; ?>
 <script>
+  (function () {
+    if (typeof window.jQuery === 'undefined' || typeof jQuery.fn.DataTable === 'undefined') {
+      return;
+    }
+
+    jQuery('#printedProductsTable').DataTable({
+      searching: true,
+      paging: true,
+      info: true,
+      ordering: true,
+      responsive: true,
+      pageLength: 10,
+      columnDefs: [
+        { targets: 5, orderable: false }
+      ],
+      language: {
+        lengthMenu: '_MENU_ kayıt göster',
+        search: 'Ara:',
+        zeroRecords: 'Kayıt bulunamadı',
+        info: '_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor',
+        infoEmpty: '0 kayıttan 0 - 0 arası gösteriliyor',
+        infoFiltered: '(_MAX_ kayıt içinden filtrelendi)',
+        paginate: { first: 'İlk', last: 'Son', next: 'Sonraki', previous: 'Önceki' },
+        processing: 'Yükleniyor...'
+      }
+    });
+  })();
+
   (function () {
     const lineLabels = <?= json_encode($lineLabels, JSON_UNESCAPED_UNICODE) ?>;
     const lineSeries = <?= json_encode($lineSeries) ?>;

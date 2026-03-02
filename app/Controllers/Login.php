@@ -46,6 +46,12 @@ class Login extends BaseController
         $session->set('user_id', (string) ($user['id'] ?? ''));
         $session->set('role', (string) ($user['role'] ?? ''));
 
+        $role = strtolower((string) ($user['role'] ?? ''));
+
+        if ($role === 'admin') {
+            return redirect()->to(base_url('admin/dashboard'));
+        }
+
         // ✅ DİKKAT: burası URL değil, route olmalı.
         // Site anasayfan neyse oraya yönlendir:
         return redirect()->to(base_url('dashboard_anasayfa'));
