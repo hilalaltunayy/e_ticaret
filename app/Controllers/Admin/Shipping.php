@@ -9,8 +9,11 @@ class Shipping extends BaseController
 {
     public function index()
     {
+        $shippingModel = new ShippingModel();
+
         return view('admin/shipping/index', [
             'title' => 'Kargo Takip',
+            'kpi' => $shippingModel->kpiStats(),
         ]);
     }
 
@@ -35,6 +38,9 @@ class Shipping extends BaseController
             $trackingNo = trim((string) ($row['tracking_no'] ?? ''));
             $updatedAt = trim((string) ($row['updated_at'] ?? ''));
             $shippingStatus = trim((string) ($row['shipping_status'] ?? 'not_shipped'));
+            $shippedDate = trim((string) ($row['shipped_date'] ?? ''));
+            $deliveredDate = trim((string) ($row['delivered_date'] ?? ''));
+            $statusGroup = $this->statusGroup($shippingStatus);
 
             $detailHref = $id !== '' ? site_url('admin/orders/' . $id) : '#';
 
@@ -45,6 +51,10 @@ class Shipping extends BaseController
                 'tracking_no' => esc($trackingNo !== '' ? $trackingNo : '-'),
                 'shipping_status' => $this->shippingStatusBadge($shippingStatus),
                 'updated_at' => esc($updatedAt !== '' ? $updatedAt : '-'),
+                'shipping_status_raw' => esc($statusGroup),
+                'shipped_date' => esc($shippedDate),
+                'delivered_filter' => ($deliveredDate !== '' || $statusGroup === 'delivered') ? '1' : '0',
+                'problem_filter' => $statusGroup === 'delayed' ? '1' : '0',
                 'actions' => '<div class="d-flex gap-1">'
                     . '<a href="#" class="btn btn-sm btn-light-secondary">Takip Gör</a>'
                     . '<a href="' . esc($detailHref) . '" class="btn btn-sm btn-outline-primary">Sipariş Detayı</a>'
@@ -86,6 +96,20 @@ class Shipping extends BaseController
             'İade' => '<span class="badge bg-light-warning text-warning">İade</span>',
             'Geciken' => '<span class="badge bg-light-danger text-danger">Geciken</span>',
             default => '<span class="badge bg-light-secondary text-secondary">Hazırlanıyor</span>',
+        };
+    }
+
+    private function statusGroup(string $status): string
+    {
+        $status = strtolower(trim($status));
+
+        return match ($status) {
+            'not_shipped', 'preparing', 'ready' => 'preparing',
+            'shipped' => 'shipped',
+            'delivered' => 'delivered',
+            'returned', 'return_in_progress' => 'returned',
+            'delayed', 'cancelled' => 'delayed',
+            default => 'preparing',
         };
     }
 }

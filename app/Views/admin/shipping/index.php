@@ -11,6 +11,18 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?php
+$kpi = is_array($kpi ?? null) ? $kpi : [];
+$kpiShippedToday = (int) ($kpi['shipped_today'] ?? 0);
+$kpiInTransit = (int) ($kpi['in_transit'] ?? 0);
+$kpiDelivered = (int) ($kpi['delivered'] ?? 0);
+$kpiProblem = (int) ($kpi['problem'] ?? 0);
+$statusPreparing = (int) ($kpi['status_preparing'] ?? 0);
+$statusShipped = (int) ($kpi['status_shipped'] ?? 0);
+$statusDelivered = (int) ($kpi['status_delivered'] ?? 0);
+$statusReturned = (int) ($kpi['status_returned'] ?? 0);
+$statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
+?>
 <div class="page-header">
   <div class="page-block">
     <div class="row align-items-center">
@@ -37,34 +49,34 @@
 
 <div class="row g-3 mb-3">
   <div class="col-12 col-sm-6 col-xl-3">
-    <div class="card statistics-card-1 overflow-hidden">
+    <div class="card statistics-card-1 overflow-hidden js-kpi-card" data-kpi-filter="shipped_today" role="button" style="cursor:pointer;">
       <div class="card-body">
         <h6 class="mb-1 text-muted">Bugün Kargoya Verilen</h6>
-        <h4 class="mb-0">0</h4>
+        <h4 class="mb-0"><?= number_format($kpiShippedToday) ?></h4>
       </div>
     </div>
   </div>
   <div class="col-12 col-sm-6 col-xl-3">
-    <div class="card statistics-card-1 overflow-hidden">
+    <div class="card statistics-card-1 overflow-hidden js-kpi-card" data-kpi-filter="in_transit" role="button" style="cursor:pointer;">
       <div class="card-body">
         <h6 class="mb-1 text-muted">Yolda</h6>
-        <h4 class="mb-0">0</h4>
+        <h4 class="mb-0"><?= number_format($kpiInTransit) ?></h4>
       </div>
     </div>
   </div>
   <div class="col-12 col-sm-6 col-xl-3">
-    <div class="card statistics-card-1 overflow-hidden">
+    <div class="card statistics-card-1 overflow-hidden js-kpi-card" data-kpi-filter="delivered" role="button" style="cursor:pointer;">
       <div class="card-body">
         <h6 class="mb-1 text-muted">Teslim Edildi</h6>
-        <h4 class="mb-0">0</h4>
+        <h4 class="mb-0"><?= number_format($kpiDelivered) ?></h4>
       </div>
     </div>
   </div>
   <div class="col-12 col-sm-6 col-xl-3">
-    <div class="card statistics-card-1 overflow-hidden">
+    <div class="card statistics-card-1 overflow-hidden js-kpi-card" data-kpi-filter="problem" role="button" style="cursor:pointer;">
       <div class="card-body">
         <h6 class="mb-1 text-muted">Sorunlu / Geciken</h6>
-        <h4 class="mb-0">0</h4>
+        <h4 class="mb-0"><?= number_format($kpiProblem) ?></h4>
       </div>
     </div>
   </div>
@@ -120,15 +132,14 @@
       </div>
       <div class="card-body">
         <ul class="list-group list-group-flush">
-          <li class="list-group-item d-flex justify-content-between px-0"><span>Hazırlanıyor</span><span class="badge bg-light-secondary text-secondary">0</span></li>
-          <li class="list-group-item d-flex justify-content-between px-0"><span>Kargoda</span><span class="badge bg-light-primary text-primary">0</span></li>
-          <li class="list-group-item d-flex justify-content-between px-0"><span>Teslim</span><span class="badge bg-light-success text-success">0</span></li>
-          <li class="list-group-item d-flex justify-content-between px-0"><span>İade</span><span class="badge bg-light-warning text-warning">0</span></li>
-          <li class="list-group-item d-flex justify-content-between px-0"><span>Geciken</span><span class="badge bg-light-danger text-danger">0</span></li>
+          <li class="list-group-item d-flex justify-content-between px-0"><span>Hazırlanıyor</span><span class="badge bg-light-secondary text-secondary"><?= number_format($statusPreparing) ?></span></li>
+          <li class="list-group-item d-flex justify-content-between px-0"><span>Kargoda</span><span class="badge bg-light-primary text-primary"><?= number_format($statusShipped) ?></span></li>
+          <li class="list-group-item d-flex justify-content-between px-0"><span>Teslim</span><span class="badge bg-light-success text-success"><?= number_format($statusDelivered) ?></span></li>
+          <li class="list-group-item d-flex justify-content-between px-0"><span>İade</span><span class="badge bg-light-warning text-warning"><?= number_format($statusReturned) ?></span></li>
+          <li class="list-group-item d-flex justify-content-between px-0"><span>Geciken</span><span class="badge bg-light-danger text-danger"><?= number_format($statusDelayed) ?></span></li>
         </ul>
       </div>
     </div>
-
   </div>
 
   <div class="col-12 col-xl-4">
@@ -221,67 +232,118 @@
 <script src="<?= base_url('assets/admin/js/plugins/dataTables.bootstrap5.min.js') ?>"></script>
 <script>
   (function () {
-    var table = $('#shippingTable').DataTable({
-      processing: true,
-      serverSide: true,
-      pageLength: 10,
-      lengthMenu: [10, 25, 50, 100],
-      order: [[5, 'desc']],
-      dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-      ajax: {
-        url: "<?= site_url('admin/api/shipping') ?>",
-        type: 'GET'
-      },
-      columns: [
-        { data: 'order_no', name: 'order_no' },
-        { data: 'customer_name', name: 'customer_name' },
-        { data: 'shipping_company', name: 'shipping_company' },
-        { data: 'tracking_no', name: 'tracking_no' },
-        { data: 'shipping_status', name: 'shipping_status', orderable: false, searchable: false },
-        { data: 'updated_at', name: 'updated_at' },
-        { data: 'actions', name: 'actions', orderable: false, searchable: false }
-      ],
-      language: {
-        lengthMenu: '_MENU_ kayıt göster',
-        search: 'Ara:',
-        zeroRecords: 'Henüz kayıt yok',
-        info: '_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor',
-        infoEmpty: '0 kayıttan 0 - 0 arası gösteriliyor',
-        infoFiltered: '(_MAX_ kayıt içinden filtrelendi)',
-        paginate: { first: 'İlk', last: 'Son', next: 'Sonraki', previous: 'Önceki' },
-        processing: 'Yükleniyor...'
+    function initShippingPage() {
+      var todayDate = "<?= esc(date('Y-m-d')) ?>";
+
+      var table = $('#shippingTable').DataTable({
+        processing: true,
+        serverSide: true,
+        searching: true,
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        order: [[5, 'desc']],
+        dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        ajax: {
+          url: "<?= site_url('admin/api/shipping') ?>",
+          type: 'GET'
+        },
+        columns: [
+          { data: 'order_no', name: 'order_no' },
+          { data: 'customer_name', name: 'customer_name' },
+          { data: 'shipping_company', name: 'shipping_company' },
+          { data: 'tracking_no', name: 'tracking_no' },
+          { data: 'shipping_status', name: 'shipping_status', orderable: false, searchable: false },
+          { data: 'updated_at', name: 'updated_at' },
+          { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ],
+        language: {
+          lengthMenu: '_MENU_ kayıt göster',
+          search: 'Ara:',
+          zeroRecords: 'Henüz kayıt yok',
+          info: '_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor',
+          infoEmpty: '0 kayıttan 0 - 0 arası gösteriliyor',
+          infoFiltered: '(_MAX_ kayıt içinden filtrelendi)',
+          paginate: { first: 'İlk', last: 'Son', next: 'Sonraki', previous: 'Önceki' },
+          processing: 'Yükleniyor...'
+        }
+      });
+
+      function clearAllSearches() {
+        table.search('');
+        var count = table.columns().count();
+        for (var i = 0; i < count; i++) {
+          table.column(i).search('');
+        }
       }
-    });
 
-    $('#btnShippingRefresh').on('click', function () {
-      table.ajax.reload(null, false);
-    });
+      function applyKpiFilter(filterName) {
+        clearAllSearches();
 
-    if (typeof ApexCharts === 'undefined') {
-      $('#avgDeliveryChart').html('<p class="text-muted mb-0">Grafik kütüphanesi bulunamadı. Yakında canlı veri.</p>');
-      $('#carrierPerformanceChart').html('<p class="text-muted mb-0">Grafik kütüphanesi bulunamadı. Yakında canlı veri.</p>');
-      return;
+        if (filterName === 'shipped_today') {
+          table.column(5).search(todayDate);
+        } else if (filterName === 'in_transit') {
+          table.column(4).search('Hazırlanıyor|Kargoda|Geciken', true, false);
+        } else if (filterName === 'delivered') {
+          table.column(4).search('Teslim');
+        } else if (filterName === 'problem') {
+          table.column(4).search('Geciken');
+        }
+
+        table.draw();
+      }
+
+      document.addEventListener('click', function (event) {
+        var card = event.target.closest('[data-kpi-filter]');
+        if (!card) {
+          return;
+        }
+
+        var filterName = card.getAttribute('data-kpi-filter') || '';
+        if (filterName === '') {
+          return;
+        }
+
+        applyKpiFilter(filterName);
+      });
+
+      $('#btnShippingRefresh').on('click', function () {
+        clearAllSearches();
+        table.draw();
+        table.ajax.reload(null, false);
+      });
+
+      if (typeof ApexCharts === 'undefined') {
+        $('#avgDeliveryChart').html('<p class="text-muted mb-0">Grafik kütüphanesi bulunamadı. Yakında canlı veri.</p>');
+        $('#carrierPerformanceChart').html('<p class="text-muted mb-0">Grafik kütüphanesi bulunamadı. Yakında canlı veri.</p>');
+        return;
+      }
+
+      var avgDeliveryChart = new ApexCharts(document.querySelector('#avgDeliveryChart'), {
+        chart: { type: 'area', height: 220, toolbar: { show: false } },
+        series: [{ name: 'Teslim Süresi', data: [2.4, 2.2, 2.8, 2.1, 2.5, 2.3, 2.0] }],
+        xaxis: { categories: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'] },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 2 },
+        noData: { text: 'Yakında canlı veri' }
+      });
+      avgDeliveryChart.render();
+
+      var carrierPerformanceChart = new ApexCharts(document.querySelector('#carrierPerformanceChart'), {
+        chart: { type: 'bar', height: 220, toolbar: { show: false } },
+        series: [{ name: 'Başarı', data: [86, 82, 79, 75] }],
+        xaxis: { categories: ['Yurtiçi', 'Aras', 'MNG', 'PTT'] },
+        dataLabels: { enabled: false },
+        plotOptions: { bar: { borderRadius: 4, columnWidth: '55%' } },
+        noData: { text: 'Yakında canlı veri' }
+      });
+      carrierPerformanceChart.render();
     }
 
-    var avgDeliveryChart = new ApexCharts(document.querySelector('#avgDeliveryChart'), {
-      chart: { type: 'area', height: 220, toolbar: { show: false } },
-      series: [{ name: 'Teslim Süresi', data: [2.4, 2.2, 2.8, 2.1, 2.5, 2.3, 2.0] }],
-      xaxis: { categories: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'] },
-      dataLabels: { enabled: false },
-      stroke: { curve: 'smooth', width: 2 },
-      noData: { text: 'Yakında canlı veri' }
-    });
-    avgDeliveryChart.render();
-
-    var carrierPerformanceChart = new ApexCharts(document.querySelector('#carrierPerformanceChart'), {
-      chart: { type: 'bar', height: 220, toolbar: { show: false } },
-      series: [{ name: 'Başarı', data: [86, 82, 79, 75] }],
-      xaxis: { categories: ['Yurtiçi', 'Aras', 'MNG', 'PTT'] },
-      dataLabels: { enabled: false },
-      plotOptions: { bar: { borderRadius: 4, columnWidth: '55%' } },
-      noData: { text: 'Yakında canlı veri' }
-    });
-    carrierPerformanceChart.render();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initShippingPage);
+    } else {
+      initShippingPage();
+    }
   })();
 </script>
 <?= $this->endSection() ?>

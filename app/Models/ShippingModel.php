@@ -29,7 +29,9 @@ class ShippingModel
             ->select($this->selectField('shipping_company', 'shipping_company', "'-'"), false)
             ->select($this->trackingExpression() . ' AS tracking_no', false)
             ->select($this->statusExpression() . ' AS shipping_status', false)
-            ->select($this->updatedAtExpression() . ' AS updated_at', false);
+            ->select($this->updatedAtExpression() . ' AS updated_at', false)
+            ->select($this->dateOnlyExpression('shipped_at') . ' AS shipped_date', false)
+            ->select($this->dateOnlyExpression('delivered_at') . ' AS delivered_date', false);
 
         if ($this->hasField('deleted_at')) {
             $baseBuilder->where('o.deleted_at', null);
@@ -52,6 +54,8 @@ class ShippingModel
                 ? 'o.shipping_status'
                 : ($this->hasField('order_status') ? 'o.order_status' : ($this->hasField('status') ? 'o.status' : 'updated_at')),
             'updated_at' => $this->sortUpdatedAtColumn(),
+            'shipped_date' => $this->hasField('shipped_at') ? 'DATE(o.shipped_at)' : 'updated_at',
+            'delivered_date' => $this->hasField('delivered_at') ? 'DATE(o.delivered_at)' : 'updated_at',
         ];
 
         $orderIndex = (int) ($params['order'][0]['column'] ?? 5);
@@ -77,41 +81,76 @@ class ShippingModel
     private function applyDatatablesFilters(\CodeIgniter\Database\BaseBuilder $builder, array $params): void
     {
         $searchTerm = trim((string) ($params['search']['value'] ?? ''));
-        if ($searchTerm === '') {
-            return;
+        if ($searchTerm !== '') {
+            $hasAny = false;
+            $builder->groupStart();
+            foreach ([
+                'order_no',
+                'customer_name',
+                'tracking_number',
+                'tracking_no',
+                'shipping_company',
+            ] as $column) {
+                if (! $this->hasField($column)) {
+                    continue;
+                }
+
+                if ($hasAny) {
+                    $builder->orLike('o.' . $column, $searchTerm);
+                } else {
+                    $builder->like('o.' . $column, $searchTerm);
+                    $hasAny = true;
+                }
+            }
+
+            if (! $hasAny && $this->hasField('id')) {
+                $builder->like('o.id', $searchTerm);
+                $hasAny = true;
+            }
+
+            if (! $hasAny) {
+                $builder->where('1 = 0', null, false);
+            }
+
+            $builder->groupEnd();
         }
 
-        $hasAny = false;
-        $builder->groupStart();
-        foreach ([
-            'order_no',
-            'customer_name',
-            'tracking_number',
-            'tracking_no',
-            'shipping_company',
-        ] as $column) {
-            if (! $this->hasField($column)) {
+        $columnSearches = $params['columns'] ?? [];
+        foreach ($columnSearches as $column) {
+            $columnName = (string) ($column['name'] ?? $column['data'] ?? '');
+            $columnValue = trim((string) ($column['search']['value'] ?? ''));
+            if ($columnName === '' || $columnValue === '') {
                 continue;
             }
 
-            if ($hasAny) {
-                $builder->orLike('o.' . $column, $searchTerm);
-            } else {
-                $builder->like('o.' . $column, $searchTerm);
-                $hasAny = true;
+            if ($columnName === 'shipping_status_raw') {
+                $this->applyStatusFilter($builder, $columnValue);
+                continue;
+            }
+
+            if ($columnName === 'shipped_date') {
+                if ($this->hasField('shipped_at')) {
+                    $builder->where('DATE(o.shipped_at)', $columnValue);
+                } else {
+                    $builder->where('1 = 0', null, false);
+                }
+                continue;
+            }
+
+            if ($columnName === 'delivered_filter') {
+                if ($columnValue === '1') {
+                    $this->applyDeliveredFilter($builder);
+                }
+                continue;
+            }
+
+            if ($columnName === 'problem_filter') {
+                if ($columnValue === '1') {
+                    $this->applyProblemFilter($builder);
+                }
+                continue;
             }
         }
-
-        if (! $hasAny && $this->hasField('id')) {
-            $builder->like('o.id', $searchTerm);
-            $hasAny = true;
-        }
-
-        if (! $hasAny) {
-            $builder->where('1 = 0', null, false);
-        }
-
-        $builder->groupEnd();
     }
 
     private function hasField(string $fieldName): bool
@@ -183,5 +222,149 @@ class ShippingModel
         }
 
         return $this->hasField('id') ? 'o.id' : '1';
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function kpiStats(): array
+    {
+        $today = date('Y-m-d');
+        $builder = $this->db->table('orders o')
+            ->select($this->statusExpression() . ' AS shipping_status', false)
+            ->select($this->selectField('shipped_at', 'shipped_at', 'NULL') . ', ' . $this->selectField('delivered_at', 'delivered_at', 'NULL'), false);
+
+        if ($this->hasField('deleted_at')) {
+            $builder->where('o.deleted_at', null);
+        }
+
+        $rows = $builder->get()->getResultArray();
+
+        $stats = [
+            'shipped_today' => 0,
+            'in_transit' => 0,
+            'delivered' => 0,
+            'problem' => 0,
+            'status_preparing' => 0,
+            'status_shipped' => 0,
+            'status_delivered' => 0,
+            'status_returned' => 0,
+            'status_delayed' => 0,
+        ];
+
+        foreach ($rows as $row) {
+            $status = strtolower(trim((string) ($row['shipping_status'] ?? 'not_shipped')));
+            $statusGroup = $this->statusGroup($status);
+            $shippedAt = trim((string) ($row['shipped_at'] ?? ''));
+            $deliveredAt = trim((string) ($row['delivered_at'] ?? ''));
+            $isDelivered = $deliveredAt !== '' || $statusGroup === 'delivered';
+            $isReturned = $statusGroup === 'returned';
+            $isDelayed = $statusGroup === 'delayed';
+
+            if ($shippedAt !== '' && substr($shippedAt, 0, 10) === $today) {
+                $stats['shipped_today']++;
+            }
+
+            if (! $isDelivered && ! $isReturned && in_array($statusGroup, ['preparing', 'shipped', 'delayed'], true)) {
+                $stats['in_transit']++;
+            }
+
+            if ($isDelivered) {
+                $stats['delivered']++;
+            }
+
+            if ($isDelayed) {
+                $stats['problem']++;
+            }
+
+            if ($statusGroup === 'preparing') {
+                $stats['status_preparing']++;
+            } elseif ($statusGroup === 'shipped') {
+                $stats['status_shipped']++;
+            } elseif ($statusGroup === 'delivered') {
+                $stats['status_delivered']++;
+            } elseif ($statusGroup === 'returned') {
+                $stats['status_returned']++;
+            } elseif ($statusGroup === 'delayed') {
+                $stats['status_delayed']++;
+            }
+        }
+
+        return $stats;
+    }
+
+    private function dateOnlyExpression(string $fieldName): string
+    {
+        if ($this->hasField($fieldName)) {
+            return 'DATE(o.' . $fieldName . ')';
+        }
+
+        return 'NULL';
+    }
+
+    private function applyStatusFilter(\CodeIgniter\Database\BaseBuilder $builder, string $filter): void
+    {
+        $map = match ($filter) {
+            'preparing' => ['not_shipped', 'preparing', 'ready'],
+            'shipped' => ['shipped'],
+            'delayed' => ['delayed', 'cancelled'],
+            'in_transit' => ['not_shipped', 'preparing', 'ready', 'shipped', 'delayed', 'cancelled'],
+            default => [],
+        };
+
+        if ($map === []) {
+            return;
+        }
+
+        if ($this->hasField('shipping_status')) {
+            $builder->whereIn('LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\'))', $map, false);
+        } else {
+            $builder->where('1 = 0', null, false);
+        }
+    }
+
+    private function applyDeliveredFilter(\CodeIgniter\Database\BaseBuilder $builder): void
+    {
+        $hasCondition = false;
+        $builder->groupStart();
+        if ($this->hasField('delivered_at')) {
+            $builder->where('o.delivered_at IS NOT NULL', null, false);
+            $hasCondition = true;
+        }
+        if ($this->hasField('shipping_status')) {
+            if ($hasCondition) {
+                $builder->orWhere('LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\'))', 'delivered');
+            } else {
+                $builder->where('LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\'))', 'delivered');
+            }
+            $hasCondition = true;
+        }
+        $builder->groupEnd();
+
+        if (! $hasCondition) {
+            $builder->where('1 = 0', null, false);
+        }
+    }
+
+    private function applyProblemFilter(\CodeIgniter\Database\BaseBuilder $builder): void
+    {
+        if ($this->hasField('shipping_status')) {
+            $builder->whereIn('LOWER(COALESCE(NULLIF(o.shipping_status, \'\'), \'not_shipped\'))', ['delayed', 'cancelled'], false);
+            return;
+        }
+
+        $builder->where('1 = 0', null, false);
+    }
+
+    private function statusGroup(string $status): string
+    {
+        return match ($status) {
+            'not_shipped', 'preparing', 'ready' => 'preparing',
+            'shipped' => 'shipped',
+            'delivered' => 'delivered',
+            'returned', 'return_in_progress' => 'returned',
+            'delayed', 'cancelled' => 'delayed',
+            default => 'preparing',
+        };
     }
 }
