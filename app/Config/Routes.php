@@ -75,6 +75,9 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('dashboard', 'Admin\Dashboard::index');
     $routes->get('stock', 'Admin\Stock::index');
     $routes->get('shipping', 'Admin\Shipping::index');
+    $routes->get('shipping/tracking-template', 'Admin\Shipping::trackingTemplate');
+    $routes->get('shipping/templates/tracking-upload', 'Admin\Shipping::trackingUploadTemplate');
+    $routes->get('shipping/manifesto/download', 'Admin\Shipping::manifestoDownload');
     $routes->get('shipping/companies/create', 'Admin\ShippingCompanies::create');
     $routes->post('shipping/companies/store', 'Admin\ShippingCompanies::store');
     $routes->get('pricing', 'Admin\Pricing::index');
@@ -131,6 +134,10 @@ $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_orders'],
     $routes->get('api/orders/status-distribution', 'Admin\Orders::statusDistribution');
     $routes->get('orders/summary', 'Admin\Orders::summary');
     $routes->get('orders/statuses', 'Admin\OrderStatuses::index');
+    $routes->get('orders/(:segment)/packing/label', 'Admin\Orders::packingLabel/$1');
+    $routes->get('orders/(:segment)/packing/verify', 'Admin\Orders::packingVerify/$1');
+    $routes->post('orders/(:segment)/packing/scan', 'Admin\Orders::packingScan/$1');
+    $routes->post('orders/(:segment)/packing/finish', 'Admin\Orders::packingFinish/$1');
     $routes->get('orders/(:segment)', 'Admin\Orders::show/$1');
     $routes->post('orders/create', 'Admin\Orders::create');
     $routes->post('orders/update-status', 'Admin\Orders::inlineStatusUpdate');

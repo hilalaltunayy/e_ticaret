@@ -410,6 +410,7 @@ $timelineLogs = array_slice($logs, 0, 8);
                     <?= csrf_field() ?>
                     <button type="submit" class="btn btn-outline-primary w-100" <?= $disableCreateInvoice ? 'disabled aria-disabled="true"' : '' ?> <?= $createInvoiceTitle !== '' ? 'title="' . esc($createInvoiceTitle, 'attr') . '"' : '' ?>>Fatura Oluştur</button>
                 </form>
+                <a href="<?= site_url('admin/orders/' . (string) ($order['id'] ?? '') . '/packing/label') ?>" class="btn btn-outline-primary w-100">Kargo Etiketi &Ccedil;&#305;kar</a>
                 <?php if (! $hasInvoice && ! $canCreateInvoice && $invoiceBlockMessage !== ''): ?>
                     <div class="small text-muted mt-1"><?= esc($invoiceBlockMessage) ?></div>
                 <?php endif; ?>
@@ -427,3 +428,5 @@ $timelineLogs = array_slice($logs, 0, 8);
 </div>
 </div>
 <?= $this->endSection() ?>
+
+

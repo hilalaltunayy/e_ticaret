@@ -85,6 +85,12 @@ class ShippingModel
             $this->applyKpiFilter($builder, $kpiFilter);
         }
 
+        $trackCompany = trim((string) ($params['track_company'] ?? ''));
+        $trackNo = trim((string) ($params['track_no'] ?? ''));
+        if ($trackCompany !== '' || $trackNo !== '') {
+            $this->applyTrackingFilters($builder, $trackCompany, $trackNo);
+        }
+
         $searchTerm = trim((string) ($params['search']['value'] ?? ''));
         if ($searchTerm !== '') {
             $hasAny = false;
@@ -154,6 +160,36 @@ class ShippingModel
                     $this->applyProblemFilter($builder);
                 }
                 continue;
+            }
+        }
+    }
+
+    private function applyTrackingFilters(\CodeIgniter\Database\BaseBuilder $builder, string $trackCompany, string $trackNo): void
+    {
+        if ($trackNo !== '') {
+            if ($this->hasField('tracking_number')) {
+                $builder->groupStart()
+                    ->where('o.tracking_number', $trackNo)
+                    ->orLike('o.tracking_number', $trackNo)
+                    ->groupEnd();
+            } elseif ($this->hasField('tracking_no')) {
+                $builder->groupStart()
+                    ->where('o.tracking_no', $trackNo)
+                    ->orLike('o.tracking_no', $trackNo)
+                    ->groupEnd();
+            } else {
+                $builder->where('1 = 0', null, false);
+            }
+        }
+
+        if ($trackCompany !== '') {
+            if ($this->hasField('shipping_company')) {
+                $builder->groupStart()
+                    ->where('o.shipping_company', $trackCompany)
+                    ->orLike('o.shipping_company', $trackCompany)
+                    ->groupEnd();
+            } else {
+                $builder->where('1 = 0', null, false);
             }
         }
     }

@@ -148,7 +148,7 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
         <h5 class="mb-0">Takip Sorgula</h5>
       </div>
       <div class="card-body">
-        <form>
+        <form id="shippingTrackForm">
           <div class="mb-3">
             <label for="shipping_company" class="form-label">Kargo firması</label>
             <select id="shipping_company" class="form-select">
@@ -163,7 +163,7 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
             <label for="tracking_number" class="form-label">Takip numarası</label>
             <input type="text" id="tracking_number" class="form-control" placeholder="Örn: TRK123456789">
           </div>
-          <button type="button" class="btn btn-primary w-100">Sorgula</button>
+          <button type="button" id="btnShippingTrackSearch" class="btn btn-primary w-100">Sorgula</button>
         </form>
       </div>
     </div>
@@ -177,13 +177,24 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
       </div>
       <div class="collapse" id="carrierList">
         <div class="card-body pt-0">
+          <?php $shippingCompanies = is_array($shippingCompanies ?? null) ? $shippingCompanies : []; ?>
           <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between px-0"><span>Yurtiçi Kargo</span><span class="badge bg-light-secondary text-secondary">Entegrasyon: Hazır Değil</span></li>
-            <li class="list-group-item d-flex justify-content-between px-0"><span>Aras Kargo</span><span class="badge bg-light-secondary text-secondary">Entegrasyon: Hazır Değil</span></li>
-            <li class="list-group-item d-flex justify-content-between px-0"><span>MNG Kargo</span><span class="badge bg-light-secondary text-secondary">Entegrasyon: Hazır Değil</span></li>
-            <li class="list-group-item d-flex justify-content-between px-0"><span>Sürat Kargo</span><span class="badge bg-light-secondary text-secondary">Entegrasyon: Hazır Değil</span></li>
-            <li class="list-group-item d-flex justify-content-between px-0"><span>PTT Kargo</span><span class="badge bg-light-secondary text-secondary">Entegrasyon: Hazır Değil</span></li>
-            <li class="list-group-item d-flex justify-content-between px-0"><span>UPS</span><span class="badge bg-light-secondary text-secondary">Entegrasyon: Hazır Değil</span></li>
+            <?php foreach ($shippingCompanies as $company): ?>
+              <?php
+              $companyName = trim((string) ($company['name'] ?? ''));
+              if ($companyName === '') {
+                  continue;
+              }
+              $integrationType = trim((string) ($company['integration_type'] ?? 'Yok'));
+              $isNotReady = $integrationType === '' || strtolower($integrationType) === 'yok';
+              $labelClass = $isNotReady ? 'bg-light-secondary text-secondary' : 'bg-light-success text-success';
+              $labelText = $isNotReady ? 'Entegrasyon: Hazır Değil' : ('Entegrasyon: ' . $integrationType);
+              ?>
+              <li class="list-group-item d-flex justify-content-between px-0">
+                <span><?= esc($companyName) ?></span>
+                <span class="badge <?= esc($labelClass) ?>"><?= esc($labelText) ?></span>
+              </li>
+            <?php endforeach; ?>
           </ul>
           <div class="mt-3">
             <a href="<?= site_url('admin/shipping/companies/create?return_url=' . urlencode(site_url('admin/shipping'))) ?>" class="btn btn-primary w-100">+ Firma Ekle</a>
@@ -201,12 +212,11 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
           <li class="list-group-item px-0">Toplu etiket oluşturma</li>
           <li class="list-group-item px-0">Barkod çıktısı</li>
           <li class="list-group-item px-0">Toplu takip no yükleme (Excel)</li>
-          <li class="list-group-item px-0">Otomatik kargo atama (desi/şehir)</li>
           <li class="list-group-item px-0">Manifesto oluşturma</li>
         </ul>
         <div class="d-grid gap-2">
-          <a href="#" class="btn btn-light-secondary">Excel Şablonu İndir (Yakında)</a>
-          <button type="button" class="btn btn-outline-secondary" disabled>Toplu Yükleme (Yakında)</button>
+          <a href="<?= site_url('admin/shipping/templates/tracking-upload') ?>" class="btn btn-light-secondary">Excel Şablonu İndir</a>
+          <a href="<?= site_url('admin/shipping/manifesto/download?date=' . date('Y-m-d')) ?>" class="btn btn-outline-secondary">Manifesto İndir</a>
         </div>
       </div>
     </div>
@@ -234,6 +244,8 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
   (function () {
     function initShippingPage() {
       var activeKpiFilter = '';
+      var activeTrackCompany = '';
+      var activeTrackNo = '';
 
       var table = $('#shippingTable').DataTable({
         processing: true,
@@ -251,6 +263,18 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
               d.kpi_filter = activeKpiFilter;
             } else if (Object.prototype.hasOwnProperty.call(d, 'kpi_filter')) {
               delete d.kpi_filter;
+            }
+
+            if (activeTrackCompany !== '') {
+              d.track_company = activeTrackCompany;
+            } else if (Object.prototype.hasOwnProperty.call(d, 'track_company')) {
+              delete d.track_company;
+            }
+
+            if (activeTrackNo !== '') {
+              d.track_no = activeTrackNo;
+            } else if (Object.prototype.hasOwnProperty.call(d, 'track_no')) {
+              delete d.track_no;
             }
           }
         },
@@ -285,7 +309,38 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
 
       function applyKpiFilter(filterName) {
         clearAllSearches();
+        activeTrackCompany = '';
+        activeTrackNo = '';
         activeKpiFilter = filterName;
+        table.ajax.reload(null, false);
+      }
+
+      function normalizeTrackCompany(companyValue) {
+        if (companyValue === 'yurtici') {
+          return 'Yurtiçi Kargo';
+        }
+        if (companyValue === 'aras') {
+          return 'Aras Kargo';
+        }
+        if (companyValue === 'mng') {
+          return 'MNG Kargo';
+        }
+        if (companyValue === 'ptt') {
+          return 'PTT Kargo';
+        }
+
+        return companyValue;
+      }
+
+      function applyTrackSearch() {
+        var companyValue = String($('#shipping_company').val() || '').trim();
+        var trackNoValue = String($('#tracking_number').val() || '').trim();
+
+        activeTrackCompany = normalizeTrackCompany(companyValue);
+        activeTrackNo = trackNoValue;
+        activeKpiFilter = '';
+
+        clearAllSearches();
         table.ajax.reload(null, false);
       }
 
@@ -303,9 +358,21 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
         applyKpiFilter(filterName);
       });
 
+      $('#shippingTrackForm').on('submit', function (event) {
+        event.preventDefault();
+        applyTrackSearch();
+      });
+
+      $('#btnShippingTrackSearch').on('click', function (event) {
+        event.preventDefault();
+        applyTrackSearch();
+      });
+
       $('#btnShippingRefresh').on('click', function () {
         clearAllSearches();
         activeKpiFilter = '';
+        activeTrackCompany = '';
+        activeTrackNo = '';
         table.ajax.reload(null, false);
       });
 
