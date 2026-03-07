@@ -3,7 +3,9 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Models\OrderModel;
 use App\Models\ShippingModel;
+use App\Services\PackingService;
 
 class Shipping extends BaseController
 {
@@ -48,6 +50,7 @@ class Shipping extends BaseController
                 $detailHref = $id !== '' ? site_url('admin/orders/' . $id) : '#';
 
                 return [
+                    'order_id' => esc($id),
                     'order_no' => esc($orderNo),
                     'customer_name' => esc($customer !== '' ? $customer : '-'),
                     'shipping_company' => esc($shippingCompany !== '' ? $shippingCompany : '-'),
@@ -115,7 +118,7 @@ class Shipping extends BaseController
 
         $zip->addFromString(
             '[Content_Types].xml',
-            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<xml version="1.0" encoding="UTF-8">'
             . '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
             . '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
             . '<Default Extension="xml" ContentType="application/xml"/>'
@@ -127,7 +130,7 @@ class Shipping extends BaseController
 
         $zip->addFromString(
             '_rels/.rels',
-            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<xml version="1.0" encoding="UTF-8">'
             . '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
             . '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
             . '</Relationships>'
@@ -135,7 +138,7 @@ class Shipping extends BaseController
 
         $zip->addFromString(
             'xl/workbook.xml',
-            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<xml version="1.0" encoding="UTF-8">'
             . '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
             . ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
             . '<sheets>'
@@ -147,7 +150,7 @@ class Shipping extends BaseController
 
         $zip->addFromString(
             'xl/_rels/workbook.xml.rels',
-            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<xml version="1.0" encoding="UTF-8">'
             . '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
             . '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'
             . '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>'
@@ -291,6 +294,288 @@ class Shipping extends BaseController
             ->setBody($csv);
     }
 
+    public function bulkLabels()
+    {
+        $orderIds = $this->selectedOrderIds();
+        if ($orderIds === []) {
+            return $this->invalidBulkSelectionResponse();
+        }
+
+        $orders = $this->selectedOrders($orderIds);
+        if ($orders === []) {
+            return $this->invalidBulkSelectionResponse();
+        }
+
+        $user = session()->get('user') ?? [];
+        $actorId = trim((string) ($user['id'] ?? ''));
+        $packingService = new PackingService();
+
+        $labels = [];
+        foreach ($orders as $order) {
+            $orderId = trim((string) ($order['id'] ?? ''));
+            if ($orderId === '') {
+                continue;
+            }
+
+            $session = $packingService->createOrGetSession($orderId, $actorId !== '' ? $actorId : null);
+            $labels[] = [
+                'order_id' => $orderId,
+                'order_no' => $this->orderNo($order),
+                'customer_name' => trim((string) ($order['customer_name'] ?? '-')),
+                'shipping_company' => trim((string) ($order['shipping_company'] ?? '-')),
+                'tracking_no' => trim((string) ($order['tracking_no'] ?? '-')),
+                'package_code' => trim((string) ($session['package_code'] ?? '-')),
+                'verify_url' => site_url('admin/orders/' . $orderId . '/packing/verify'),
+            ];
+        }
+
+        $html = view('admin/shipping/bulk_labels', [
+            'labels' => $labels,
+            'generatedAt' => date('Y-m-d H:i:s'),
+        ]);
+
+        return $this->response
+            ->setHeader('Content-Type', 'text/html; charset=UTF-8')
+            ->setHeader('Content-Disposition', 'attachment; filename="toplu_kargo_etiketleri.html"')
+            ->setBody($html);
+    }
+
+    public function bulkBarcodes()
+    {
+        $orderIds = $this->selectedOrderIds();
+        if ($orderIds === []) {
+            return $this->invalidBulkSelectionResponse();
+        }
+
+        $orders = $this->selectedOrders($orderIds);
+        if ($orders === []) {
+            return $this->invalidBulkSelectionResponse();
+        }
+
+        $user = session()->get('user') ?? [];
+        $actorId = trim((string) ($user['id'] ?? ''));
+        $packingService = new PackingService();
+        $orderModel = new OrderModel();
+
+        $rows = [];
+        foreach ($orders as $order) {
+            $orderId = trim((string) ($order['id'] ?? ''));
+            if ($orderId === '') {
+                continue;
+            }
+
+            $session = $packingService->createOrGetSession($orderId, $actorId !== '' ? $actorId : null);
+
+            $productCodes = [];
+            foreach ($orderModel->getOrderItems($orderId) as $item) {
+                $pid = trim((string) ($item['product_id'] ?? ''));
+                if ($pid !== '') {
+                    $productCodes[] = $pid;
+                }
+            }
+            if ($productCodes === []) {
+                $fallbackProductId = trim((string) ($order['product_id'] ?? ''));
+                if ($fallbackProductId !== '') {
+                    $productCodes[] = $fallbackProductId;
+                }
+            }
+            $productCodes = array_values(array_unique($productCodes));
+
+            $rows[] = [
+                'order_no' => $this->orderNo($order),
+                'tracking_no' => trim((string) ($order['tracking_no'] ?? '-')),
+                'package_code' => trim((string) ($session['package_code'] ?? '-')),
+                'barcode_text' => $productCodes !== [] ? implode(', ', $productCodes) : '-',
+            ];
+        }
+
+        $html = view('admin/shipping/bulk_barcodes', [
+            'rows' => $rows,
+            'generatedAt' => date('Y-m-d H:i:s'),
+        ]);
+
+        return $this->response
+            ->setHeader('Content-Type', 'text/html; charset=UTF-8')
+            ->setHeader('Content-Disposition', 'attachment; filename="toplu_barkod_ciktisi.html"')
+            ->setBody($html);
+    }
+
+    public function bulkManifest()
+    {
+        $orderIds = $this->selectedOrderIds();
+        if ($orderIds === []) {
+            return $this->invalidBulkSelectionResponse();
+        }
+
+        $orders = $this->selectedOrders($orderIds);
+        if ($orders === []) {
+            return $this->invalidBulkSelectionResponse();
+        }
+
+        $lines = [];
+        $lines[] = [
+            'Sipariş No',
+            'Müşteri',
+            'Kargo Firması',
+            'Takip No',
+            'Kargo Durumu',
+            'Kargoya Veriliş Tarihi',
+        ];
+
+        foreach ($orders as $order) {
+            $status = trim((string) ($order['shipping_status'] ?? 'not_shipped'));
+            $lines[] = [
+                $this->orderNo($order),
+                trim((string) ($order['customer_name'] ?? '-')),
+                trim((string) ($order['shipping_company'] ?? '-')),
+                trim((string) ($order['tracking_no'] ?? '-')),
+                $this->shippingStatusText($status),
+                trim((string) ($order['shipped_at'] ?? '')),
+            ];
+        }
+
+        $csv = "\xEF\xBB\xBF";
+        foreach ($lines as $line) {
+            $csv .= implode(',', array_map([$this, 'csvCell'], $line)) . "\r\n";
+        }
+
+        $fileDate = date('Y-m-d');
+
+        return $this->response
+            ->setHeader('Content-Type', 'text/csv; charset=UTF-8')
+            ->setHeader('Content-Disposition', 'attachment; filename="manifesto_' . $fileDate . '.csv"')
+            ->setBody($csv);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function selectedOrderIds(): array
+    {
+        $raw = $this->request->getPost('order_ids');
+        $items = [];
+
+        if (is_array($raw)) {
+            $items = $raw;
+        } elseif (is_string($raw)) {
+            $items = explode(',', $raw);
+        }
+
+        $ids = [];
+        foreach ($items as $item) {
+            $id = trim((string) $item);
+            if ($id !== '') {
+                $ids[] = $id;
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
+
+    /**
+     * @param array<int, string> $orderIds
+     * @return array<int, array<string, mixed>>
+     */
+    private function selectedOrders(array $orderIds): array
+    {
+        if ($orderIds === []) {
+            return [];
+        }
+
+        $db = db_connect();
+        if (! $db->tableExists('orders')) {
+            return [];
+        }
+
+        $fields = $this->ordersFieldMap($db);
+        if (! isset($fields['id'])) {
+            return [];
+        }
+
+        $select = ['o.id AS id'];
+        $select[] = isset($fields['order_no']) ? 'o.order_no AS order_no' : "'' AS order_no";
+        $select[] = isset($fields['customer_name']) ? 'o.customer_name AS customer_name' : "'-' AS customer_name";
+        $select[] = isset($fields['shipping_company']) ? 'o.shipping_company AS shipping_company' : "'-' AS shipping_company";
+        if (isset($fields['tracking_number'])) {
+            $select[] = 'o.tracking_number AS tracking_no';
+        } elseif (isset($fields['tracking_no'])) {
+            $select[] = 'o.tracking_no AS tracking_no';
+        } else {
+            $select[] = "'-' AS tracking_no";
+        }
+        if (isset($fields['shipping_status'])) {
+            $select[] = "COALESCE(NULLIF(o.shipping_status, ''), 'not_shipped') AS shipping_status";
+        } else {
+            $select[] = "'not_shipped' AS shipping_status";
+        }
+        $select[] = isset($fields['shipped_at']) ? 'o.shipped_at AS shipped_at' : "'' AS shipped_at";
+        $select[] = isset($fields['product_id']) ? 'o.product_id AS product_id' : "'' AS product_id";
+
+        $builder = $db->table('orders o')
+            ->select(implode(', ', $select), false)
+            ->whereIn('o.id', $orderIds);
+
+        if (isset($fields['deleted_at'])) {
+            $builder->where('o.deleted_at', null);
+        }
+
+        $rows = $builder->get()->getResultArray();
+        if ($rows === []) {
+            return [];
+        }
+
+        $mapped = [];
+        foreach ($rows as $row) {
+            $id = trim((string) ($row['id'] ?? ''));
+            if ($id !== '') {
+                $mapped[$id] = $row;
+            }
+        }
+
+        $orderedRows = [];
+        foreach ($orderIds as $orderId) {
+            if (isset($mapped[$orderId])) {
+                $orderedRows[] = $mapped[$orderId];
+            }
+        }
+
+        return $orderedRows;
+    }
+
+    private function invalidBulkSelectionResponse()
+    {
+        $message = 'Lütfen en az bir gönderi seçin.';
+
+        if ($this->request->isAJAX()) {
+            return $this->response
+                ->setStatusCode(422)
+                ->setJSON([
+                    'success' => false,
+                    'message' => $message,
+                ]);
+        }
+
+        return redirect()->to(site_url('admin/shipping'))->with('error', $message);
+    }
+
+    /**
+     * @param array<string, mixed> $order
+     */
+    private function orderNo(array $order): string
+    {
+        $orderNo = trim((string) ($order['order_no'] ?? ''));
+        if ($orderNo !== '') {
+            return $orderNo;
+        }
+
+        $id = trim((string) ($order['id'] ?? ''));
+        if ($id === '') {
+            return '-';
+        }
+
+        return '#' . strtoupper(substr(str_replace('-', '', $id), 0, 8));
+    }
+
     private function shippingStatusBadge(string $status): string
     {
         $labelMap = [
@@ -366,7 +651,7 @@ class Shipping extends BaseController
      */
     private function buildTemplateSheetXml(array $rows): string
     {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>'
+        $xml = '<xml version="1.0" encoding="UTF-8">'
             . '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
             . '<sheetData>';
 

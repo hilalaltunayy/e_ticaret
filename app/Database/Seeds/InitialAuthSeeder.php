@@ -24,10 +24,14 @@ class InitialAuthSeeder extends Seeder
         $permManageProductsId = $this->firstOrCreatePerm($perms, 'manage_products', 'Manage products');
         $permManageOrdersId = $this->firstOrCreatePerm($perms, 'manage_orders', 'Manage orders');
         $permManageShippingId = $this->firstOrCreatePerm($perms, 'manage_shipping', 'Manage shipping automation');
+        $permManageCampaignsId = $this->firstOrCreatePerm($perms, 'manage_campaigns', 'Manage campaigns and coupons');
+        $permManageCampaignsEngineId = $this->firstOrCreatePerm($perms, 'manage_campaigns_engine', 'Manage campaigns engine');
 
         $this->firstOrCreateRolePerm($rp, $roleAdminId, $permManageProductsId);
         $this->firstOrCreateRolePerm($rp, $roleAdminId, $permManageOrdersId);
         $this->firstOrCreateRolePerm($rp, $roleAdminId, $permManageShippingId);
+        $this->firstOrCreateRolePerm($rp, $roleAdminId, $permManageCampaignsId);
+        $this->firstOrCreateRolePerm($rp, $roleAdminId, $permManageCampaignsEngineId);
 
         $this->firstOrCreateRolePerm($rp, $roleSecId, $permManageOrdersId);
 

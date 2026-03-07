@@ -20,13 +20,13 @@
     <div class="row align-items-center">
       <div class="col-md-12">
         <ul class="breadcrumb">
-          <li class="breadcrumb-item"><a href="<?= site_url('admin/dashboard') ?>">Yönetim</a></li>
-          <li class="breadcrumb-item" aria-current="page">Siparişler</li>
+          <li class="breadcrumb-item"><a href="<?= site_url('admin/dashboard') ?>">Y&#246;netim</a></li>
+          <li class="breadcrumb-item" aria-current="page">Sipari&#351;ler</li>
         </ul>
       </div>
       <div class="col-sm-6">
         <div class="page-header-title">
-          <h2 class="mb-0">Siparişler</h2>
+          <h2 class="mb-0">Sipari&#351;ler</h2>
         </div>
       </div>
       <div class="col-sm-6 text-sm-end mt-2 mt-sm-0"></div>
@@ -45,7 +45,7 @@
   <div class="col-sm-6 col-xl-3">
     <div class="card statistics-card-1 overflow-hidden summary-card-clickable js-summary-card" data-smart-filter="all">
       <div class="card-body">
-        <h5 class="mb-1">Toplam Sipariş</h5>
+        <h5 class="mb-1">Toplam Sipari&#351;</h5>
         <h4 class="mb-0" id="summary-total"><?= esc((string) ($summary['total'] ?? 0)) ?></h4>
       </div>
     </div>
@@ -53,7 +53,7 @@
   <div class="col-sm-6 col-xl-3">
     <div class="card statistics-card-1 overflow-hidden summary-card-clickable js-summary-card" data-smart-filter="pending">
       <div class="card-body">
-        <h5 class="mb-1">Bekleyen / Hazırlık</h5>
+        <h5 class="mb-1">Bekleyen / Haz&#305;rl&#305;k</h5>
         <h4 class="mb-0" id="summary-pending"><?= esc((string) ($summary['pending'] ?? 0)) ?></h4>
       </div>
     </div>
@@ -69,7 +69,7 @@
   <div class="col-sm-6 col-xl-3">
     <div class="card statistics-card-1 overflow-hidden summary-card-clickable js-summary-card" data-smart-filter="returned_cancelled">
       <div class="card-body">
-        <h5 class="mb-1">İade / İptal</h5>
+        <h5 class="mb-1">&#304;ade / &#304;ptal</h5>
         <h4 class="mb-0" id="summary-returned-cancelled"><?= esc((string) ((int) ($summary['returned'] ?? 0) + (int) ($summary['cancelled'] ?? 0))) ?></h4>
       </div>
     </div>
@@ -78,11 +78,11 @@
 
 <div class="card mb-3">
   <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <h5 class="mb-0">Sipariş Trendi</h5>
-    <div class="btn-group orders-trend-range" role="group" aria-label="Sipariş trend aralığı">
-      <button type="button" class="btn btn-sm btn-outline-primary js-orders-trend-range active" data-range="daily">Günlük</button>
-      <button type="button" class="btn btn-sm btn-outline-primary js-orders-trend-range" data-range="weekly">Haftalık</button>
-      <button type="button" class="btn btn-sm btn-outline-primary js-orders-trend-range" data-range="monthly">Aylık</button>
+    <h5 class="mb-0">Sipari&#351; Trendi</h5>
+    <div class="btn-group orders-trend-range" role="group" aria-label="Sipari&#351; trend aral&#305;&#287;&#305;">
+      <button type="button" class="btn btn-sm btn-outline-primary js-orders-trend-range active" data-range="daily">G&#252;nl&#252;k</button>
+      <button type="button" class="btn btn-sm btn-outline-primary js-orders-trend-range" data-range="weekly">Haftal&#305;k</button>
+      <button type="button" class="btn btn-sm btn-outline-primary js-orders-trend-range" data-range="monthly">Ayl&#305;k</button>
     </div>
   </div>
   <div class="card-body">
@@ -92,7 +92,7 @@
 
 <div class="card mb-3">
   <div class="card-header">
-    <h5 class="mb-0">Haftalık Sipariş Durum Dağılımı</h5>
+    <h5 class="mb-0">Haftal&#305;k Sipari&#351; Durum Da&#287;&#305;l&#305;m&#305;</h5>
   </div>
   <div class="card-body">
     <div id="ordersStatusDistributionChart"></div>
@@ -103,7 +103,7 @@
   <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
     <h5 class="mb-0">Filtreler</h5>
     <button class="btn btn-light-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOrderFilters" aria-expanded="false" aria-controls="advancedOrderFilters">
-      Gelişmiş Filtreler
+      Geli&#351;mi&#351; Filtreler
     </button>
   </div>
   <div class="card-body">
@@ -111,37 +111,37 @@
       <input type="hidden" id="filter_order_statuses" name="filter_order_statuses" value="">
 
       <div class="col-12 col-md-6 col-lg-2">
-        <label class="form-label" for="filter_order_no">Sipariş No</label>
+        <label class="form-label" for="filter_order_no">Sipari&#351; No</label>
         <input type="text" class="form-control" id="filter_order_no" name="filter_order_no" placeholder="ORD-...">
       </div>
 
       <div class="col-12 col-md-6 col-lg-2">
-        <label class="form-label" for="filter_customer">Müşteri</label>
+        <label class="form-label" for="filter_customer">M&#252;&#351;teri</label>
         <input type="text" class="form-control" id="filter_customer" name="filter_customer" placeholder="Ad / e-posta">
       </div>
 
       <div class="col-12 col-md-6 col-lg-2">
-        <label class="form-label" for="filter_date_start">Başlangıç</label>
+        <label class="form-label" for="filter_date_start">Ba&#351;lang&#305;&#231;</label>
         <input type="date" class="form-control" id="filter_date_start" name="filter_date_start">
       </div>
 
       <div class="col-12 col-md-6 col-lg-2">
-        <label class="form-label" for="filter_date_end">Bitiş</label>
+        <label class="form-label" for="filter_date_end">Biti&#351;</label>
         <input type="date" class="form-control" id="filter_date_end" name="filter_date_end">
       </div>
 
       <div class="col-12 col-md-6 col-lg-2">
-        <label class="form-label" for="filter_order_status">Sipariş Durumu</label>
+        <label class="form-label" for="filter_order_status">Sipari&#351; Durumu</label>
         <select class="form-select" id="filter_order_status" name="filter_order_status">
-          <option value="">Tümü</option>
+          <option value="">T&#252;m&#252;</option>
           <option value="pending">Beklemede</option>
-          <option value="preparing">Hazırlanıyor</option>
+          <option value="preparing">Haz&#305;rlan&#305;yor</option>
           <option value="packed">Paketlendi</option>
           <option value="shipped">Kargoya Verildi</option>
           <option value="delivered">Teslim Edildi</option>
-          <option value="cancelled">İptal Edildi</option>
-          <option value="return_in_progress">İade Sürecinde</option>
-          <option value="return_done">İade Tamamlandı</option>
+          <option value="cancelled">&#304;ptal Edildi</option>
+          <option value="return_in_progress">&#304;ade S&#252;recinde</option>
+          <option value="return_done">&#304;ade Tamamland&#305;</option>
         </select>
       </div>
 
@@ -154,31 +154,31 @@
           <div class="border rounded p-3 mt-1">
             <div class="row g-3 align-items-end">
               <div class="col-12 col-md-4">
-                <label class="form-label" for="filter_payment_method">Ödeme Türü</label>
+                <label class="form-label" for="filter_payment_method">&#214;deme T&#252;r&#252;</label>
                 <select class="form-select" id="filter_payment_method" name="filter_payment_method">
-                  <option value="">Tümü</option>
-                  <option value="credit_card">Kredi Kartı</option>
+                  <option value="">T&#252;m&#252;</option>
+                  <option value="credit_card">Kredi Kart&#305;</option>
                   <option value="bank_transfer">Havale / EFT</option>
-                  <option value="cash_on_delivery">Kapıda Ödeme</option>
+                  <option value="cash_on_delivery">Kap&#305;da &#214;deme</option>
                   <option value="unknown">Bilinmiyor</option>
                 </select>
               </div>
 
               <div class="col-12 col-md-4">
-                <label class="form-label" for="filter_payment_status">Ödeme Durumu</label>
+                <label class="form-label" for="filter_payment_status">&#214;deme Durumu</label>
                 <select class="form-select" id="filter_payment_status" name="filter_payment_status">
-                  <option value="">Tümü</option>
-                  <option value="unpaid">Ödenmedi</option>
-                  <option value="paid">Ödendi</option>
-                  <option value="refunded">İade Edildi</option>
-                  <option value="partial_refund">Kısmi İade</option>
-                  <option value="failed">Başarısız</option>
+                  <option value="">T&#252;m&#252;</option>
+                  <option value="unpaid">&#214;denmedi</option>
+                  <option value="paid">&#214;dendi</option>
+                  <option value="refunded">&#304;ade Edildi</option>
+                  <option value="partial_refund">K&#305;smi &#304;ade</option>
+                  <option value="failed">Ba&#351;ar&#305;s&#305;z</option>
                 </select>
               </div>
 
               <div class="col-12 col-md-4">
-                <label class="form-label" for="filter_shipping_company">Kargo Firması</label>
-                <input type="text" class="form-control" id="filter_shipping_company" name="filter_shipping_company" placeholder="Yurtiçi, Aras...">
+                <label class="form-label" for="filter_shipping_company">Kargo Firmas&#305;</label>
+                <input type="text" class="form-control" id="filter_shipping_company" name="filter_shipping_company" placeholder="Yurti&#231;i, Aras...">
               </div>
 
               <div class="col-12 d-flex justify-content-end">
@@ -198,14 +198,14 @@
       <table id="ordersTable" class="table table-hover table-striped align-middle mb-0 w-100">
         <thead>
           <tr>
-            <th>Sipariş No</th>
-            <th>Müşteri</th>
+            <th>Sipari&#351; No</th>
+            <th>M&#252;&#351;teri</th>
             <th>Tarih</th>
             <th>Tutar</th>
-            <th>Ödeme Durumu</th>
-            <th>Sipariş Durumu</th>
+            <th>&#214;deme Durumu</th>
+            <th>Sipari&#351; Durumu</th>
             <th>Kargo Durumu</th>
-            <th>İşlemler</th>
+            <th>&#304;&#351;lemler</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -348,7 +348,7 @@
           }
         },
         noData: {
-          text: 'Veri yükleniyor...'
+          text: 'Veri y\u00fckleniyor...'
         }
       });
 
@@ -366,7 +366,7 @@
 
         statusDistributionChart.updateOptions({
           xaxis: {
-            categories: res.categories || ['Son 7 Gün']
+            categories: res.categories || ['Son 7 G\u00fcn']
           }
         }, false, false, false);
 
@@ -395,14 +395,14 @@
         },
         series: [],
         xaxis: {
-          categories: ['Son 7 Gün'],
+          categories: ['Son 7 G\u00fcn'],
           title: {
-            text: 'Sipariş Adedi'
+            text: 'Sipari\u015f Adedi'
           }
         },
         yaxis: {
           title: {
-            text: 'Dönem'
+            text: 'D\u00f6nem'
           }
         },
         legend: {
@@ -412,7 +412,7 @@
           enabled: false
         },
         noData: {
-          text: 'Veri yükleniyor...'
+          text: 'Veri y\u00fckleniyor...'
         }
       });
 
@@ -453,14 +453,14 @@
         { data: 'actions', orderable: false, searchable: false }
       ],
       language: {
-        lengthMenu: '_MENU_ kayıt göster',
+        lengthMenu: '_MENU_ kay\u0131t g\u00f6ster',
         search: 'Ara:',
-        zeroRecords: 'Kayıt bulunamadı',
-        info: '_TOTAL_ kayıttan _START_ - _END_ arası gösteriliyor',
-        infoEmpty: '0 kayıttan 0 - 0 arası gösteriliyor',
-        infoFiltered: '(_MAX_ kayıt içinden filtrelendi)',
-        paginate: { first: 'İlk', last: 'Son', next: 'Sonraki', previous: 'Önceki' },
-        processing: 'Yükleniyor...'
+        zeroRecords: 'Kay\u0131t bulunamad\u0131',
+        info: '_TOTAL_ kay\u0131ttan _START_ - _END_ aras\u0131 g\u00f6steriliyor',
+        infoEmpty: '0 kay\u0131ttan 0 - 0 aras\u0131 g\u00f6steriliyor',
+        infoFiltered: '(_MAX_ kay\u0131t i\u00e7inden filtrelendi)',
+        paginate: { first: '\u0130lk', last: 'Son', next: 'Sonraki', previous: '\u00d6nceki' },
+        processing: 'Y\u00fckleniyor...'
       }
     });
 

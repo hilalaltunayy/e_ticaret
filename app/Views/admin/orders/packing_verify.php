@@ -1,6 +1,6 @@
 <?= $this->extend('admin/layouts/main') ?>
 
-<?= $this->section('scripts') ?>
+<?= $this->section('pageScripts') ?>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const scanForm = document.getElementById('packing-scan-form');
@@ -219,6 +219,10 @@ document.addEventListener('DOMContentLoaded', function () {
 $order = $order ?? [];
 $session = $session ?? [];
 $verification = is_array($verification ?? null) ? $verification : [];
+$expectedItems = is_array($expectedItems ?? null) ? $expectedItems : [];
+$scanState = is_array($scanState ?? null) ? $scanState : ['items' => [], 'unknown_scans' => []];
+$scanItemsCount = count((array) ($scanState['items'] ?? []));
+$unknownScansCount = count((array) ($scanState['unknown_scans'] ?? []));
 
 $orderNo = trim((string) ($order['order_no'] ?? ''));
 if ($orderNo === '') {
@@ -227,6 +231,7 @@ if ($orderNo === '') {
 
 $customerName = trim((string) ($order['customer_name'] ?? $order['user_name'] ?? '-'));
 ?>
+<!-- packing_verify_debug expectedItems=<?= (int) count($expectedItems) ?> scanItems=<?= (int) $scanItemsCount ?> unknownScans=<?= (int) $unknownScansCount ?> -->
 
 <div class="page-header">
     <div class="page-block">

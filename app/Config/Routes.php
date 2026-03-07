@@ -78,8 +78,12 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('shipping/tracking-template', 'Admin\Shipping::trackingTemplate');
     $routes->get('shipping/templates/tracking-upload', 'Admin\Shipping::trackingUploadTemplate');
     $routes->get('shipping/manifesto/download', 'Admin\Shipping::manifestoDownload');
+    $routes->post('shipping/bulk/labels', 'Admin\Shipping::bulkLabels');
+    $routes->post('shipping/bulk/barcodes', 'Admin\Shipping::bulkBarcodes');
+    $routes->post('shipping/bulk/manifest', 'Admin\Shipping::bulkManifest');
     $routes->get('shipping/companies/create', 'Admin\ShippingCompanies::create');
     $routes->post('shipping/companies/store', 'Admin\ShippingCompanies::store');
+    $routes->get('marketing', 'Admin\Marketing::index');
     $routes->get('pricing', 'Admin\Pricing::index');
     $routes->get('customers', 'Admin\Customers::index');
     $routes->get('automation', 'Admin\Automation::index');
@@ -121,6 +125,23 @@ $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_shipping'
     $routes->post('shipping/automation/rules/create', 'Admin\ShippingAutomationController::create');
     $routes->post('shipping/automation/rules/update/(:segment)', 'Admin\ShippingAutomationController::update/$1');
     $routes->post('shipping/automation/simulate', 'Admin\ShippingAutomationController::simulate');
+});
+
+$routes->group('admin', ['filter' => 'campaign_access'], function ($routes) {
+    $routes->get('campaigns', 'Admin\Campaigns::index');
+    $routes->get('campaigns/create', 'Admin\Campaigns::create');
+    $routes->post('campaigns', 'Admin\Campaigns::store');
+    $routes->get('campaigns/edit/(:segment)', 'Admin\Campaigns::edit/$1');
+    $routes->post('campaigns/update/(:segment)', 'Admin\Campaigns::update/$1');
+    $routes->post('campaigns/toggle/(:segment)', 'Admin\Campaigns::toggle/$1');
+    $routes->post('campaigns/delete/(:segment)', 'Admin\Campaigns::delete/$1');
+    $routes->get('coupons', 'Admin\Coupons::index');
+    $routes->get('coupons/create', 'Admin\Coupons::create');
+    $routes->post('coupons', 'Admin\Coupons::store');
+    $routes->get('coupons/edit/(:segment)', 'Admin\Coupons::edit/$1');
+    $routes->post('coupons/update/(:segment)', 'Admin\Coupons::update/$1');
+    $routes->post('coupons/toggle/(:segment)', 'Admin\Coupons::toggle/$1');
+    $routes->post('coupons/delete/(:segment)', 'Admin\Coupons::delete/$1');
 });
 
 // ----------------------------------------------------

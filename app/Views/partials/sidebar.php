@@ -16,6 +16,9 @@ if (! is_array($permissions)) {
 
 $canManageOrders = ($roleName === 'admin') || in_array('manage_orders', $permissions, true);
 $canManageShipping = ($roleName === 'admin') || in_array('manage_shipping', $permissions, true);
+$canManageCampaigns = ($roleName === 'admin')
+    || in_array('manage_campaigns', $permissions, true)
+    || in_array('manage_campaigns_engine', $permissions, true);
 $canManageAuthz = ($roleName === 'admin');
 ?>
 <nav class="pc-sidebar">
@@ -136,14 +139,16 @@ $canManageAuthz = ($roleName === 'admin');
         <li class="pc-item pc-caption">
           <label>Pazarlama Yönetimi</label>
         </li>
-        <li class="pc-item">
-          <a href="<?= site_url('admin/pricing') ?>" class="pc-link<?= $isActive('admin/pricing') ?>">
-            <span class="pc-micon">
-              <i class="ti ti-percentage"></i>
-            </span>
-            <span class="pc-mtext">Kampanya / Kupon / Fiyat Paneli</span>
-          </a>
-        </li>
+        <?php if ($canManageCampaigns): ?>
+          <li class="pc-item">
+            <a href="<?= site_url('admin/marketing') ?>" class="pc-link<?= $isActive('admin/marketing') ?>">
+              <span class="pc-micon">
+                <i class="ti ti-percentage"></i>
+              </span>
+              <span class="pc-mtext">Kampanya / Kupon / Fiyat</span>
+            </a>
+          </li>
+        <?php endif; ?>
         <li class="pc-item">
           <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
             <span class="pc-micon">

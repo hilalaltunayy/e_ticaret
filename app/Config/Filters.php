@@ -34,6 +34,7 @@ class Filters extends BaseFilters
             'auth' => \App\Filters\AuthFilter::class,
             'role' => \App\Filters\RoleFilter::class,
             'perm' => \App\Filters\PermissionFilter::class,
+            'campaign_access' => \App\Filters\CampaignAccessFilter::class,
             'csrf'          => \CodeIgniter\Filters\CSRF::class,
             'toolbar'       => \CodeIgniter\Filters\DebugToolbar::class,
             'honeypot'      => \CodeIgniter\Filters\Honeypot::class,

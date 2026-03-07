@@ -93,6 +93,9 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
           <table id="shippingTable" class="table table-hover table-striped align-middle mb-0 w-100">
             <thead>
               <tr>
+                <th style="width:36px;">
+                  <input type="checkbox" id="shippingSelectAll" class="form-check-input" aria-label="Tümünü seç">
+                </th>
                 <th>Sipariş No</th>
                 <th>Müşteri</th>
                 <th>Kargo Firması</th>
@@ -189,7 +192,7 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
               $isNotReady = $integrationType === '' || strtolower($integrationType) === 'yok';
               $labelClass = $isNotReady ? 'bg-light-secondary text-secondary' : 'bg-light-success text-success';
               $labelText = $isNotReady ? 'Entegrasyon: Hazır Değil' : ('Entegrasyon: ' . $integrationType);
-              ?>
+?>
               <li class="list-group-item d-flex justify-content-between px-0">
                 <span><?= esc($companyName) ?></span>
                 <span class="badge <?= esc($labelClass) ?>"><?= esc($labelText) ?></span>
@@ -203,20 +206,21 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
       </div>
     </div>
 
+    <div class="mb-3">
+      <a id="btnPackingLabel" href="#" class="btn btn-primary w-100 disabled" aria-disabled="true">Kargo Etiketi Çıkar</a>
+    </div>
+
     <div class="card mb-3">
       <div class="card-header">
         <h5 class="mb-0">Toplu Kargo İşlemleri</h5>
       </div>
       <div class="card-body">
-        <ul class="list-group list-group-flush mb-3">
-          <li class="list-group-item px-0">Toplu etiket oluşturma</li>
-          <li class="list-group-item px-0">Barkod çıktısı</li>
-          <li class="list-group-item px-0">Toplu takip no yükleme (Excel)</li>
-          <li class="list-group-item px-0">Manifesto oluşturma</li>
-        </ul>
+        <div id="bulkShippingAlert" class="alert alert-warning py-2 px-3 d-none mb-3" role="alert"></div>
         <div class="d-grid gap-2">
-          <a href="<?= site_url('admin/shipping/templates/tracking-upload') ?>" class="btn btn-light-secondary">Excel Şablonu İndir</a>
-          <a href="<?= site_url('admin/shipping/manifesto/download?date=' . date('Y-m-d')) ?>" class="btn btn-outline-secondary">Manifesto İndir</a>
+          <button type="button" class="btn btn-light-secondary text-start js-bulk-action" data-action="labels" data-endpoint="<?= site_url('admin/shipping/bulk/labels') ?>">Toplu Etiket Oluştur</button>
+          <button type="button" class="btn btn-light-secondary text-start js-bulk-action" data-action="barcodes" data-endpoint="<?= site_url('admin/shipping/bulk/barcodes') ?>">Barkod Çıktısı</button>
+          <button type="button" class="btn btn-light-secondary text-start js-bulk-action" data-action="tracking-upload" data-href="<?= site_url('admin/shipping/templates/tracking-upload') ?>">Toplu Takip No Yükleme (Excel)</button>
+          <button type="button" class="btn btn-light-secondary text-start js-bulk-action" data-action="manifest" data-endpoint="<?= site_url('admin/shipping/bulk/manifest') ?>">Manifesto Oluştur</button>
         </div>
       </div>
     </div>
@@ -246,6 +250,24 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
       var activeKpiFilter = '';
       var activeTrackCompany = '';
       var activeTrackNo = '';
+      var packingLabelBase = "<?= site_url('admin/orders') ?>";
+      var csrfTokenName = "<?= csrf_token() ?>";
+      var csrfHash = "<?= csrf_hash() ?>";
+      var selectedOrderIds = {};
+
+      function extractOrderIdFromActions(actionsHtml) {
+        var html = String(actionsHtml || '');
+        var match = html.match(/admin\/orders\/([^"'/?#]+)/i);
+        return match && match[1] ? String(match[1]).trim() : '';
+      }
+
+      function buildPackingLabelUrl(orderId) {
+        if (!orderId) {
+          return '#';
+        }
+
+        return packingLabelBase.replace(/\/+$/, '') + '/' + encodeURIComponent(orderId) + '/packing/label';
+      }
 
       var table = $('#shippingTable').DataTable({
         processing: true,
@@ -253,7 +275,7 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
         searching: true,
         pageLength: 10,
         lengthMenu: [10, 25, 50, 100],
-        order: [[5, 'desc']],
+        order: [[6, 'desc']],
         dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
         ajax: {
           url: "<?= site_url('admin/api/shipping') ?>",
@@ -279,13 +301,41 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
           }
         },
         columns: [
+          {
+            data: 'order_id',
+            name: 'order_id',
+            orderable: false,
+            searchable: false,
+            className: 'text-center',
+            render: function (data) {
+              var orderId = String(data || '').trim();
+              if (orderId === '') {
+                return '';
+              }
+              var checked = selectedOrderIds[orderId] ? ' checked' : '';
+              return '<input type="checkbox" class="form-check-input js-shipping-select" data-order-id="' + orderId + '"' + checked + '>';
+            }
+          },
           { data: 'order_no', name: 'order_no' },
           { data: 'customer_name', name: 'customer_name' },
           { data: 'shipping_company', name: 'shipping_company' },
           { data: 'tracking_no', name: 'tracking_no' },
           { data: 'shipping_status', name: 'shipping_status', orderable: false, searchable: false },
           { data: 'updated_at', name: 'updated_at' },
-          { data: 'actions', name: 'actions', orderable: false, searchable: false }
+          {
+            data: 'actions',
+            name: 'actions',
+            orderable: false,
+            searchable: false,
+            render: function (data, type, row) {
+              var html = String(data || '');
+              var orderId = row && row.order_id ? String(row.order_id).trim() : extractOrderIdFromActions(html);
+              if (orderId !== '') {
+                html += ' <a href="' + buildPackingLabelUrl(orderId) + '" class="btn btn-sm btn-primary">Etiket</a>';
+              }
+              return html;
+            }
+          }
         ],
         language: {
           lengthMenu: '_MENU_ kayıt göster',
@@ -298,6 +348,103 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
           processing: 'Yükleniyor...'
         }
       });
+
+      function updateTopPackingLabelButton() {
+        var button = document.getElementById('btnPackingLabel');
+        if (!button) {
+          return;
+        }
+
+        var rows = table.rows({ page: 'current' }).data().toArray();
+        var firstOrderId = '';
+        for (var i = 0; i < rows.length; i++) {
+          firstOrderId = String((rows[i] && rows[i].order_id) || '').trim();
+          if (firstOrderId === '') {
+            firstOrderId = extractOrderIdFromActions(rows[i] && rows[i].actions);
+          }
+          if (firstOrderId !== '') {
+            break;
+          }
+        }
+
+        if (firstOrderId === '') {
+          button.setAttribute('href', '#');
+          button.classList.add('disabled');
+          button.setAttribute('aria-disabled', 'true');
+          return;
+        }
+
+        button.setAttribute('href', buildPackingLabelUrl(firstOrderId));
+        button.classList.remove('disabled');
+        button.setAttribute('aria-disabled', 'false');
+      }
+
+      table.on('draw', function () {
+        updateTopPackingLabelButton();
+        syncSelectAllCheckbox();
+      });
+
+      function getSelectedOrderIds() {
+        return Object.keys(selectedOrderIds);
+      }
+
+      function showBulkAlert(message) {
+        var alertBox = document.getElementById('bulkShippingAlert');
+        if (!alertBox) {
+          return;
+        }
+        alertBox.textContent = message;
+        alertBox.classList.remove('d-none');
+      }
+
+      function hideBulkAlert() {
+        var alertBox = document.getElementById('bulkShippingAlert');
+        if (!alertBox) {
+          return;
+        }
+        alertBox.classList.add('d-none');
+        alertBox.textContent = '';
+      }
+
+      function syncSelectAllCheckbox() {
+        var selectAll = document.getElementById('shippingSelectAll');
+        if (!selectAll) {
+          return;
+        }
+
+        var $checkboxes = $('#shippingTable tbody .js-shipping-select');
+        var total = $checkboxes.length;
+        var checked = $('#shippingTable tbody .js-shipping-select:checked').length;
+
+        selectAll.checked = total > 0 && checked === total;
+        selectAll.indeterminate = checked > 0 && checked < total;
+      }
+
+      function submitBulkPost(url, orderIds) {
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+        form.target = '_blank';
+        form.style.display = 'none';
+
+        var csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = csrfTokenName;
+        csrfInput.value = csrfHash;
+        form.appendChild(csrfInput);
+
+        for (var i = 0; i < orderIds.length; i++) {
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'order_ids[]';
+          input.value = orderIds[i];
+          form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        form.remove();
+      }
 
       function clearAllSearches() {
         table.search('');
@@ -374,6 +521,65 @@ $statusDelayed = (int) ($kpi['status_delayed'] ?? 0);
         activeTrackCompany = '';
         activeTrackNo = '';
         table.ajax.reload(null, false);
+      });
+
+      $('#shippingTable tbody').on('change', '.js-shipping-select', function () {
+        var orderId = String($(this).data('order-id') || '').trim();
+        if (orderId === '') {
+          return;
+        }
+
+        if (this.checked) {
+          selectedOrderIds[orderId] = true;
+        } else {
+          delete selectedOrderIds[orderId];
+        }
+
+        syncSelectAllCheckbox();
+        hideBulkAlert();
+      });
+
+      $('#shippingSelectAll').on('change', function () {
+        var checked = !!this.checked;
+        $('#shippingTable tbody .js-shipping-select').each(function () {
+          var orderId = String($(this).data('order-id') || '').trim();
+          if (orderId === '') {
+            return;
+          }
+
+          this.checked = checked;
+          if (checked) {
+            selectedOrderIds[orderId] = true;
+          } else {
+            delete selectedOrderIds[orderId];
+          }
+        });
+
+        syncSelectAllCheckbox();
+        hideBulkAlert();
+      });
+
+      $('.js-bulk-action').on('click', function () {
+        var orderIds = getSelectedOrderIds();
+        if (orderIds.length === 0) {
+          showBulkAlert('Lütfen en az bir gönderi seçin.');
+          return;
+        }
+
+        hideBulkAlert();
+        var action = String($(this).data('action') || '');
+
+        if (action === 'tracking-upload') {
+          window.location.href = String($(this).data('href') || '#');
+          return;
+        }
+
+        var endpoint = String($(this).data('endpoint') || '');
+        if (endpoint === '') {
+          return;
+        }
+
+        submitBulkPost(endpoint, orderIds);
       });
 
       if (typeof ApexCharts === 'undefined') {
