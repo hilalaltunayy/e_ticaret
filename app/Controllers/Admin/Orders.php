@@ -398,20 +398,13 @@ class Orders extends BaseController
             return redirect()->back()->with('error', 'Yetkisiz istek.');
         }
 
-        $order = (new OrderModel())->findByIdOrOrderNo($identifier);
-        if (! $order) {
+        $result = $this->invoiceService->createForOrderIdentifier($identifier);
+        $order = is_array($result['order'] ?? null) ? $result['order'] : null;
+        $invoice = is_array($result['invoice'] ?? null) ? $result['invoice'] : null;
+
+        if (($result['code'] ?? '') === 'order_not_found') {
             return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
         }
-
-        $invoiceEligibility = $this->invoiceService->evaluateInvoiceEligibility($order);
-        if (! ($invoiceEligibility['allowed'] ?? false)) {
-            return redirect()
-                ->to(site_url('admin/orders/' . (string) $order['id']))
-                ->with('error', (string) ($invoiceEligibility['message'] ?? 'Fatura olusturulamadi.'));
-        }
-
-        $result = $this->invoiceService->createForOrder((string) $order['id']);
-        $invoice = is_array($result['invoice'] ?? null) ? $result['invoice'] : null;
 
         if (($result['code'] ?? '') === 'already_exists') {
             return redirect()
