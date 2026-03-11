@@ -40,20 +40,13 @@ class Orders extends BaseController
     public function summary()
     {
         if (! $this->canManageOrders()) {
-            return $this->response->setStatusCode(403)->setJSON([
-                'success' => false,
-                'message' => 'Yetkisiz istek.',
-            ]);
+            return $this->unauthorizedJsonResponse();
         }
 
-        return $this->response->setJSON([
+        return $this->response->setJSON($this->withCsrf([
             'success' => true,
             'summary' => $this->getSummaryCounts(),
-            'csrf' => [
-                'token' => csrf_token(),
-                'hash' => csrf_hash(),
-            ],
-        ]);
+        ]));
     }
 
     public function analytics()
@@ -64,19 +57,14 @@ class Orders extends BaseController
                 'message' => 'Yetkisiz istek.',
             ];
 
-            return $this->response
-                ->setStatusCode(403)
-                ->setHeader('Content-Type', 'application/json; charset=utf-8')
-                ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            return $this->utf8JsonResponse($payload, 403);
         }
 
         $payload = $this->ordersReportingService->buildAnalyticsPayload(
             (string) ($this->request->getGet('range') ?? 'daily')
         );
 
-        return $this->response
-            ->setHeader('Content-Type', 'application/json; charset=utf-8')
-            ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        return $this->utf8JsonResponse($payload);
     }
 
     public function statusDistribution()
@@ -87,19 +75,14 @@ class Orders extends BaseController
                 'message' => 'Yetkisiz istek.',
             ];
 
-            return $this->response
-                ->setStatusCode(403)
-                ->setHeader('Content-Type', 'application/json; charset=utf-8')
-                ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            return $this->utf8JsonResponse($payload, 403);
         }
 
         $payload = $this->ordersReportingService->buildStatusDistributionPayload(
             (string) ($this->request->getGet('range') ?? 'weekly')
         );
 
-        return $this->response
-            ->setHeader('Content-Type', 'application/json; charset=utf-8')
-            ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        return $this->utf8JsonResponse($payload);
     }
 
     public function datatables()
@@ -146,18 +129,13 @@ class Orders extends BaseController
             'data' => $data,
         ];
 
-        return $this->response
-            ->setHeader('Content-Type', 'application/json; charset=utf-8')
-            ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        return $this->utf8JsonResponse($payload);
     }
 
     public function inlineStatusUpdate()
     {
         if (! $this->canManageOrders()) {
-            return $this->response->setStatusCode(403)->setJSON([
-                'success' => false,
-                'message' => 'Yetkisiz istek.',
-            ]);
+            return $this->unauthorizedJsonResponse();
         }
 
         $orderId = trim((string) ($this->request->getPost('order_id') ?? ''));
@@ -165,38 +143,23 @@ class Orders extends BaseController
         $value = trim((string) ($this->request->getPost('value') ?? ''));
 
         if ($orderId === '' || ! in_array($field, ['order_status', 'payment_status'], true) || $value === '') {
-            return $this->response->setStatusCode(422)->setJSON([
-                'success' => false,
-                'message' => "Gecersiz istek.",
-                'csrf' => [
-                    'token' => csrf_token(),
-                    'hash' => csrf_hash(),
-                ],
-            ]);
+            return $this->jsonErrorResponse(422, "Gecersiz istek.");
         }
 
         $actor = $this->getActor();
         $result = $this->ordersService->applyInlineStatusUpdate($orderId, $field, $value, $actor);
         if (! (bool) ($result['success'] ?? false)) {
-            return $this->response->setStatusCode((int) ($result['httpStatus'] ?? 422))->setJSON([
-                'success' => false,
-                'message' => (string) ($result['message'] ?? "Gecersiz istek."),
-                'csrf' => [
-                    'token' => csrf_token(),
-                    'hash' => csrf_hash(),
-                ],
-            ]);
+            return $this->jsonErrorResponse(
+                (int) ($result['httpStatus'] ?? 422),
+                (string) ($result['message'] ?? "Gecersiz istek.")
+            );
         }
 
-        return $this->response->setJSON([
+        return $this->response->setJSON($this->withCsrf([
             'success' => true,
             'message' => "Durum guncellendi.",
             'summary' => $this->getSummaryCounts(),
-            'csrf' => [
-                'token' => csrf_token(),
-                'hash' => csrf_hash(),
-            ],
-        ]);
+        ]));
     }
 
     public function show(string $identifier)
@@ -316,10 +279,7 @@ class Orders extends BaseController
     public function packingScan(string $identifier)
     {
         if (! $this->canManageOrders()) {
-            return $this->response->setStatusCode(403)->setJSON([
-                'success' => false,
-                'message' => 'Yetkisiz istek.',
-            ]);
+            return $this->unauthorizedJsonResponse();
         }
 
         $scanCode = trim((string) ($this->request->getPost('barcode') ?? ''));
@@ -332,72 +292,43 @@ class Orders extends BaseController
         $qty = max(1, (int) ($this->request->getPost('qty') ?? 1));
 
         if ($scanCode === '') {
-            return $this->response->setStatusCode(422)->setJSON([
-                'success' => false,
-                'message' => 'Barkod veya ISBN zorunludur.',
-                'csrf' => [
-                    'token' => csrf_token(),
-                    'hash' => csrf_hash(),
-                ],
-            ]);
+            return $this->jsonErrorResponse(422, 'Barkod veya ISBN zorunludur.');
         }
 
         $result = $this->packingService->applyScanForOrderIdentifier($identifier, $scanCode, $qty);
         $type = (string) ($result['type'] ?? '');
 
         if ($type === 'not_found') {
-            return $this->response->setStatusCode(404)->setJSON([
-                'success' => false,
-                'message' => 'Siparis bulunamadi.',
-                'csrf' => [
-                    'token' => csrf_token(),
-                    'hash' => csrf_hash(),
-                ],
-            ]);
+            $order = $this->findOrderByIdentifierOrJsonError($identifier);
+            if ($order instanceof \CodeIgniter\HTTP\ResponseInterface) {
+                return $order;
+            }
+
+            return $this->jsonErrorResponse(404, 'Siparis bulunamadi.');
         }
 
         if ($type === 'session_not_found') {
-            return $this->response->setStatusCode(409)->setJSON([
-                'success' => false,
-                'message' => 'Acik paket dogrulama oturumu bulunamadi.',
-                'csrf' => [
-                    'token' => csrf_token(),
-                    'hash' => csrf_hash(),
-                ],
-            ]);
+            return $this->jsonErrorResponse(409, 'Acik paket dogrulama oturumu bulunamadi.');
         }
 
         if (! (bool) ($result['success'] ?? false)) {
-            return $this->response->setStatusCode(422)->setJSON([
-                'success' => false,
-                'message' => (string) ($result['message'] ?? 'Okutma kaydedilemedi.'),
+            return $this->jsonErrorResponse(422, (string) ($result['message'] ?? 'Okutma kaydedilemedi.'), [
                 'verification' => $result['verification'] ?? null,
-                'csrf' => [
-                    'token' => csrf_token(),
-                    'hash' => csrf_hash(),
-                ],
             ]);
         }
 
-        return $this->response->setJSON([
+        return $this->response->setJSON($this->withCsrf([
             'success' => true,
             'message' => (string) ($result['message'] ?? 'Okutma kaydedildi.'),
             'verification' => $result['verification'] ?? null,
-            'csrf' => [
-                'token' => csrf_token(),
-                'hash' => csrf_hash(),
-            ],
-        ]);
+        ]));
     }
 
     public function packingFinish(string $identifier)
     {
         if (! $this->canManageOrders()) {
             if ($this->request->isAJAX()) {
-                return $this->response->setStatusCode(403)->setJSON([
-                    'success' => false,
-                    'message' => 'Yetkisiz istek.',
-                ]);
+                return $this->unauthorizedJsonResponse();
             }
 
             return redirect()->back()->with('error', 'Yetkisiz istek.');
@@ -410,10 +341,12 @@ class Orders extends BaseController
 
         if ($type === 'not_found') {
             if ($this->request->isAJAX()) {
-                return $this->response->setStatusCode(404)->setJSON([
-                    'success' => false,
-                    'message' => 'Siparis bulunamadi.',
-                ]);
+                $resolvedOrder = $this->findOrderByIdentifierOrJsonError($identifier, 404, false);
+                if ($resolvedOrder instanceof \CodeIgniter\HTTP\ResponseInterface) {
+                    return $resolvedOrder;
+                }
+
+                return $this->jsonErrorResponse(404, 'Siparis bulunamadi.', [], false);
             }
 
             return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
@@ -421,10 +354,7 @@ class Orders extends BaseController
 
         if ($type === 'session_not_found') {
             if ($this->request->isAJAX()) {
-                return $this->response->setStatusCode(409)->setJSON([
-                    'success' => false,
-                    'message' => 'Acik paket dogrulama oturumu bulunamadi.',
-                ]);
+                return $this->jsonErrorResponse(409, 'Acik paket dogrulama oturumu bulunamadi.', [], false);
             }
 
             return redirect()->to(site_url('admin/orders/' . $orderId . '/packing/verify'))
@@ -434,14 +364,8 @@ class Orders extends BaseController
         if ($type === 'cannot_finish') {
             $verification = $result['verification'] ?? null;
             if ($this->request->isAJAX()) {
-                return $this->response->setStatusCode(422)->setJSON([
-                    'success' => false,
-                    'message' => 'Dogrulama tamamlanamadi. Eksik, fazla veya bilinmeyen okutma var.',
+                return $this->jsonErrorResponse(422, 'Dogrulama tamamlanamadi. Eksik, fazla veya bilinmeyen okutma var.', [
                     'verification' => $verification,
-                    'csrf' => [
-                        'token' => csrf_token(),
-                        'hash' => csrf_hash(),
-                    ],
                 ]);
             }
 
@@ -451,10 +375,7 @@ class Orders extends BaseController
 
         if ($type === 'save_failed' || ! (bool) ($result['success'] ?? false)) {
             if ($this->request->isAJAX()) {
-                return $this->response->setStatusCode(500)->setJSON([
-                    'success' => false,
-                    'message' => 'Paket dogrulamasi tamamlanamadi.',
-                ]);
+                return $this->jsonErrorResponse(500, 'Paket dogrulamasi tamamlanamadi.', [], false);
             }
 
             return redirect()->to(site_url('admin/orders/' . $orderId . '/packing/verify'))
@@ -462,14 +383,10 @@ class Orders extends BaseController
         }
 
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON([
+            return $this->response->setJSON($this->withCsrf([
                 'success' => true,
                 'message' => 'Paket dogrulamasi tamamlandi.',
-                'csrf' => [
-                    'token' => csrf_token(),
-                    'hash' => csrf_hash(),
-                ],
-            ]);
+            ]));
         }
 
         return redirect()->to(site_url('admin/orders/' . $orderId . '/packing/verify'))
@@ -532,26 +449,15 @@ class Orders extends BaseController
             return $this->response->setStatusCode(403)->setBody('Yetkisiz istek.');
         }
 
-        $order = (new OrderModel())->findByIdOrOrderNo($identifier);
-        if (! $order) {
-            return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
+        $pdf = $this->resolveInvoicePdfResponseData($identifier);
+        if ($pdf instanceof \CodeIgniter\HTTP\RedirectResponse) {
+            return $pdf;
         }
 
-        $invoice = $this->invoiceService->findByOrderId((string) $order['id']);
-        if (! $invoice) {
-            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura bulunamadi.');
-        }
-
-        $pdfPath = $this->resolveInvoicePdfPath((string) ($invoice['pdf_path'] ?? ''));
-        if ($pdfPath === null) {
-            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura PDF dosyasi bulunamadi.');
-        }
-
-        $fileName = basename($pdfPath);
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
-            ->setHeader('Content-Disposition', 'inline; filename="' . $fileName . '"')
-            ->setBody((string) file_get_contents($pdfPath));
+            ->setHeader('Content-Disposition', 'inline; filename="' . $pdf['fileName'] . '"')
+            ->setBody($pdf['body']);
     }
 
     public function downloadInvoice(string $identifier)
@@ -560,26 +466,15 @@ class Orders extends BaseController
             return $this->response->setStatusCode(403)->setBody('Yetkisiz istek.');
         }
 
-        $order = (new OrderModel())->findByIdOrOrderNo($identifier);
-        if (! $order) {
-            return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
+        $pdf = $this->resolveInvoicePdfResponseData($identifier);
+        if ($pdf instanceof \CodeIgniter\HTTP\RedirectResponse) {
+            return $pdf;
         }
 
-        $invoice = $this->invoiceService->findByOrderId((string) $order['id']);
-        if (! $invoice) {
-            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura bulunamadi.');
-        }
-
-        $pdfPath = $this->resolveInvoicePdfPath((string) ($invoice['pdf_path'] ?? ''));
-        if ($pdfPath === null) {
-            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura PDF dosyasi bulunamadi.');
-        }
-
-        $fileName = basename($pdfPath);
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
-            ->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"')
-            ->setBody((string) file_get_contents($pdfPath));
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $pdf['fileName'] . '"')
+            ->setBody($pdf['body']);
     }
 
     public function create()
@@ -1045,20 +940,30 @@ class Orders extends BaseController
         ];
     }
 
-    private function resolveInvoicePdfPath(string $relativePath): ?string
+    private function resolveInvoicePdfResponseData(string $identifier)
     {
-        $path = trim($relativePath);
-        if ($path === '') {
-            return null;
+        $order = (new OrderModel())->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
         }
 
+        $invoice = $this->invoiceService->findByOrderId((string) $order['id']);
+        if (! $invoice) {
+            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura bulunamadi.');
+        }
+
+        $path = trim((string) ($invoice['pdf_path'] ?? ''));
         $normalized = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, ltrim($path, '/\\'));
-        $absolute = WRITEPATH . $normalized;
-        if (! is_file($absolute)) {
-            return null;
+        $pdfPath = WRITEPATH . $normalized;
+
+        if ($path === '' || ! is_file($pdfPath)) {
+            return redirect()->to(site_url('admin/orders/' . (string) $order['id']))->with('error', 'Fatura PDF dosyasi bulunamadi.');
         }
 
-        return $absolute;
+        return [
+            'fileName' => basename($pdfPath),
+            'body' => (string) file_get_contents($pdfPath),
+        ];
     }
 
     private function getActor(): array
@@ -1075,6 +980,67 @@ class Orders extends BaseController
         $user = session()->get('user') ?? [];
         $role = strtolower((string) ($user['role'] ?? ''));
         return in_array($role, ['admin', 'secretary'], true);
+    }
+
+    private function unauthorizedJsonResponse()
+    {
+        return $this->response->setStatusCode(403)->setJSON([
+            'success' => false,
+            'message' => 'Yetkisiz istek.',
+        ]);
+    }
+
+    private function csrfPayload(): array
+    {
+        return [
+            'token' => csrf_token(),
+            'hash' => csrf_hash(),
+        ];
+    }
+
+    private function withCsrf(array $payload): array
+    {
+        $payload['csrf'] = $this->csrfPayload();
+
+        return $payload;
+    }
+
+    private function jsonErrorResponse(int $status, string $message, array $extra = [], bool $withCsrf = true)
+    {
+        $payload = array_merge([
+            'success' => false,
+            'message' => $message,
+        ], $extra);
+
+        if ($withCsrf) {
+            $payload = $this->withCsrf($payload);
+        }
+
+        return $this->response->setStatusCode($status)->setJSON($payload);
+    }
+
+    private function utf8JsonResponse(array $payload, ?int $status = null)
+    {
+        $response = $this->response;
+        if ($status !== null) {
+            $response = $response->setStatusCode($status);
+        }
+
+        return $response
+            ->setHeader('Content-Type', 'application/json; charset=utf-8')
+            ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+
+    private function findOrderByIdentifierOrJsonError(string $identifier, int $status = 404, bool $withCsrf = true)
+    {
+        $normalizedIdentifier = trim($identifier);
+        $order = (new OrderModel())->findByIdOrOrderNo($normalizedIdentifier);
+
+        if (! $order) {
+            return $this->jsonErrorResponse($status, 'Siparis bulunamadi.', [], $withCsrf);
+        }
+
+        return $order;
     }
 
     private function logOrderAction(
