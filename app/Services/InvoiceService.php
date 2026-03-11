@@ -26,6 +26,62 @@ class InvoiceService
         return $this->invoiceModel->findByOrderId($orderId);
     }
 
+    public function createForOrderIdentifier(string $identifier): array
+    {
+        $identifier = trim($identifier);
+        if ($identifier === '') {
+            return [
+                'success' => false,
+                'code' => 'order_not_found',
+                'message' => 'SipariÅŸ bulunamadÄ±.',
+            ];
+        }
+
+        $order = $this->orderModel->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return [
+                'success' => false,
+                'code' => 'order_not_found',
+                'message' => 'SipariÅŸ bulunamadÄ±.',
+            ];
+        }
+
+        $existing = $this->invoiceModel->findByOrderId((string) $order['id']);
+        if ($existing) {
+            return [
+                'success' => false,
+                'code' => 'already_exists',
+                'message' => 'Bu sipariÅŸ iÃ§in fatura zaten oluÅŸturulmuÅŸ.',
+                'order' => $order,
+                'invoice' => $existing,
+            ];
+        }
+
+        $eligibility = $this->evaluateInvoiceEligibility($order);
+        if (! ($eligibility['allowed'] ?? false)) {
+            return [
+                'success' => false,
+                'code' => 'not_allowed',
+                'message' => (string) ($eligibility['message'] ?? 'Bu sipariÅŸ iÃ§in fatura oluÅŸturulamaz.'),
+                'order' => $order,
+            ];
+        }
+
+        $result = $this->createForOrder((string) $order['id']);
+        $result['order'] = $order;
+        return $result;
+    }
+
+    public function getViewPdfPayloadByOrderIdentifier(string $identifier): array
+    {
+        return $this->buildPdfPayloadByOrderIdentifier($identifier);
+    }
+
+    public function getDownloadPdfPayloadByOrderIdentifier(string $identifier): array
+    {
+        return $this->buildPdfPayloadByOrderIdentifier($identifier);
+    }
+
     public function evaluateInvoiceEligibility(array $order): array
     {
         $orderStatus = strtolower(trim((string) ($order['order_status'] ?? $order['status'] ?? '')));
@@ -404,5 +460,91 @@ class InvoiceService
 
         $message = strtolower((string) ($error['message'] ?? ''));
         return str_contains($message, 'duplicate');
+    }
+
+    private function buildPdfPayloadByOrderIdentifier(string $identifier): array
+    {
+        $identifier = trim($identifier);
+        if ($identifier === '') {
+            return [
+                'success' => false,
+                'code' => 'order_not_found',
+                'message' => 'SipariÅŸ bulunamadÄ±.',
+            ];
+        }
+
+        $order = $this->orderModel->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return [
+                'success' => false,
+                'code' => 'order_not_found',
+                'message' => 'SipariÅŸ bulunamadÄ±.',
+            ];
+        }
+
+        $invoice = $this->invoiceModel->findByOrderId((string) $order['id']);
+        if (! $invoice) {
+            return [
+                'success' => false,
+                'code' => 'invoice_not_found',
+                'message' => 'Fatura bulunamadÄ±.',
+                'order' => $order,
+            ];
+        }
+
+        $pdfPath = $this->resolveInvoicePdfPath((string) ($invoice['pdf_path'] ?? ''));
+        if ($pdfPath === null) {
+            return [
+                'success' => false,
+                'code' => 'pdf_not_found',
+                'message' => 'Fatura PDF dosyasÄ± bulunamadÄ±.',
+                'order' => $order,
+                'invoice' => $invoice,
+            ];
+        }
+
+        $body = @file_get_contents($pdfPath);
+        if (! is_string($body)) {
+            return [
+                'success' => false,
+                'code' => 'pdf_not_found',
+                'message' => 'Fatura PDF dosyasÄ± bulunamadÄ±.',
+                'order' => $order,
+                'invoice' => $invoice,
+            ];
+        }
+
+        return [
+            'success' => true,
+            'code' => 'ok',
+            'order' => $order,
+            'invoice' => $invoice,
+            'pdfPath' => $pdfPath,
+            'fileName' => basename($pdfPath),
+            'body' => $body,
+        ];
+    }
+
+    private function resolveInvoicePdfPath(string $relativePath): ?string
+    {
+        $relativePath = trim($relativePath);
+        if ($relativePath === '') {
+            return null;
+        }
+
+        $normalized = ltrim(str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $relativePath), DIRECTORY_SEPARATOR);
+        $candidates = [
+            WRITEPATH . $normalized,
+            ROOTPATH . 'public' . DIRECTORY_SEPARATOR . $normalized,
+            ROOTPATH . $normalized,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 }

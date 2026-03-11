@@ -41,7 +41,7 @@ public function __construct(
 
         $messages = [
             'direction' => [
-                'in_list' => 'YÃ¶n alanÄ± GiriÅŸ/Ã‡Ä±kÄ±ÅŸ olmalÄ±dÄ±r.',
+                'in_list' => 'Yon alani girilmis olmalidir.',
             ],
         ];
 
@@ -49,24 +49,24 @@ public function __construct(
             return redirect()->back()
                 ->withInput()
                 ->with('validation', $this->validator)
-                ->with('error', 'LÃ¼tfen form alanlarÄ±nÄ± kontrol edin.');
+                ->with('error', 'Lutfen form alanlarini kontrol edin.');
         }
 
         $user = session()->get('user') ?? [];
         $role = (string) ($user['role'] ?? '');
         $actorUserId = trim((string) (session()->get('user_id') ?? ($user['id'] ?? '')));
         if ($actorUserId === '') {
-            return redirect()->back()->withInput()->with('error', 'KullanÄ±cÄ± oturumu doÄŸrulanamadÄ±.');
+            return redirect()->back()->withInput()->with('error', 'Kullanici oturumu dogrulanmadi.');
         }
 
         $reason = trim((string) $this->request->getPost('reason'));
         if ($reason === 'manuel_duzeltme' && $role !== 'admin') {
-            return $this->response->setStatusCode(403, 'Bu iÅŸlem iÃ§in yetkiniz yok.');
+            return $this->response->setStatusCode(403, 'Bu islem icin yetkiniz yok.');
         }
 
         $snapshot = $this->productsService->getProductStockSnapshot($productId);
         if (empty($snapshot)) {
-            return redirect()->to(site_url('admin/stock'))->with('error', 'ÃœrÃ¼n bulunamadÄ±.');
+            return redirect()->to(site_url('admin/stock'))->with('error', 'Urun bulunamadi.');
         }
 
         $direction = (string) $this->request->getPost('direction');
@@ -77,7 +77,7 @@ public function __construct(
         $stockCount = (int) ($snapshot['stock_count'] ?? 0);
         $sellable = (int) ($snapshot['sellable'] ?? 0);
         if ($direction === 'out' && ($quantity > $sellable || $quantity > $stockCount)) {
-            return redirect()->back()->withInput()->with('error', 'Stok Ã§Ä±kÄ±ÅŸÄ± iÃ§in satÄ±labilir stok yetersiz.');
+            return redirect()->back()->withInput()->with('error', 'Stok goruntulemek icin satilabilir stok yetersiz.');
         }
 
         $saved = $this->productsService->applyStockMove($productId, $delta, [
@@ -93,7 +93,6 @@ public function __construct(
         }
 
         return redirect()->to(site_url('admin/stock/moves') . '?product_id=' . urlencode($productId) . '#stock-detail')
-            ->with('success', 'Stok hareketi baÅŸarÄ±yla kaydedildi.');
+            ->with('success', 'Stok hareketi basariyla kaydedildi.');
     }
 }
-

@@ -69,6 +69,262 @@ class PackingService
         return $this->packingSessionModel->find((string) $sessionData['id']) ?: null;
     }
 
+    public function getOrCreateSessionForOrderIdentifier(string $identifier, ?string $createdBy = null): ?array
+    {
+        $identifier = trim($identifier);
+        if ($identifier === '') {
+            return null;
+        }
+
+        $order = $this->orderModel->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return null;
+        }
+
+        $orderId = trim((string) ($order['id'] ?? ''));
+        if ($orderId === '') {
+            return null;
+        }
+
+        $session = $this->packingSessionModel
+            ->where('order_id', $orderId)
+            ->where('status', 'open')
+            ->orderBy('updated_at', 'DESC')
+            ->orderBy('created_at', 'DESC')
+            ->first();
+
+        if (! is_array($session) || $session === []) {
+            $session = $this->packingSessionModel
+                ->where('order_id', $orderId)
+                ->orderBy('updated_at', 'DESC')
+                ->orderBy('created_at', 'DESC')
+                ->first();
+        }
+
+        if (! is_array($session) || $session === []) {
+            $session = $this->createOrGetSession($orderId, $createdBy);
+        }
+
+        if (! is_array($session) || $session === []) {
+            return null;
+        }
+
+        $refreshed = $this->packingSessionModel->find((string) ($session['id'] ?? ''));
+        if (is_array($refreshed) && $refreshed !== []) {
+            $session = $refreshed;
+        }
+
+        return [
+            'order' => $order,
+            'session' => $session,
+        ];
+    }
+
+    public function buildVerifyPayload(string $identifier, ?string $createdBy = null): ?array
+    {
+        $bundle = $this->getOrCreateSessionForOrderIdentifier($identifier, $createdBy);
+        if (! is_array($bundle) || $bundle === []) {
+            return null;
+        }
+
+        $order = (array) ($bundle['order'] ?? []);
+        $session = (array) ($bundle['session'] ?? []);
+        if ($order === [] || $session === []) {
+            return null;
+        }
+
+        $rawExpected = (string) ($session['expected_items_json'] ?? '');
+        $rawScanned = (string) ($session['scanned_items_json'] ?? '');
+
+        $expectedItems = $this->decodeExpectedItems($session);
+        $scanState = $this->decodeScannedPayload($session);
+
+        $expectedJson = json_encode($expectedItems, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $scanStateJson = json_encode($scanState, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $session['expected_items_json'] = is_string($expectedJson) ? $expectedJson : '[]';
+        $session['scanned_items_json'] = is_string($scanStateJson) ? $scanStateJson : '{"items":[],"unknown_scans":[]}';
+
+        return [
+            'order' => $order,
+            'session' => $session,
+            'verification' => $this->getVerificationState($session),
+            'expectedItems' => $expectedItems,
+            'scanState' => $scanState,
+            'debug' => [
+                'expected_raw_len' => strlen($rawExpected),
+                'scanned_raw_len' => strlen($rawScanned),
+                'expected_count' => count($expectedItems),
+                'scanned_items_count' => count((array) ($scanState['items'] ?? [])),
+            ],
+        ];
+    }
+
+    public function applyScanForOrderIdentifier(string $identifier, string $scanCode, int $qty = 1): array
+    {
+        $identifier = trim($identifier);
+        if ($identifier === '') {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+                'message' => 'Siparis bulunamadi.',
+            ];
+        }
+
+        $order = $this->orderModel->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+                'message' => 'Siparis bulunamadi.',
+            ];
+        }
+
+        $orderId = trim((string) ($order['id'] ?? ''));
+        if ($orderId === '') {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+                'message' => 'Siparis bulunamadi.',
+            ];
+        }
+
+        $session = $this->packingSessionModel
+            ->where('order_id', $orderId)
+            ->where('status', 'open')
+            ->orderBy('created_at', 'DESC')
+            ->first();
+
+        if (! is_array($session) || $session === []) {
+            return [
+                'success' => false,
+                'type' => 'session_not_found',
+                'message' => 'Acik paket dogrulama oturumu bulunamadi.',
+            ];
+        }
+
+        $result = $this->applyScan($session, $scanCode, $qty);
+        if (! (bool) ($result['success'] ?? false)) {
+            return $result + [
+                'type' => 'invalid_scan',
+                'order' => $order,
+                'session' => $session,
+            ];
+        }
+
+        $normalizedScannedJson = $this->normalizeScannedItemsJson(
+            (string) ($result['scanned_json'] ?? '{"items":[],"unknown_scans":[]}')
+        );
+
+        $updated = $this->packingSessionModel->update((string) ($session['id'] ?? ''), [
+            'scanned_items_json' => $normalizedScannedJson,
+        ]);
+        if ($updated) {
+            $refreshed = $this->packingSessionModel->find((string) ($session['id'] ?? ''));
+            if (is_array($refreshed) && $refreshed !== []) {
+                $session = $refreshed;
+            } else {
+                $session['scanned_items_json'] = $normalizedScannedJson;
+            }
+        } else {
+            $session['scanned_items_json'] = $normalizedScannedJson;
+        }
+
+        $verification = $this->getVerificationState($session);
+
+        return $result + [
+            'success' => true,
+            'type' => 'ok',
+            'order' => $order,
+            'session' => $session,
+            'verification' => $verification,
+            'scanned_json' => $normalizedScannedJson,
+        ];
+    }
+
+    public function finishPackingForOrderIdentifier(string $identifier): array
+    {
+        $identifier = trim($identifier);
+        if ($identifier === '') {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+                'message' => 'Siparis bulunamadi.',
+            ];
+        }
+
+        $order = $this->orderModel->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+                'message' => 'Siparis bulunamadi.',
+            ];
+        }
+
+        $orderId = trim((string) ($order['id'] ?? ''));
+        if ($orderId === '') {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+                'message' => 'Siparis bulunamadi.',
+            ];
+        }
+
+        $session = $this->packingSessionModel
+            ->where('order_id', $orderId)
+            ->where('status', 'open')
+            ->orderBy('created_at', 'DESC')
+            ->first();
+
+        if (! is_array($session) || $session === []) {
+            return [
+                'success' => false,
+                'type' => 'session_not_found',
+                'message' => 'Acik paket dogrulama oturumu bulunamadi.',
+                'order' => $order,
+            ];
+        }
+
+        $verification = $this->getVerificationState($session);
+        if (! (bool) ($verification['can_finish'] ?? false)) {
+            return [
+                'success' => false,
+                'type' => 'cannot_finish',
+                'message' => 'Dogrulama tamamlanamadi. Eksik, fazla veya bilinmeyen okutma var.',
+                'order' => $order,
+                'session' => $session,
+                'verification' => $verification,
+            ];
+        }
+
+        $normalizedScannedJson = $this->normalizeScannedItemsJson(
+            (string) ($session['scanned_items_json'] ?? '{"items":[],"unknown_scans":[]}')
+        );
+
+        $updated = $this->packingSessionModel->update((string) ($session['id'] ?? ''), [
+            'status' => 'verified',
+            'verified_at' => date('Y-m-d H:i:s'),
+            'scanned_items_json' => $normalizedScannedJson,
+        ]);
+
+        if ($updated) {
+            $session = $this->packingSessionModel->find((string) ($session['id'] ?? '')) ?? $session;
+        } else {
+            $session['status'] = 'verified';
+            $session['verified_at'] = date('Y-m-d H:i:s');
+            $session['scanned_items_json'] = $normalizedScannedJson;
+        }
+
+        return [
+            'success' => true,
+            'type' => 'ok',
+            'message' => 'Paket dogrulama tamamlandi.',
+            'order' => $order,
+            'session' => $session,
+            'verification' => $verification,
+        ];
+    }
+
     private function backfillExpectedItemsIfEmpty(array $session): ?array
     {
         $sessionId = trim((string) ($session['id'] ?? ''));
