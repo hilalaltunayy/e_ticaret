@@ -272,6 +272,74 @@ class OrdersService
         return $this->orderModel->cancelOrder($orderId, $actorUserId);
     }
 
+    public function cancelOrderByIdentifier(string $identifier, array $actor): array
+    {
+        $order = $this->orderModel->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+                'order' => null,
+                'from_status' => null,
+                'to_status' => 'cancelled',
+            ];
+        }
+
+        $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
+        $toStatus = 'cancelled';
+
+        if ($fromStatus === 'cancelled') {
+            return [
+                'success' => true,
+                'type' => 'already_cancelled',
+                'order' => $order,
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+            ];
+        }
+
+        if (in_array($fromStatus, ['delivered', 'return_in_progress', 'return_done', 'returned'], true)) {
+            return [
+                'success' => false,
+                'type' => 'invalid_status',
+                'order' => $order,
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+            ];
+        }
+
+        $actorId = trim((string) ($actor['id'] ?? ''));
+        $cancelled = $this->cancelOrder((string) $order['id'], $actorId);
+        if (! $cancelled) {
+            $now = date('Y-m-d H:i:s');
+            $cancelled = $this->orderModel->update((string) $order['id'], [
+                'status' => 'cancelled',
+                'order_status' => 'cancelled',
+                'shipping_status' => 'not_shipped',
+                'cancelled_at' => $now,
+                'updated_by' => $actorId,
+            ]);
+        }
+
+        if (! $cancelled) {
+            return [
+                'success' => false,
+                'type' => 'failed',
+                'order' => $order,
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+            ];
+        }
+
+        return [
+            'success' => true,
+            'type' => 'success',
+            'order' => $order,
+            'from_status' => $fromStatus,
+            'to_status' => $toStatus,
+        ];
+    }
+
     public function returnOrder(string $orderId, string $actorUserId): bool
     {
         return $this->orderModel->returnOrder($orderId, $actorUserId);

@@ -37,18 +37,18 @@ class OrderDatatablePresenter
                 (string) ($row['order_status'] ?? $row['status'] ?? 'pending')
             ),
             'shipping_status' => $this->shippingStatusBadge((string) ($row['shipping_status'] ?? 'not_shipped')),
-            'actions' => '<a href="' . esc($detailHref) . '" class="btn btn-sm btn-outline-primary">Detay G\u{00F6}r</a>',
+            'actions' => '<a href="' . esc($detailHref) . '" class="btn btn-sm btn-outline-primary">Detay Gor</a>',
         ];
     }
 
     private function paymentStatusBadge(string $status): string
     {
         $labels = [
-            'unpaid' => "\u{00D6}denmedi",
-            'paid' => "\u{00D6}dendi",
-            'refunded' => "\u{0130}ade Edildi",
-            'partial_refund' => "K\u{0131}smi \u{0130}ade",
-            'failed' => "Ba\u{015F}ar\u{0131}s\u{0131}z",
+            'unpaid' => "Odenmedi",
+            'paid' => "Odendi",
+            'refunded' => "Iade Edildi",
+            'partial_refund' => "Kismi Iade",
+            'failed' => "Basarisiz",
         ];
         $label = $labels[$status] ?? $labels['unpaid'];
 
@@ -65,13 +65,13 @@ class OrderDatatablePresenter
     {
         $labels = [
             'pending' => 'Beklemede',
-            'preparing' => "Haz\u{0131}rlan\u{0131}yor",
+            'preparing' => "Hazirlaniyor",
             'packed' => 'Paketlendi',
             'shipped' => 'Kargoya Verildi',
             'delivered' => 'Teslim Edildi',
-            'cancelled' => "\u{0130}ptal Edildi",
-            'return_in_progress' => "\u{0130}ade S\u{00FC}recinde",
-            'return_done' => "\u{0130}ade Tamamland\u{0131}",
+            'cancelled' => "Iptal Edildi",
+            'return_in_progress' => "Iade Surecinde",
+            'return_done' => "Iade Tamamlandi",
         ];
         $label = $labels[$status] ?? $labels['pending'];
 
@@ -89,10 +89,10 @@ class OrderDatatablePresenter
     private function shippingStatusBadge(string $status): string
     {
         $labels = [
-            'not_shipped' => "Haz\u{0131}rlanmad\u{0131}",
+            'not_shipped' => "Hazirlanmadi",
             'shipped' => 'Kargoda',
             'delivered' => 'Teslim',
-            'returned' => "\u{0130}ade",
+            'returned' => "Iade",
         ];
         $label = $labels[$status] ?? $labels['not_shipped'];
 
@@ -126,23 +126,23 @@ class OrderDatatablePresenter
     {
         if ($field === 'payment_status') {
             return [
-                'unpaid' => "\u{00D6}denmedi",
-                'paid' => "\u{00D6}dendi",
-                'refunded' => "\u{0130}ade Edildi",
-                'partial_refund' => "K\u{0131}smi \u{0130}ade",
-                'failed' => "Ba\u{015F}ar\u{0131}s\u{0131}z",
+                'unpaid' => "Odenmedi",
+                'paid' => "Odendi",
+                'refunded' => "Iade Edildi",
+                'partial_refund' => "Kismi iade",
+                'failed' => "Basarisiz",
             ];
         }
 
         return [
             'pending' => 'Beklemede',
-            'preparing' => "Haz\u{0131}rlan\u{0131}yor",
+            'preparing' => "Hazirlaniyor",
             'packed' => 'Paketlendi',
             'shipped' => 'Kargoya Verildi',
             'delivered' => 'Teslim Edildi',
-            'cancelled' => "\u{0130}ptal Edildi",
-            'return_in_progress' => "\u{0130}ade S\u{00FC}recinde",
-            'return_done' => "\u{0130}ade Tamamland\u{0131}",
+            'cancelled' => "Iptal Edildi",
+            'return_in_progress' => "Iade Surecinde",
+            'return_done' => "Iade Tamamlandi",
         ];
     }
 }

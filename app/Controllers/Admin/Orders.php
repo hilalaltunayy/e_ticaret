@@ -2,12 +2,13 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
-use App\Models\OrderItemModel;
 use App\Models\OrderLogModel;
 use App\Models\OrderModel;
-use App\Models\ProductsModel;
+use App\Presenters\OrderDatatablePresenter;
 use App\Services\InvoiceService;
+use App\Services\OrderCreationService;
 use App\Services\OrderNoteService;
+use App\Services\OrderShippingService;
 use App\Services\OrdersService;
 use App\Services\OrdersReportingService;
 use App\Services\PackingService;
@@ -19,13 +20,17 @@ class Orders extends BaseController
         private ?OrdersReportingService $ordersReportingService = null,
         private ?InvoiceService $invoiceService = null,
         private ?PackingService $packingService = null,
-        private ?OrderNoteService $orderNoteService = null
+        private ?OrderNoteService $orderNoteService = null,
+        private ?OrderCreationService $orderCreationService = null,
+        private ?OrderShippingService $orderShippingService = null
     ) {
         $this->ordersService = $this->ordersService ?? new OrdersService();
         $this->ordersReportingService = $this->ordersReportingService ?? new OrdersReportingService();
         $this->invoiceService = $this->invoiceService ?? new InvoiceService();
         $this->packingService = $this->packingService ?? new PackingService();
         $this->orderNoteService = $this->orderNoteService ?? new OrderNoteService();
+        $this->orderCreationService = $this->orderCreationService ?? new OrderCreationService();
+        $this->orderShippingService = $this->orderShippingService ?? new OrderShippingService();
     }
 
     public function index()
@@ -92,38 +97,7 @@ class Orders extends BaseController
     {
         $params = $this->request->getGet();
         $result = $this->ordersService->datatablesList($params);
-        $rows = $result['data'] ?? [];
-
-        $data = array_map(function (array $row) {
-            $id = (string) ($row['id'] ?? '');
-            $orderNo = trim((string) ($row['order_no'] ?? ''));
-            if ($orderNo === '') {
-                $orderNo = '#' . strtoupper(substr(str_replace('-', '', $id), 0, 8));
-            }
-
-            $date = (string) ($row['created_at'] ?? $row['order_date'] ?? '-');
-            $amount = number_format((float) ($row['total_amount'] ?? 0), 2, ',', '.');
-            $detailHref = $id !== '' ? site_url('admin/orders/' . $id) : '#';
-
-            return [
-                'order_no' => esc($orderNo),
-                'customer' => esc((string) ($row['customer_display'] ?? '-')),
-                'date' => esc($date),
-                'total_amount' => $amount . ' &#8378;',
-                'payment_status' => $this->renderInlineStatusDropdown(
-                    $id,
-                    'payment_status',
-                    (string) ($row['payment_status'] ?? 'unpaid')
-                ),
-                'order_status' => $this->renderInlineStatusDropdown(
-                    $id,
-                    'order_status',
-                    (string) ($row['order_status'] ?? $row['status'] ?? 'pending')
-                ),
-                'shipping_status' => $this->shippingStatusBadge((string) ($row['shipping_status'] ?? 'not_shipped')),
-                'actions' => '<a href="' . esc($detailHref) . '" class="btn btn-sm btn-outline-primary">Detay Gor</a>',
-            ];
-        }, $rows);
+        $data = (new OrderDatatablePresenter())->formatRows((array) ($result['data'] ?? []));
 
         $payload = [
             'draw' => (int) ($params['draw'] ?? 0),
@@ -480,33 +454,26 @@ class Orders extends BaseController
             return redirect()->back()->with('error', 'Kullanici bulunamadi.');
         }
 
-        $productId = trim((string) $this->request->getPost('product_id'));
-        $quantity = (int) $this->request->getPost('quantity');
-        $customerName = trim((string) ($this->request->getPost('customer_name') ?? ''));
-
-        $orderId = $this->ordersService->createReservedOrder(
-            $productId,
-            $quantity,
-            $actor['id'],
-            $customerName !== '' ? $customerName : null
+        $result = $this->orderCreationService->createManualOrder(
+            trim((string) $this->request->getPost('product_id')),
+            (int) $this->request->getPost('quantity'),
+            trim((string) ($this->request->getPost('customer_name') ?? '')),
+            $actor
         );
-
-        if (! $orderId) {
+        if (! (bool) ($result['success'] ?? false)) {
             return redirect()->back()->withInput()->with('error', 'Siparis olusturulamadi.');
         }
 
-        $orderNo = 'ORD-' . strtoupper(substr(str_replace('-', '', $orderId), 0, 10));
-        (new OrderModel())->update($orderId, [
-            'order_no' => $orderNo,
-            'payment_method' => 'unknown',
-            'payment_status' => 'unpaid',
-            'order_status' => 'pending',
-            'shipping_status' => 'not_shipped',
-            'updated_by' => $actor['id'],
-        ]);
-
-        $this->upsertOrderItemSnapshot($orderId);
-        $this->logOrderAction($orderId, $actor['id'], $actor['role'], 'order_created', null, 'pending', 'Siparis basariyla olusturuldu.');
+        $orderId = (string) ($result['order_id'] ?? '');
+        $this->logOrderAction(
+            $orderId,
+            $actor['id'],
+            $actor['role'],
+            'order_created',
+            ($result['from_status'] ?? null) !== null ? (string) $result['from_status'] : null,
+            ($result['to_status'] ?? null) !== null ? (string) $result['to_status'] : null,
+            'Siparis basariyla olusturuldu.'
+        );
 
         return redirect()->back()->with('success', 'Siparis basariyla olusturuldu.');
     }
@@ -518,14 +485,20 @@ class Orders extends BaseController
             return redirect()->back()->with('error', 'Kullanici bulunamadi.');
         }
 
-        $order = (new OrderModel())->findByIdOrOrderNo($id);
-        $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
-
-        if (! $this->ordersService->shipOrder($id, $actor['id'])) {
+        $result = $this->orderShippingService->shipOrderByIdentifier($id, $actor);
+        if (! (bool) ($result['success'] ?? false)) {
             return redirect()->back()->with('error', 'Kargoya verilemedi.');
         }
 
-        $this->logOrderAction($id, $actor['id'], $actor['role'], 'order_shipped', $fromStatus, 'shipped', 'Kargoya verildi.');
+        $this->logOrderAction(
+            $id,
+            $actor['id'],
+            $actor['role'],
+            'order_shipped',
+            (string) ($result['from_status'] ?? ''),
+            (string) ($result['to_status'] ?? ''),
+            'Kargoya verildi.'
+        );
 
         return redirect()->back()->with('success', 'Kargoya verildi.');
     }
@@ -537,38 +510,32 @@ class Orders extends BaseController
             return redirect()->back()->with('error', 'Kullanici bulunamadi.');
         }
 
-        $orderModel = new OrderModel();
-        $order = $orderModel->findByIdOrOrderNo($id);
-        if (! $order) {
+        $result = $this->ordersService->cancelOrderByIdentifier($id, $actor);
+        if (($result['type'] ?? '') === 'not_found') {
             return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
         }
 
-        $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
-        if ($fromStatus === 'cancelled') {
+        if (($result['type'] ?? '') === 'already_cancelled') {
             return redirect()->back()->with('success', 'Iptal edildi.');
         }
 
-        if (in_array($fromStatus, ['delivered', 'return_in_progress', 'return_done', 'returned'], true)) {
+        if (($result['type'] ?? '') === 'invalid_status') {
             return redirect()->back()->with('error', 'Gecersiz durum gecisi.');
         }
 
-        $cancelled = $this->ordersService->cancelOrder($id, $actor['id']);
-        if (! $cancelled) {
-            $now = date('Y-m-d H:i:s');
-            $cancelled = $orderModel->update((string) $order['id'], [
-                'status' => 'cancelled',
-                'order_status' => 'cancelled',
-                'shipping_status' => 'not_shipped',
-                'cancelled_at' => $now,
-                'updated_by' => $actor['id'],
-            ]);
-        }
-
-        if (! $cancelled) {
+        if (! (bool) ($result['success'] ?? false)) {
             return redirect()->back()->with('error', 'Iptal edilemedi.');
         }
 
-        $this->logOrderAction($id, $actor['id'], $actor['role'], 'order_cancelled', $fromStatus, 'cancelled', 'Iptal edildi.');
+        $this->logOrderAction(
+            $id,
+            $actor['id'],
+            $actor['role'],
+            'order_cancelled',
+            (string) ($result['from_status'] ?? ''),
+            (string) ($result['to_status'] ?? ''),
+            'Iptal edildi.'
+        );
 
         return redirect()->back()->with('success', 'Iptal edildi.');
     }
@@ -756,43 +723,6 @@ class Orders extends BaseController
         return redirect()->back()->with('success', 'Islem basariyla tamamlandi.');
     }
 
-    private function upsertOrderItemSnapshot(string $orderId): void
-    {
-        $db = db_connect();
-        if (! $db->tableExists('order_items')) {
-            return;
-        }
-
-        $order = (new OrderModel())->find($orderId);
-        if (! $order) {
-            return;
-        }
-
-        $product = (new ProductsModel())
-            ->select('product_name, price')
-            ->where('id', (string) ($order['product_id'] ?? ''))
-            ->first();
-
-        $quantity = max(1, (int) ($order['quantity'] ?? 1));
-        $unitPrice = (float) ($product['price'] ?? 0);
-        $lineTotal = (float) ($order['total_amount'] ?? ($unitPrice * $quantity));
-
-        $itemModel = new OrderItemModel();
-        $exists = $itemModel->where('order_id', $orderId)->countAllResults();
-        if ($exists > 0) {
-            return;
-        }
-
-        $itemModel->insert([
-            'order_id' => $orderId,
-            'product_id' => (string) ($order['product_id'] ?? ''),
-            'product_name_snapshot' => (string) ($product['product_name'] ?? 'Bilinmeyen urun'),
-            'unit_price' => $unitPrice,
-            'quantity' => $quantity,
-            'line_total' => $lineTotal,
-        ]);
-    }
-
     private function resolveInvoicePdfResponseData(string $identifier)
     {
         $order = (new OrderModel())->findByIdOrOrderNo($identifier);
@@ -919,108 +849,4 @@ class Orders extends BaseController
         return $this->ordersReportingService->getSummaryCounts();
     }
 
-    private function paymentStatusBadge(string $status): string
-    {
-        $labels = [
-            'unpaid' => "Odenmedi",
-            'paid' => "Odendi",
-            'refunded' => "Iade Edildi",
-            'partial_refund' => "Kismi Iade",
-            'failed' => "Basarisiz",
-        ];
-        $label = $labels[$status] ?? $labels['unpaid'];
-
-        return match ($status) {
-            'paid' => '<span class="badge bg-light-success text-success">' . esc($label) . '</span>',
-            'refunded' => '<span class="badge bg-light-warning text-warning">' . esc($label) . '</span>',
-            'partial_refund' => '<span class="badge bg-light-info text-info">' . esc($label) . '</span>',
-            'failed' => '<span class="badge bg-light-danger text-danger">' . esc($label) . '</span>',
-            default => '<span class="badge bg-light-secondary text-secondary">' . esc($label) . '</span>',
-        };
-    }
-
-    private function orderStatusBadge(string $status): string
-    {
-        $labels = [
-            'pending' => 'Beklemede',
-            'preparing' => "Hazirlaniyor",
-            'packed' => 'Paketlendi',
-            'shipped' => 'Kargoya Verildi',
-            'delivered' => 'Teslim Edildi',
-            'cancelled' => "Iptal Edildi",
-            'return_in_progress' => "Iade Surecinde",
-            'return_done' => "Iade Tamamlandi",
-        ];
-        $label = $labels[$status] ?? $labels['pending'];
-
-        return match ($status) {
-            'preparing', 'shipped' => '<span class="badge bg-light-primary text-primary">' . esc($label) . '</span>',
-            'packed' => '<span class="badge bg-light-info text-info">' . esc($label) . '</span>',
-            'delivered' => '<span class="badge bg-light-success text-success">' . esc($label) . '</span>',
-            'cancelled' => '<span class="badge bg-light-danger text-danger">' . esc($label) . '</span>',
-            'return_in_progress' => '<span class="badge bg-light-warning text-warning">' . esc($label) . '</span>',
-            'return_done' => '<span class="badge bg-light-dark text-dark">' . esc($label) . '</span>',
-            default => '<span class="badge bg-light-secondary text-secondary">' . esc($label) . '</span>',
-        };
-    }
-
-    private function shippingStatusBadge(string $status): string
-    {
-        $labels = [
-            'not_shipped' => "Hazirlanmadi",
-            'shipped' => 'Kargoda',
-            'delivered' => 'Teslim',
-            'returned' => "Iade",
-        ];
-        $label = $labels[$status] ?? $labels['not_shipped'];
-
-        return match ($status) {
-            'shipped' => '<span class="badge bg-light-primary text-primary">' . esc($label) . '</span>',
-            'delivered' => '<span class="badge bg-light-success text-success">' . esc($label) . '</span>',
-            'returned' => '<span class="badge bg-light-warning text-warning">' . esc($label) . '</span>',
-            default => '<span class="badge bg-light-secondary text-secondary">' . esc($label) . '</span>',
-        };
-    }
-
-    private function renderInlineStatusDropdown(string $orderId, string $field, string $current): string
-    {
-        $currentBadge = $field === 'payment_status'
-            ? $this->paymentStatusBadge($current)
-            : $this->orderStatusBadge($current);
-
-        $options = $this->statusOptions($field);
-        $items = '';
-        foreach ($options as $value => $label) {
-            $items .= '<li><a href="#" class="dropdown-item js-inline-status-item" data-order-id="' . esc($orderId) . '" data-field="' . esc($field) . '" data-value="' . esc($value) . '">' . esc($label) . '</a></li>';
-        }
-
-        return '<div class="dropdown d-inline-block">'
-            . '<a href="#" class="text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">' . $currentBadge . '</a>'
-            . '<ul class="dropdown-menu">' . $items . '</ul>'
-            . '</div>';
-    }
-
-    private function statusOptions(string $field): array
-    {
-        if ($field === 'payment_status') {
-            return [
-                'unpaid' => "Odenmedi",
-                'paid' => "Odendi",
-                'refunded' => "Iade Edildi",
-                'partial_refund' => "Kismi iade",
-                'failed' => "Basarisiz",
-            ];
-        }
-
-        return [
-            'pending' => 'Beklemede',
-            'preparing' => "Hazirlaniyor",
-            'packed' => 'Paketlendi',
-            'shipped' => 'Kargoya Verildi',
-            'delivered' => 'Teslim Edildi',
-            'cancelled' => "Iptal Edildi",
-            'return_in_progress' => "Iade Surecinde",
-            'return_done' => "Iade Tamamlandi",
-        ];
-    }
 }
