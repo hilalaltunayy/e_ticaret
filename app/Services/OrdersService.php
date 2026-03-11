@@ -277,6 +277,160 @@ class OrdersService
         return $this->orderModel->returnOrder($orderId, $actorUserId);
     }
 
+    public function applyShippingUpdate(
+        string $identifier,
+        ?string $shippingCompany,
+        ?string $trackingNumber,
+        ?string $shippingStatus,
+        array $actor
+    ): array {
+        $order = $this->orderModel->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+            ];
+        }
+
+        $normalizedShippingCompany = trim((string) ($shippingCompany ?? ''));
+        $normalizedTrackingNumber = trim((string) ($trackingNumber ?? ''));
+        $normalizedShippingStatus = trim((string) ($shippingStatus ?? ''));
+
+        if ($normalizedShippingStatus === '' && $normalizedTrackingNumber !== '') {
+            $normalizedShippingStatus = 'shipped';
+        }
+        if ($normalizedShippingStatus === '') {
+            $normalizedShippingStatus = (string) ($order['shipping_status'] ?? 'not_shipped');
+        }
+
+        $actorId = trim((string) ($actor['id'] ?? ''));
+        $update = [
+            'shipping_company' => $normalizedShippingCompany !== '' ? $normalizedShippingCompany : null,
+            'tracking_number' => $normalizedTrackingNumber !== '' ? $normalizedTrackingNumber : null,
+            'shipping_status' => $normalizedShippingStatus,
+            'updated_by' => $actorId !== '' ? $actorId : null,
+        ];
+
+        $now = date('Y-m-d H:i:s');
+        if ($normalizedShippingStatus === 'shipped' && empty($order['shipped_at'])) {
+            $update['shipped_at'] = $now;
+        }
+        if ($normalizedShippingStatus === 'delivered') {
+            $update['delivered_at'] = $now;
+            $update['order_status'] = 'delivered';
+            $update['status'] = 'completed';
+        }
+        if ($normalizedShippingStatus === 'returned') {
+            $update['order_status'] = 'return_in_progress';
+            if (empty($order['return_started_at'])) {
+                $update['return_started_at'] = $now;
+            }
+        }
+
+        $this->orderModel->update((string) $order['id'], $update);
+
+        return [
+            'success' => true,
+            'order' => $order,
+            'shipping_company' => $normalizedShippingCompany,
+            'tracking_number' => $normalizedTrackingNumber,
+            'shipping_status' => $normalizedShippingStatus,
+        ];
+    }
+
+    public function startReturnForOrderIdentifier(string $identifier, array $actor): array
+    {
+        $order = $this->orderModel->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+                'order' => null,
+                'from_status' => null,
+                'to_status' => null,
+            ];
+        }
+
+        $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
+        $toStatus = 'return_in_progress';
+        if ($fromStatus !== 'delivered') {
+            return [
+                'success' => false,
+                'type' => 'invalid_status',
+                'order' => $order,
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+            ];
+        }
+
+        $actorId = trim((string) ($actor['id'] ?? ''));
+        $this->orderModel->update((string) $order['id'], [
+            'order_status' => $toStatus,
+            'shipping_status' => 'returned',
+            'return_started_at' => date('Y-m-d H:i:s'),
+            'updated_by' => $actorId !== '' ? $actorId : null,
+        ]);
+
+        return [
+            'success' => true,
+            'type' => 'success',
+            'order' => $order,
+            'from_status' => $fromStatus,
+            'to_status' => $toStatus,
+        ];
+    }
+
+    public function completeReturnForOrderIdentifier(string $identifier, array $actor): array
+    {
+        $order = $this->orderModel->findByIdOrOrderNo($identifier);
+        if (! $order) {
+            return [
+                'success' => false,
+                'type' => 'not_found',
+                'order' => null,
+                'from_status' => null,
+                'to_status' => null,
+            ];
+        }
+
+        $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
+        $toStatus = 'return_done';
+        if ($fromStatus !== 'return_in_progress') {
+            return [
+                'success' => false,
+                'type' => 'invalid_status',
+                'order' => $order,
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+            ];
+        }
+
+        $actorId = trim((string) ($actor['id'] ?? ''));
+        if (! $this->orderModel->returnOrder((string) $order['id'], $actorId)) {
+            return [
+                'success' => false,
+                'type' => 'failed',
+                'order' => $order,
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+            ];
+        }
+
+        $this->orderModel->update((string) $order['id'], [
+            'order_status' => $toStatus,
+            'return_completed_at' => date('Y-m-d H:i:s'),
+            'updated_by' => $actorId !== '' ? $actorId : null,
+        ]);
+
+        return [
+            'success' => true,
+            'type' => 'success',
+            'order' => $order,
+            'from_status' => $fromStatus,
+            'to_status' => $toStatus,
+        ];
+    }
+
     public function datatablesList(array $params): array
     {
         return $this->orderModel->datatablesList($params);

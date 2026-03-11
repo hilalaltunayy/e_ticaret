@@ -299,11 +299,6 @@ class Orders extends BaseController
         $type = (string) ($result['type'] ?? '');
 
         if ($type === 'not_found') {
-            $order = $this->findOrderByIdentifierOrJsonError($identifier);
-            if ($order instanceof \CodeIgniter\HTTP\ResponseInterface) {
-                return $order;
-            }
-
             return $this->jsonErrorResponse(404, 'Siparis bulunamadi.');
         }
 
@@ -326,8 +321,9 @@ class Orders extends BaseController
 
     public function packingFinish(string $identifier)
     {
+        $isAjax = $this->request->isAJAX();
         if (! $this->canManageOrders()) {
-            if ($this->request->isAJAX()) {
+            if ($isAjax) {
                 return $this->unauthorizedJsonResponse();
             }
 
@@ -340,12 +336,7 @@ class Orders extends BaseController
         $orderId = (string) ($order['id'] ?? $identifier);
 
         if ($type === 'not_found') {
-            if ($this->request->isAJAX()) {
-                $resolvedOrder = $this->findOrderByIdentifierOrJsonError($identifier, 404, false);
-                if ($resolvedOrder instanceof \CodeIgniter\HTTP\ResponseInterface) {
-                    return $resolvedOrder;
-                }
-
+            if ($isAjax) {
                 return $this->jsonErrorResponse(404, 'Siparis bulunamadi.', [], false);
             }
 
@@ -353,7 +344,7 @@ class Orders extends BaseController
         }
 
         if ($type === 'session_not_found') {
-            if ($this->request->isAJAX()) {
+            if ($isAjax) {
                 return $this->jsonErrorResponse(409, 'Acik paket dogrulama oturumu bulunamadi.', [], false);
             }
 
@@ -363,7 +354,7 @@ class Orders extends BaseController
 
         if ($type === 'cannot_finish') {
             $verification = $result['verification'] ?? null;
-            if ($this->request->isAJAX()) {
+            if ($isAjax) {
                 return $this->jsonErrorResponse(422, 'Dogrulama tamamlanamadi. Eksik, fazla veya bilinmeyen okutma var.', [
                     'verification' => $verification,
                 ]);
@@ -374,7 +365,7 @@ class Orders extends BaseController
         }
 
         if ($type === 'save_failed' || ! (bool) ($result['success'] ?? false)) {
-            if ($this->request->isAJAX()) {
+            if ($isAjax) {
                 return $this->jsonErrorResponse(500, 'Paket dogrulamasi tamamlanamadi.', [], false);
             }
 
@@ -382,7 +373,7 @@ class Orders extends BaseController
                 ->with('error', 'Paket dogrulamasi tamamlanamadi.');
         }
 
-        if ($this->request->isAJAX()) {
+        if ($isAjax) {
             return $this->response->setJSON($this->withCsrf([
                 'success' => true,
                 'message' => 'Paket dogrulamasi tamamlandi.',
@@ -645,47 +636,22 @@ class Orders extends BaseController
         }
 
         $actor = $this->getActor();
-        $orderModel = new OrderModel();
-        $order = $orderModel->findByIdOrOrderNo($identifier);
-        if (! $order) {
+        $result = $this->ordersService->applyShippingUpdate(
+            $identifier,
+            (string) ($this->request->getPost('shipping_company') ?? ''),
+            (string) ($this->request->getPost('tracking_number') ?? ''),
+            (string) ($this->request->getPost('shipping_status') ?? ''),
+            $actor
+        );
+
+        if (($result['type'] ?? '') === 'not_found') {
             return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
         }
 
-        $shippingCompany = trim((string) ($this->request->getPost('shipping_company') ?? ''));
-        $trackingNumber = trim((string) ($this->request->getPost('tracking_number') ?? ''));
-        $shippingStatus = trim((string) ($this->request->getPost('shipping_status') ?? ''));
-
-        if ($shippingStatus === '' && $trackingNumber !== '') {
-            $shippingStatus = 'shipped';
-        }
-        if ($shippingStatus === '') {
-            $shippingStatus = (string) ($order['shipping_status'] ?? 'not_shipped');
-        }
-
-        $update = [
-            'shipping_company' => $shippingCompany !== '' ? $shippingCompany : null,
-            'tracking_number' => $trackingNumber !== '' ? $trackingNumber : null,
-            'shipping_status' => $shippingStatus,
-            'updated_by' => $actor['id'] !== '' ? $actor['id'] : null,
-        ];
-
-        $now = date('Y-m-d H:i:s');
-        if ($shippingStatus === 'shipped' && empty($order['shipped_at'])) {
-            $update['shipped_at'] = $now;
-        }
-        if ($shippingStatus === 'delivered') {
-            $update['delivered_at'] = $now;
-            $update['order_status'] = 'delivered';
-            $update['status'] = 'completed';
-        }
-        if ($shippingStatus === 'returned') {
-            $update['order_status'] = 'return_in_progress';
-            if (empty($order['return_started_at'])) {
-                $update['return_started_at'] = $now;
-            }
-        }
-
-        $orderModel->update((string) $order['id'], $update);
+        $order = (array) ($result['order'] ?? []);
+        $shippingCompany = (string) ($result['shipping_company'] ?? '');
+        $trackingNumber = (string) ($result['tracking_number'] ?? '');
+        $shippingStatus = (string) ($result['shipping_status'] ?? '');
         $this->logOrderAction(
             (string) $order['id'],
             $actor['id'],
@@ -739,25 +705,25 @@ class Orders extends BaseController
             return redirect()->back()->with('error', 'Kullanici bulunamadi.');
         }
 
-        $orderModel = new OrderModel();
-        $order = $orderModel->findByIdOrOrderNo($identifier);
-        if (! $order) {
+        $result = $this->ordersService->startReturnForOrderIdentifier($identifier, $actor);
+        if (($result['type'] ?? '') === 'not_found') {
             return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
         }
 
-        $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
-        if ($fromStatus !== 'delivered') {
+        if (! (bool) ($result['success'] ?? false)) {
             return redirect()->back()->with('error', 'Gecersiz durum gecisi.');
         }
 
-        $orderModel->update((string) $order['id'], [
-            'order_status' => 'return_in_progress',
-            'shipping_status' => 'returned',
-            'return_started_at' => date('Y-m-d H:i:s'),
-            'updated_by' => $actor['id'] !== '' ? $actor['id'] : null,
-        ]);
-
-        $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'return_started', $fromStatus, 'return_in_progress', 'Iade baslatildi.');
+        $order = (array) ($result['order'] ?? []);
+        $this->logOrderAction(
+            (string) $order['id'],
+            $actor['id'],
+            $actor['role'],
+            'return_started',
+            (string) ($result['from_status'] ?? ''),
+            (string) ($result['to_status'] ?? ''),
+            'Iade baslatildi.'
+        );
 
         return redirect()->back()->with('success', 'Iade baslatildi.');
     }
@@ -769,28 +735,25 @@ class Orders extends BaseController
             return redirect()->back()->with('error', 'Kullanici dogrulamasi gerekli.');
         }
 
-        $orderModel = new OrderModel();
-        $order = $orderModel->findByIdOrOrderNo($identifier);
-        if (! $order) {
+        $result = $this->ordersService->completeReturnForOrderIdentifier($identifier, $actor);
+        if (($result['type'] ?? '') === 'not_found') {
             return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
         }
 
-        $fromStatus = (string) ($order['order_status'] ?? $order['status'] ?? '');
-        if ($fromStatus !== 'return_in_progress') {
+        if (! (bool) ($result['success'] ?? false)) {
             return redirect()->back()->with('error', 'Islem tamamlanamadi.');
         }
 
-        if (! $this->ordersService->returnOrder((string) $order['id'], $actor['id'])) {
-            return redirect()->back()->with('error', 'Islem tamamlanamadi.');
-        }
-
-        $orderModel->update((string) $order['id'], [
-            'order_status' => 'return_done',
-            'return_completed_at' => date('Y-m-d H:i:s'),
-            'updated_by' => $actor['id'] !== '' ? $actor['id'] : null,
-        ]);
-
-        $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'return_completed', $fromStatus, 'return_done', 'Iade tamamlandi.');
+        $order = (array) ($result['order'] ?? []);
+        $this->logOrderAction(
+            (string) $order['id'],
+            $actor['id'],
+            $actor['role'],
+            'return_completed',
+            (string) ($result['from_status'] ?? ''),
+            (string) ($result['to_status'] ?? ''),
+            'Iade tamamlandi.'
+        );
 
         return redirect()->back()->with('success', 'Islem basariyla tamamlandi.');
     }
@@ -1022,18 +985,6 @@ class Orders extends BaseController
         return $response
             ->setHeader('Content-Type', 'application/json; charset=utf-8')
             ->setBody((string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-    }
-
-    private function findOrderByIdentifierOrJsonError(string $identifier, int $status = 404, bool $withCsrf = true)
-    {
-        $normalizedIdentifier = trim($identifier);
-        $order = (new OrderModel())->findByIdOrOrderNo($normalizedIdentifier);
-
-        if (! $order) {
-            return $this->jsonErrorResponse($status, 'Siparis bulunamadi.', [], $withCsrf);
-        }
-
-        return $order;
     }
 
     private function logOrderAction(
