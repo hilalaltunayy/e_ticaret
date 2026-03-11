@@ -7,6 +7,7 @@ use App\Models\OrderLogModel;
 use App\Models\OrderModel;
 use App\Models\ProductsModel;
 use App\Services\InvoiceService;
+use App\Services\OrderNoteService;
 use App\Services\OrdersService;
 use App\Services\OrdersReportingService;
 use App\Services\PackingService;
@@ -17,12 +18,14 @@ class Orders extends BaseController
         private ?OrdersService $ordersService = null,
         private ?OrdersReportingService $ordersReportingService = null,
         private ?InvoiceService $invoiceService = null,
-        private ?PackingService $packingService = null
+        private ?PackingService $packingService = null,
+        private ?OrderNoteService $orderNoteService = null
     ) {
         $this->ordersService = $this->ordersService ?? new OrdersService();
         $this->ordersReportingService = $this->ordersReportingService ?? new OrdersReportingService();
         $this->invoiceService = $this->invoiceService ?? new InvoiceService();
         $this->packingService = $this->packingService ?? new PackingService();
+        $this->orderNoteService = $this->orderNoteService ?? new OrderNoteService();
     }
 
     public function index()
@@ -677,22 +680,17 @@ class Orders extends BaseController
         }
 
         $actor = $this->getActor();
-        $orderModel = new OrderModel();
-        $order = $orderModel->findByIdOrOrderNo($identifier);
-        if (! $order) {
+        $result = $this->orderNoteService->addAdminNoteToOrderIdentifier(
+            $identifier,
+            (string) $this->request->getPost('note'),
+            $actor
+        );
+        if (($result['type'] ?? '') === 'not_found') {
             return redirect()->to(site_url('admin/orders'))->with('error', 'Siparis bulunamadi.');
         }
 
-        $note = trim((string) $this->request->getPost('note'));
-        $prefix = '[' . date('Y-m-d H:i') . '] ' . ($actor['role'] !== '' ? $actor['role'] : 'admin');
-        $existing = trim((string) ($order['notes_admin'] ?? ''));
-        $updatedNote = $existing === '' ? ($prefix . ': ' . $note) : ($existing . PHP_EOL . $prefix . ': ' . $note);
-
-        $orderModel->update((string) $order['id'], [
-            'notes_admin' => $updatedNote,
-            'updated_by' => $actor['id'] !== '' ? $actor['id'] : null,
-        ]);
-
+        $order = (array) ($result['order'] ?? []);
+        $note = (string) ($result['note'] ?? '');
         $this->logOrderAction((string) $order['id'], $actor['id'], $actor['role'], 'admin_note_added', null, null, $note);
 
         return redirect()->back()->with('success', 'Not eklendi.');
