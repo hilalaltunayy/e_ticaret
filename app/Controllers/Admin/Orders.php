@@ -795,107 +795,6 @@ class Orders extends BaseController
         ]);
     }
 
-    private function decodeExpectedItemsForView(string $raw): array
-    {
-        $raw = trim($raw);
-        if ($raw === '') {
-            return [];
-        }
-
-        $decoded = json_decode($raw, true);
-        if (! is_array($decoded)) {
-            return [];
-        }
-
-        $items = [];
-        foreach ($decoded as $item) {
-            if (! is_array($item)) {
-                continue;
-            }
-
-            $items[] = [
-                'product_id' => trim((string) ($item['product_id'] ?? '')),
-                'name' => trim((string) ($item['name'] ?? ($item['product_name'] ?? "Urun"))),
-                'qty' => max(1, (int) ($item['qty'] ?? ($item['expected_qty'] ?? 1))),
-                'barcode' => trim((string) ($item['barcode'] ?? ($item['product_id'] ?? ''))),
-                'isbn' => trim((string) ($item['isbn'] ?? '')),
-            ];
-        }
-
-        return $items;
-    }
-
-    private function normalizeScanStateForView(string $raw): array
-    {
-        $raw = trim($raw);
-        if ($raw === '') {
-            return ['items' => [], 'unknown_scans' => []];
-        }
-
-        $decoded = json_decode($raw, true);
-        if (! is_array($decoded)) {
-            return ['items' => [], 'unknown_scans' => []];
-        }
-
-        if (array_is_list($decoded)) {
-            $items = [];
-            foreach ($decoded as $row) {
-                if (! is_array($row)) {
-                    continue;
-                }
-                $code = trim((string) ($row['code'] ?? $row['barcode'] ?? ''));
-                if ($code === '') {
-                    continue;
-                }
-                $items[] = [
-                    'code' => $code,
-                    'qty' => max(1, (int) ($row['qty'] ?? 1)),
-                    'expected_key' => trim((string) ($row['expected_key'] ?? '')),
-                    'name' => trim((string) ($row['name'] ?? '')),
-                ];
-            }
-
-            return ['items' => $items, 'unknown_scans' => []];
-        }
-
-        $items = [];
-        foreach ((array) ($decoded['items'] ?? []) as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-            $code = trim((string) ($row['code'] ?? $row['barcode'] ?? ''));
-            if ($code === '') {
-                continue;
-            }
-            $items[] = [
-                'code' => $code,
-                'qty' => max(1, (int) ($row['qty'] ?? 1)),
-                'expected_key' => trim((string) ($row['expected_key'] ?? '')),
-                'name' => trim((string) ($row['name'] ?? '')),
-            ];
-        }
-
-        $unknownScans = [];
-        foreach ((array) ($decoded['unknown_scans'] ?? []) as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-            $code = trim((string) ($row['code'] ?? $row['barcode'] ?? ''));
-            if ($code === '') {
-                continue;
-            }
-            $unknownScans[] = [
-                'code' => $code,
-                'qty' => max(1, (int) ($row['qty'] ?? 1)),
-            ];
-        }
-
-        return [
-            'items' => $items,
-            'unknown_scans' => $unknownScans,
-        ];
-    }
-
     private function resolveInvoicePdfResponseData(string $identifier)
     {
         $order = (new OrderModel())->findByIdOrOrderNo($identifier);
@@ -1015,29 +914,6 @@ class Orders extends BaseController
             'meta_json' => $metaJson,
             'created_at' => date('Y-m-d H:i:s'),
         ]);
-    }
-
-    private function mapLegacyStatus(string $orderStatus): string
-    {
-        return match ($orderStatus) {
-            'pending' => 'reserved',
-            'preparing', 'packed' => 'paid',
-            'shipped' => 'shipped',
-            'delivered' => 'completed',
-            'cancelled' => 'cancelled',
-            'return_in_progress', 'return_done' => 'returned',
-            default => 'reserved',
-        };
-    }
-
-    private function mapShippingStatusByOrderStatus(string $orderStatus): string
-    {
-        return match ($orderStatus) {
-            'shipped' => 'shipped',
-            'delivered' => 'delivered',
-            'return_in_progress', 'return_done' => 'returned',
-            default => 'not_shipped',
-        };
     }
 
     private function getSummaryCounts(): array
