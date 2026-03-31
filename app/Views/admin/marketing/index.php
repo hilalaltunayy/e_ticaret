@@ -62,17 +62,16 @@ $summary = $summary ?? new \App\DTO\Marketing\MarketingPageSummaryDTO();
     <div class="card h-100">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Fiyat Kuralları</h5>
-        <span class="badge bg-light-warning text-warning">Yakında</span>
+        <span class="badge bg-light-success text-success">Hazır</span>
       </div>
       <div class="card-body d-flex flex-column">
         <p class="text-muted mb-2">Dinamik fiyat kural motoru sonraki adımda eklenecek.</p>
         <h4 class="mb-4"><?= number_format((int) $summary->pricingRuleCount) ?></h4>
         <div class="mt-auto">
-          <button type="button" class="btn btn-light-secondary" disabled>Yakında</button>
+          <a href="<?= site_url('admin/pricing/rules') ?>" class="btn btn-primary">Fiyat Kurallarını Yönet</a>
         </div>
       </div>
     </div>
   </div>
 </div>
 <?= $this->endSection() ?>
-

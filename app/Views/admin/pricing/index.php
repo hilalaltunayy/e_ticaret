@@ -10,7 +10,7 @@
         </div>
       </div>
       <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
-        <span class="badge bg-light-warning text-warning">Yakında</span>
+        <a href="<?= site_url('admin/pricing/rules') ?>" class="btn btn-primary">Fiyat Kurallarını Yönet</a>
       </div>
     </div>
   </div>
@@ -24,7 +24,15 @@
         <div class="row g-3">
           <div class="col-12 col-md-4"><div class="border rounded p-3"><div class="text-muted">Aktif Kampanyalar</div><h4 class="mb-0">0</h4></div></div>
           <div class="col-12 col-md-4"><div class="border rounded p-3"><div class="text-muted">Planlı Kampanyalar</div><h4 class="mb-0">0</h4></div></div>
-          <div class="col-12 col-md-4"><div class="border rounded p-3"><div class="text-muted">Fiyat Kuralları</div><h4 class="mb-0">0</h4></div></div>
+          <div class="col-12 col-md-4">
+            <div class="border rounded p-3 h-100 d-flex flex-column">
+              <div class="text-muted">Fiyat Kuralları</div>
+              <h4 class="mb-3">0</h4>
+              <div class="mt-auto">
+                <a href="<?= site_url('admin/pricing/rules') ?>" class="btn btn-sm btn-outline-primary">Fiyat Kurallarını Yönet</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -51,4 +59,3 @@
   </div>
 </div>
 <?= $this->endSection() ?>
-

@@ -85,6 +85,13 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('shipping/companies/store', 'Admin\ShippingCompanies::store');
     $routes->get('marketing', 'Admin\Marketing::index');
     $routes->get('pricing', 'Admin\Pricing::index');
+    $routes->get('pricing/rules', 'Admin\Pricing::rules');
+    $routes->get('pricing/rules/create', 'Admin\Pricing::createRule');
+    $routes->post('pricing/rules/store', 'Admin\Pricing::storeRule');
+    $routes->get('pricing/rules/edit/(:segment)', 'Admin\Pricing::editRule/$1');
+    $routes->post('pricing/rules/update/(:segment)', 'Admin\Pricing::updateRule/$1');
+    $routes->post('pricing/rules/toggle/(:segment)', 'Admin\Pricing::toggleRule/$1');
+    $routes->post('pricing/rules/delete/(:segment)', 'Admin\Pricing::deleteRule/$1');
     $routes->get('customers', 'Admin\Customers::index');
     $routes->get('automation', 'Admin\Automation::index');
     $routes->get('notifications', 'Admin\Notifications::index');
