@@ -98,6 +98,18 @@ class OrderModel extends BaseUuidModel
             ->getResultArray();
     }
 
+    public function getLatestOrderDate(): ?string
+    {
+        $row = $this->builder()
+            ->select('MAX(order_date) as latest_order_date')
+            ->get()
+            ->getRowArray();
+
+        $value = trim((string) ($row['latest_order_date'] ?? ''));
+
+        return $value === '' ? null : $value;
+    }
+
     public function getRevenueSumRow(string $start, string $end): array
     {
         return $this->builder()
@@ -113,9 +125,10 @@ class OrderModel extends BaseUuidModel
     {
         return $this->db->table('orders o')
             ->select('c.category_name as category_name, SUM(o.quantity) as qty')
-            ->join('products p', 'p.id = o.product_id', 'left')
-            ->join('categories c', 'c.id = p.category_id', 'left')
-            ->groupBy('c.category_name')
+            ->join('products p', 'p.id = o.product_id', 'inner')
+            ->join('categories c', 'c.id = p.category_id', 'inner')
+            ->where('c.category_name !=', '')
+            ->groupBy('c.id, c.category_name')
             ->orderBy('qty', 'DESC')
             ->limit($limit)
             ->get()
@@ -144,6 +157,17 @@ class OrderModel extends BaseUuidModel
             ->groupBy('p.product_name')
             ->orderBy('qty', 'DESC')
             ->limit($limit)
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getSalesByProductType(): array
+    {
+        return $this->db->table('orders o')
+            ->select("COALESCE(NULLIF(p.type, ''), 'print') as product_type, SUM(o.quantity) as qty")
+            ->join('products p', 'p.id = o.product_id', 'left')
+            ->groupBy("COALESCE(NULLIF(p.type, ''), 'print')")
+            ->orderBy('qty', 'DESC')
             ->get()
             ->getResultArray();
     }
