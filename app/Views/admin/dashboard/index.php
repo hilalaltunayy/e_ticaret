@@ -87,6 +87,27 @@ foreach ($builderBlocks as $builderBlock) {
     transform: translateY(-1px);
   }
 
+  .dashboard-builder-grid .builder-draggable-item {
+    cursor: default;
+  }
+
+  .dashboard-builder-grid.builder-edit-mode .builder-draggable-item {
+    cursor: grab;
+  }
+
+  .dashboard-builder-grid.builder-edit-mode .builder-draggable-item.is-dragging {
+    opacity: .55;
+  }
+
+  .dashboard-builder-grid.builder-edit-mode .builder-draggable-item.drag-over > .card {
+    box-shadow: 0 0 0 3px rgba(70, 128, 255, .18);
+    border-color: rgba(70, 128, 255, .45);
+  }
+
+  .dashboard-builder-status {
+    min-height: 1.5rem;
+  }
+
   .builder-modal-dialog {
     max-height: calc(100vh - 2rem);
   }
@@ -152,6 +173,14 @@ foreach ($builderBlocks as $builderBlock) {
             <span class="badge bg-light-primary text-primary"><?= esc($builderBlockTypeCount) ?> blok tipi</span>
             <button
               type="button"
+              class="btn btn-outline-primary btn-sm"
+              id="dashboardBuilderEditToggle"
+              aria-pressed="false"
+            >
+              Düzenleme Modu
+            </button>
+            <button
+              type="button"
               class="btn btn-primary btn-sm"
               data-bs-toggle="modal"
               data-bs-target="#builderBlockModal"
@@ -169,7 +198,9 @@ foreach ($builderBlocks as $builderBlock) {
               <?= !empty($builderDashboard['name']) ? esc($builderDashboard['name']) : 'Dashboard builder kaydı henüz yüklenmedi.' ?>
             </span>
             <span class="text-muted small">Toplam blok: <?= esc($builderBlockCount) ?></span>
+            <span class="badge bg-light-warning text-warning" id="dashboardBuilderEditBadge">Düzenleme modu kapalı</span>
           </div>
+          <div id="dashboardBuilderReorderStatus" class="dashboard-builder-status small text-muted mb-3"></div>
 
           <?php if (empty($builderBlocks)): ?>
             <div class="border rounded-3 bg-light-subtle p-4 text-center">
@@ -182,7 +213,7 @@ foreach ($builderBlocks as $builderBlock) {
               </p>
             </div>
           <?php else: ?>
-            <div class="row g-3">
+            <div class="row g-3 dashboard-builder-grid" id="dashboardBuilderBlocksGrid">
               <?php foreach ($builderBlocks as $block): ?>
                 <?php
                 $render = is_array($block['render'] ?? null) ? $block['render'] : [];
@@ -198,7 +229,13 @@ foreach ($builderBlocks as $builderBlock) {
 
                 $isVisible = (int) ($block['is_visible'] ?? 0) === 1;
                 ?>
-                <div class="<?= esc($colClass) ?>">
+                <div
+                  class="<?= esc($colClass) ?> builder-draggable-item"
+                  draggable="false"
+                  data-block-id="<?= esc((string) ($block['id'] ?? '')) ?>"
+                  data-position-x="<?= esc((string) ($block['position_x'] ?? 0)) ?>"
+                  data-position-y="<?= esc((string) ($block['position_y'] ?? 0)) ?>"
+                >
                   <?php if (($render['kind'] ?? '') === 'stat_card'): ?>
                     <?php $theme = is_array($render['theme'] ?? null) ? $render['theme'] : []; ?>
                     <div class="card shadow-sm h-100" style="border-top: 3px solid <?= esc((string) ($theme['color'] ?? '#4680FF')) ?>;">
@@ -1582,4 +1619,11 @@ foreach ($builderBlocks as $builderBlock) {
     }
   })();
 </script>
+<?= view('admin/dashboard_builder/_reorder_script', [
+  'reorderGridId' => 'dashboardBuilderBlocksGrid',
+  'reorderStatusId' => 'dashboardBuilderReorderStatus',
+  'reorderToggleId' => 'dashboardBuilderEditToggle',
+  'reorderBadgeId' => 'dashboardBuilderEditBadge',
+  'reorderEnabledByDefault' => false,
+]) ?>
 <?= $this->endSection() ?>

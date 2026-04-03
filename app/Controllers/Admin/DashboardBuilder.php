@@ -28,4 +28,42 @@ class DashboardBuilder extends BaseController
             'builderBlockTypes' => $this->dashboardBlockService->getAvailableBlockTypes(),
         ]);
     }
+
+    public function reorder()
+    {
+        $user = session()->get('user') ?? [];
+        $userId = trim((string) ($user['id'] ?? $user['user_id'] ?? ''));
+        $blocks = json_decode((string) ($this->request->getPost('blocks') ?? '[]'), true);
+
+        if ($userId === '') {
+            return $this->response->setStatusCode(403)->setJSON($this->withCsrf([
+                'success' => false,
+                'message' => 'Kullanici bilgisi bulunamadi.',
+            ]));
+        }
+
+        if (! is_array($blocks)) {
+            return $this->response->setStatusCode(422)->setJSON($this->withCsrf([
+                'success' => false,
+                'message' => 'Gecerli sira verisi gonderilmedi.',
+            ]));
+        }
+
+        $result = $this->dashboardBuilderService->saveBlockOrder($userId, $blocks);
+        $status = ($result['success'] ?? false) ? 200 : 422;
+
+        return $this->response
+            ->setStatusCode($status)
+            ->setJSON($this->withCsrf($result));
+    }
+
+    private function withCsrf(array $payload): array
+    {
+        $payload['csrf'] = [
+            'token' => csrf_token(),
+            'hash' => csrf_hash(),
+        ];
+
+        return $payload;
+    }
 }

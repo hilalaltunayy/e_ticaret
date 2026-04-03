@@ -105,6 +105,110 @@ class DashboardBuilderService
         return array_map(fn(array $block) => $this->formatBuilderBlock($block), $blocks);
     }
 
+    public function saveBlockOrder(string $userId, array $blocks): array
+    {
+        if (! $this->builderTablesReady()) {
+            return [
+                'success' => false,
+                'message' => 'Builder tablolarina ulasilamadi.',
+            ];
+        }
+
+        $dashboard = $this->getOrCreateAdminDashboard($userId);
+        $dashboardId = trim((string) ($dashboard['id'] ?? ''));
+        if ($dashboardId === '') {
+            return [
+                'success' => false,
+                'message' => 'Aktif dashboard bulunamadi.',
+            ];
+        }
+
+        $existingBlocks = $this->dashboardBlockInstanceModel->getInstancesByDashboardId($dashboardId);
+        $existingIds = array_values(array_filter(array_map(static fn(array $block) => trim((string) ($block['id'] ?? '')), $existingBlocks)));
+
+        if ($existingIds === []) {
+            return [
+                'success' => false,
+                'message' => 'Siralanacak blok bulunamadi.',
+            ];
+        }
+
+        $normalizedBlocks = [];
+
+        foreach ($blocks as $index => $block) {
+            if (! is_array($block)) {
+                return [
+                    'success' => false,
+                    'message' => 'Gonderilen blok verisi gecersiz.',
+                ];
+            }
+
+            $id = trim((string) ($block['id'] ?? ''));
+            if ($id === '') {
+                return [
+                    'success' => false,
+                    'message' => 'Blok kimligi eksik.',
+                ];
+            }
+
+            $normalizedBlocks[] = [
+                'id' => $id,
+                'order_index' => isset($block['order_index']) ? (int) $block['order_index'] : $index,
+                'position_x' => isset($block['position_x']) ? (int) $block['position_x'] : 0,
+                'position_y' => isset($block['position_y']) ? (int) $block['position_y'] : $index,
+            ];
+        }
+
+        $incomingIds = array_values(array_map(static fn(array $block) => $block['id'], $normalizedBlocks));
+        $existingSorted = $existingIds;
+        $incomingSorted = $incomingIds;
+        sort($existingSorted);
+        sort($incomingSorted);
+
+        if (count($incomingIds) !== count($existingIds) || $incomingSorted !== $existingSorted) {
+            return [
+                'success' => false,
+                'message' => 'Siralama verisi bu dashboard ile uyusmuyor.',
+            ];
+        }
+
+        $db = db_connect();
+        $db->transStart();
+
+        foreach ($normalizedBlocks as $index => $block) {
+            $payload = [
+                'order_index' => $index,
+                'position_x' => (int) $block['position_x'],
+                'position_y' => $index,
+            ];
+
+            $updated = $this->dashboardBlockInstanceModel->update($block['id'], $payload);
+
+            if (! $updated) {
+                $db->transRollback();
+
+                return [
+                    'success' => false,
+                    'message' => 'Blok sirasi kaydedilemedi.',
+                ];
+            }
+        }
+
+        $db->transComplete();
+
+        if (! $db->transStatus()) {
+            return [
+                'success' => false,
+                'message' => 'Blok sirasi kaydedilemedi.',
+            ];
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Yeni blok sirasi kaydedildi.',
+        ];
+    }
+
     private function builderTablesReady(): bool
     {
         $db = db_connect();

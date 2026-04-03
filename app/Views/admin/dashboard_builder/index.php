@@ -30,6 +30,19 @@
     box-shadow: 0 14px 36px rgba(17, 24, 39, .08);
   }
 
+  .builder-draggable-item {
+    cursor: grab;
+  }
+
+  .builder-draggable-item.is-dragging {
+    opacity: .55;
+  }
+
+  .builder-draggable-item.drag-over .builder-block-card {
+    border-color: #4680ff;
+    box-shadow: 0 0 0 3px rgba(70, 128, 255, .16);
+  }
+
   .builder-meta-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -61,6 +74,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: .5rem;
+  }
+
+  .builder-status {
+    min-height: 1.5rem;
   }
 </style>
 <?= $this->endSection() ?>
@@ -105,12 +122,19 @@ $builderBlockTypes = is_array($builderBlockTypes ?? null) ? $builderBlockTypes :
         <span class="badge bg-light-success text-success"><?= (int) ($builderDashboard['is_active'] ?? 0) === 1 ? 'Aktif dashboard' : 'Pasif dashboard' ?></span>
       </div>
     </div>
+    <div id="builderReorderStatus" class="builder-status small text-muted mt-3"></div>
   </div>
 </div>
 
-<div class="row g-3">
+<div class="row g-3 builder-edit-mode" id="builderBlocksGrid">
   <?php foreach ($builderBlocks as $block): ?>
-    <div class="col-md-6 col-xl-4">
+    <div
+      class="col-md-6 col-xl-4 builder-draggable-item"
+      draggable="true"
+      data-block-id="<?= esc((string) ($block['id'] ?? '')) ?>"
+      data-position-x="<?= esc((string) ($block['position_x'] ?? 0)) ?>"
+      data-position-y="<?= esc((string) ($block['position_y'] ?? 0)) ?>"
+    >
       <div class="card builder-block-card">
         <div class="card-body">
           <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
@@ -132,7 +156,7 @@ $builderBlockTypes = is_array($builderBlockTypes ?? null) ? $builderBlockTypes :
           <div class="builder-meta-grid mb-3">
             <div class="builder-meta-box">
               <span class="builder-meta-label">Sira</span>
-              <strong>#<?= esc((string) ($block['order_index'] ?? 0)) ?></strong>
+              <strong data-order-label>#<?= esc((string) ($block['order_index'] ?? 0)) ?></strong>
             </div>
             <div class="builder-meta-box">
               <span class="builder-meta-label">Boyut</span>
@@ -174,4 +198,13 @@ $builderBlockTypes = is_array($builderBlockTypes ?? null) ? $builderBlockTypes :
     </div>
   <?php endif; ?>
 </div>
+<?= $this->endSection() ?>
+
+<?= $this->section('pageScripts') ?>
+<?= view('admin/dashboard_builder/_reorder_script', [
+  'reorderGridId' => 'builderBlocksGrid',
+  'reorderStatusId' => 'builderReorderStatus',
+  'reorderToggleId' => '',
+  'reorderEnabledByDefault' => true,
+]) ?>
 <?= $this->endSection() ?>
