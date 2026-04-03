@@ -15,11 +15,25 @@ class DashboardBlockTypeModel extends BaseUuidModel
         'is_active',
         'created_at',
         'updated_at',
+        'deleted_at',
     ];
 
+    protected $useSoftDeletes = false;
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
+
+    public function __construct(?\CodeIgniter\Database\ConnectionInterface &$db = null, ?\CodeIgniter\Validation\ValidationInterface $validation = null)
+    {
+        parent::__construct($db, $validation);
+
+        if (! $this->db->tableExists($this->table) && $this->db->tableExists('dashboard_blocks')) {
+            $this->table = 'dashboard_blocks';
+        }
+
+        $this->useSoftDeletes = $this->db->fieldExists('deleted_at', $this->table);
+    }
 
     public function getActiveTypes(): array
     {

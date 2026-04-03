@@ -9,7 +9,9 @@ class DashboardBuilderSeeder extends Seeder
 {
     public function run()
     {
-        if (! $this->db->tableExists('dashboards') || ! $this->db->tableExists('dashboard_block_types')) {
+        $typeTable = $this->db->tableExists('dashboard_block_types') ? 'dashboard_block_types' : ($this->db->tableExists('dashboard_blocks') ? 'dashboard_blocks' : '');
+
+        if (! $this->db->tableExists('dashboards') || $typeTable === '') {
             echo "DashboardBuilderSeeder: gerekli tablolar bulunamadi.\n";
             return;
         }
@@ -35,7 +37,7 @@ class DashboardBuilderSeeder extends Seeder
             ]);
         }
 
-        $typesTable = $this->db->table('dashboard_block_types');
+        $typesTable = $this->db->table($typeTable);
         $types = [
             [
                 'code' => 'stat_card',

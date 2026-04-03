@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\DashboardBlockModel;
+use App\Models\DashboardBlockInstanceModel;
 use App\Models\DashboardBlockTypeModel;
 
 class DashboardBlockService
@@ -14,10 +14,10 @@ class DashboardBlockService
     private const COLOR_PALETTES = ['default', 'blue', 'orange', 'green', 'purple', 'finance', 'analytics', 'pastel', 'dark', 'custom'];
 
     public function __construct(
-        private ?DashboardBlockModel $dashboardBlockModel = null,
+        private ?DashboardBlockInstanceModel $dashboardBlockInstanceModel = null,
         private ?DashboardBlockTypeModel $dashboardBlockTypeModel = null
     ) {
-        $this->dashboardBlockModel = $this->dashboardBlockModel ?? new DashboardBlockModel();
+        $this->dashboardBlockInstanceModel = $this->dashboardBlockInstanceModel ?? new DashboardBlockInstanceModel();
         $this->dashboardBlockTypeModel = $this->dashboardBlockTypeModel ?? new DashboardBlockTypeModel();
     }
 
@@ -28,7 +28,7 @@ class DashboardBlockService
             return [];
         }
 
-        return $this->dashboardBlockModel->getBlocksByDashboardId($dashboardId);
+        return $this->dashboardBlockInstanceModel->getInstancesByDashboardId($dashboardId);
     }
 
     public function getAvailableBlockTypes(): array
@@ -47,7 +47,7 @@ class DashboardBlockService
             return null;
         }
 
-        $block = $this->dashboardBlockModel->findBlockWithType($blockId);
+        $block = $this->dashboardBlockInstanceModel->findInstanceWithBlock($blockId);
         if (! is_array($block)) {
             return null;
         }
@@ -91,11 +91,10 @@ class DashboardBlockService
             ];
         }
 
-        $orderIndex = $this->dashboardBlockModel->getNextOrderIndex($dashboardId);
+        $orderIndex = $this->dashboardBlockInstanceModel->getNextOrderIndex($dashboardId);
         $dimensions = $this->defaultDimensionsForType($blockCode);
         $payload = [
             'dashboard_id' => $dashboardId,
-            'block_type_id' => $blockTypeId,
             'title' => $title,
             'config_json' => json_encode($configResult['config'], JSON_UNESCAPED_UNICODE),
             'position_x' => 0,
@@ -106,7 +105,9 @@ class DashboardBlockService
             'is_visible' => $this->normalizeVisibility($data['is_visible'] ?? 1),
         ];
 
-        $insertId = $this->dashboardBlockModel->insert($payload, true);
+        $payload[$this->dashboardBlockInstanceModel->relationColumn()] = $blockTypeId;
+
+        $insertId = $this->dashboardBlockInstanceModel->insert($payload, true);
         if (! $insertId) {
             return [
                 'success' => false,
@@ -155,7 +156,7 @@ class DashboardBlockService
             'is_visible' => $this->normalizeVisibility($data['is_visible'] ?? ($block['is_visible'] ?? 1)),
         ];
 
-        if (! $this->dashboardBlockModel->update((string) $block['id'], $payload)) {
+        if (! $this->dashboardBlockInstanceModel->update((string) $block['id'], $payload)) {
             return [
                 'success' => false,
                 'errors' => ['Dashboard blogu guncellenemedi.'],
@@ -178,14 +179,14 @@ class DashboardBlockService
             ];
         }
 
-        if (! is_array($this->dashboardBlockModel->find($blockId))) {
+        if (! is_array($this->dashboardBlockInstanceModel->find($blockId))) {
             return [
                 'success' => false,
                 'errors' => ['Dashboard blogu bulunamadi.'],
             ];
         }
 
-        if (! $this->dashboardBlockModel->delete($blockId)) {
+        if (! $this->dashboardBlockInstanceModel->delete($blockId)) {
             return [
                 'success' => false,
                 'errors' => ['Dashboard blogu silinemedi.'],
@@ -202,7 +203,8 @@ class DashboardBlockService
     {
         $db = db_connect();
 
-        return $db->tableExists('dashboard_blocks') && $db->tableExists('dashboard_block_types');
+        return ($db->tableExists('dashboard_block_types') || $db->tableExists('dashboard_blocks'))
+            && $db->tableExists('dashboard_block_instances');
     }
 
     private function buildConfigForBlock(string $blockCode, array $data, array $defaults = []): array
