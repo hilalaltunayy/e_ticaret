@@ -1015,6 +1015,7 @@ foreach ($builderBlocks as $builderBlock) {
     var detailTableSelector = '#builderDetailTable';
     var detailTableInstance = null;
     var detailTableMode = null;
+    var detailModalShown = false;
     var detailState = {
       source: '',
       label: '',
@@ -1091,17 +1092,17 @@ foreach ($builderBlocks as $builderBlock) {
     }
 
     function initDetailDataTable() {
-      destroyDetailDataTable();
-
       if (typeof jQuery === 'undefined' || !jQuery.fn || !jQuery.fn.DataTable) {
         return;
       }
+
+      jQuery(detailTableSelector).css('width', '100%');
 
       detailTableInstance = jQuery(detailTableSelector).DataTable({
         pageLength: 10,
         lengthMenu: [10, 25, 50, 100],
         order: [[2, 'desc']],
-        scrollX: true,
+        scrollX: false,
         autoWidth: false,
         dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
         language: {
@@ -1123,6 +1124,12 @@ foreach ($builderBlocks as $builderBlock) {
           var wrapper = document.querySelector('#builderDetailTable_wrapper');
           var lengthLabel = wrapper ? wrapper.querySelector('.dt-length label') : null;
           if (!lengthLabel) {
+            if (detailTableInstance && detailModalShown) {
+              setTimeout(function () {
+                jQuery(detailTableSelector).css('width', '100%');
+                detailTableInstance.columns.adjust().draw(false);
+              }, 50);
+            }
             return;
           }
 
@@ -1137,6 +1144,13 @@ foreach ($builderBlocks as $builderBlock) {
             lengthLabel.innerHTML = '';
             lengthLabel.appendChild(select);
             lengthLabel.appendChild(document.createTextNode(' kayit goster'));
+          }
+
+          if (detailTableInstance && detailModalShown) {
+            setTimeout(function () {
+              jQuery(detailTableSelector).css('width', '100%');
+              detailTableInstance.columns.adjust().draw(false);
+            }, 50);
           }
         }
       });
@@ -1175,15 +1189,16 @@ foreach ($builderBlocks as $builderBlock) {
             throw new Error(payload && payload.message ? payload.message : 'detail_invalid');
           }
 
+          destroyDetailDataTable();
           detailModalTitle.textContent = payload.title || 'Satis Detayi';
           detailMeta.textContent = (payload.rows || []).length + ' kitap listeleniyor, toplam ' + String(payload.totalSoldQty || 0) + ' adet satis';
           renderDetailRows(payload.rows || []);
           initDetailDataTable();
         })
         .catch(function (error) {
+          destroyDetailDataTable();
           detailMeta.textContent = 'Detay verisi alinamadi';
           renderDetailRows([]);
-          destroyDetailDataTable();
           detailAlert.textContent = error && error.message && error.message !== 'detail_failed' ? error.message : 'Detay verisi yuklenemedi.';
           detailAlert.classList.remove('d-none');
         });
@@ -1196,7 +1211,7 @@ foreach ($builderBlocks as $builderBlock) {
 
       detailState.source = source;
       detailState.label = label;
-      detailState.period = 'weekly';
+      detailState.period = 'summary';
       setDetailPeriodButtons(detailState.period);
       detailModalTitle.textContent = label + ' Satis Detayi';
       detailMeta.textContent = 'Veri yukleniyor...';
@@ -1528,7 +1543,18 @@ foreach ($builderBlocks as $builderBlock) {
     });
 
     if (detailModalElement) {
+      detailModalElement.addEventListener('shown.bs.modal', function () {
+        detailModalShown = true;
+        if (detailTableInstance && typeof detailTableInstance.columns === 'function') {
+          setTimeout(function () {
+            jQuery(detailTableSelector).css('width', '100%');
+            detailTableInstance.columns.adjust().draw(false);
+          }, 50);
+        }
+      });
+
       detailModalElement.addEventListener('hidden.bs.modal', function () {
+        detailModalShown = false;
         destroyDetailDataTable();
         renderDetailRows([]);
         detailMeta.textContent = '';

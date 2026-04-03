@@ -270,6 +270,71 @@ class OrderModel extends BaseUuidModel
             ->getResultArray();
     }
 
+    public function getBuilderCategoryDetailAggregate(string $categoryName, ?string $start = null, ?string $end = null): array
+    {
+        $builder = $this->db->table('orders o')
+            ->select("
+                p.id as product_id,
+                p.product_name,
+                p.type as product_type,
+                SUM(o.quantity) as sold_qty,
+                GREATEST(COALESCE(p.stock_count, 0) - COALESCE(p.reserved_count, 0), 0) as remaining_stock,
+                MAX(o.order_date) as last_sale_date
+            ")
+            ->join('products p', 'p.id = o.product_id', 'inner')
+            ->join('categories c', 'c.id = p.category_id', 'inner')
+            ->where('o.deleted_at', null)
+            ->where('p.deleted_at', null)
+            ->where('c.category_name', $categoryName);
+
+        if ($start !== null && $end !== null) {
+            $builder->where('o.order_date >=', $start)
+                ->where('o.order_date <=', $end);
+        }
+
+        return $builder
+            ->groupBy('p.id, p.product_name, p.type, p.stock_count, p.reserved_count')
+            ->orderBy('sold_qty', 'DESC')
+            ->orderBy('p.product_name', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getBuilderProductTypeDetailAggregate(string $normalizedType, ?string $start = null, ?string $end = null): array
+    {
+        $productTypeExpr = "CASE
+            WHEN LOWER(TRIM(COALESCE(p.type, ''))) IN ('digital', 'dijital', 'ebook', 'e-book') THEN 'digital'
+            ELSE 'print'
+        END";
+        $normalizedType = strtolower(trim($normalizedType)) === 'digital' ? 'digital' : 'print';
+
+        $builder = $this->db->table('orders o')
+            ->select("
+                p.id as product_id,
+                p.product_name,
+                " . $productTypeExpr . " as normalized_type,
+                SUM(o.quantity) as sold_qty,
+                GREATEST(COALESCE(p.stock_count, 0) - COALESCE(p.reserved_count, 0), 0) as remaining_stock,
+                MAX(o.order_date) as last_sale_date
+            ", false)
+            ->join('products p', 'p.id = o.product_id', 'inner')
+            ->where('o.deleted_at', null)
+            ->where('p.deleted_at', null)
+            ->where($productTypeExpr . " = " . $this->db->escape($normalizedType), null, false);
+
+        if ($start !== null && $end !== null) {
+            $builder->where('o.order_date >=', $start)
+                ->where('o.order_date <=', $end);
+        }
+
+        return $builder
+            ->groupBy('p.id, p.product_name, normalized_type, p.stock_count, p.reserved_count')
+            ->orderBy('sold_qty', 'DESC')
+            ->orderBy('p.product_name', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
     public function createOrderReserved(
         string $productId,
         int $quantity,

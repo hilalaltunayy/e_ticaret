@@ -35,7 +35,7 @@ class DashboardDataSourceService
     {
         $source = trim($source);
         $label = trim($label);
-        $period = strtolower(trim($period));
+        $period = $this->normalizeDetailPeriod($period);
 
         if (! in_array($source, ['sales_by_category', 'print_vs_digital_sales'], true) || $label === '') {
             return [
@@ -49,13 +49,13 @@ class DashboardDataSourceService
         $title = $label . ' Satis Detayi';
 
         if ($source === 'sales_by_category') {
-            $rows = $this->orderModel->getSalesDetailByCategory($label, $start, $end);
+            $rows = $this->orderModel->getBuilderCategoryDetailAggregate($label, $start, $end);
             $title = $label . ' Satis Detayi';
         }
 
         if ($source === 'print_vs_digital_sales') {
             $normalizedType = $this->normalizeProductTypeLabel($label);
-            $rows = $this->orderModel->getSalesDetailByProductType($normalizedType, $start, $end);
+            $rows = $this->orderModel->getBuilderProductTypeDetailAggregate($normalizedType, $start, $end);
             $title = ($normalizedType === 'digital' ? 'Dijital' : 'Baski') . ' Urun Satis Detayi';
         }
 
@@ -758,6 +758,10 @@ class DashboardDataSourceService
 
     private function periodRange(string $period): array
     {
+        if ($period === 'summary') {
+            return [null, null];
+        }
+
         $referenceTimestamp = $this->detailReferenceTimestamp();
 
         return match ($period) {
@@ -774,6 +778,13 @@ class DashboardDataSourceService
                 date('Y-m-d 23:59:59', $referenceTimestamp),
             ],
         };
+    }
+
+    private function normalizeDetailPeriod(string $period): string
+    {
+        $period = strtolower(trim($period));
+
+        return in_array($period, ['summary', 'daily', 'weekly', 'monthly'], true) ? $period : 'summary';
     }
 
     private function detailReferenceTimestamp(): int
