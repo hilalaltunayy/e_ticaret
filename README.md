@@ -1,4 +1,8 @@
 E-Ticaret Platformu
+## Demo Preview
+
+### Main Screen
+![Main Screen](202604031554.mp4)
 
 Rol Tabanlı, Modüler Yönetim Panelli, Dijital & Basılı Kitap Satış Sistemi
 
