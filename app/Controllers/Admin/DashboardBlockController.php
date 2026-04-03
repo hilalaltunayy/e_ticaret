@@ -4,16 +4,19 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Services\DashboardBlockService;
+use App\Services\DashboardDataSourceService;
 use App\Services\DashboardService;
 
 class DashboardBlockController extends BaseController
 {
     public function __construct(
         private ?DashboardBlockService $dashboardBlockService = null,
-        private ?DashboardService $dashboardService = null
+        private ?DashboardService $dashboardService = null,
+        private ?DashboardDataSourceService $dashboardDataSourceService = null
     ) {
         $this->dashboardBlockService = $this->dashboardBlockService ?? new DashboardBlockService();
         $this->dashboardService = $this->dashboardService ?? new DashboardService();
+        $this->dashboardDataSourceService = $this->dashboardDataSourceService ?? new DashboardDataSourceService();
     }
 
     public function index()
@@ -37,6 +40,19 @@ class DashboardBlockController extends BaseController
             'success' => true,
             'block' => $block,
         ]);
+    }
+
+    public function detail()
+    {
+        $result = $this->dashboardDataSourceService->getChartBreakdownDetail(
+            (string) $this->request->getGet('source'),
+            (string) $this->request->getGet('label'),
+            (string) $this->request->getGet('period')
+        );
+
+        return $this->response
+            ->setStatusCode(($result['success'] ?? false) ? 200 : 422)
+            ->setJSON($result);
     }
 
     public function store()

@@ -135,6 +135,24 @@ class OrderModel extends BaseUuidModel
             ->getResultArray();
     }
 
+    public function getTopCategoriesByQuantityForPeriod(string $start, string $end, int $limit = 6): array
+    {
+        return $this->db->table('orders o')
+            ->select('c.category_name as category_name, SUM(o.quantity) as qty')
+            ->join('products p', 'p.id = o.product_id', 'inner')
+            ->join('categories c', 'c.id = p.category_id', 'inner')
+            ->where('o.deleted_at', null)
+            ->where('p.deleted_at', null)
+            ->where('c.category_name !=', '')
+            ->where('o.order_date >=', $start)
+            ->where('o.order_date <=', $end)
+            ->groupBy('c.id, c.category_name')
+            ->orderBy('qty', 'DESC')
+            ->limit($limit)
+            ->get()
+            ->getResultArray();
+    }
+
     public function getTopAuthorsByQuantity(int $limit = 10): array
     {
         return $this->db->table('orders o')
@@ -163,11 +181,91 @@ class OrderModel extends BaseUuidModel
 
     public function getSalesByProductType(): array
     {
+        $productTypeExpr = "CASE
+            WHEN LOWER(TRIM(COALESCE(p.type, ''))) IN ('digital', 'dijital', 'ebook', 'e-book') THEN 'digital'
+            ELSE 'print'
+        END";
+
         return $this->db->table('orders o')
-            ->select("COALESCE(NULLIF(p.type, ''), 'print') as product_type, SUM(o.quantity) as qty")
+            ->select($productTypeExpr . ' as product_type, SUM(o.quantity) as qty', false)
             ->join('products p', 'p.id = o.product_id', 'left')
-            ->groupBy("COALESCE(NULLIF(p.type, ''), 'print')")
+            ->groupBy($productTypeExpr, false)
             ->orderBy('qty', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getSalesByProductTypeForPeriod(string $start, string $end): array
+    {
+        $productTypeExpr = "CASE
+            WHEN LOWER(TRIM(COALESCE(p.type, ''))) IN ('digital', 'dijital', 'ebook', 'e-book') THEN 'digital'
+            ELSE 'print'
+        END";
+
+        return $this->db->table('orders o')
+            ->select($productTypeExpr . ' as product_type, SUM(o.quantity) as qty', false)
+            ->join('products p', 'p.id = o.product_id', 'left')
+            ->where('o.deleted_at', null)
+            ->where('p.deleted_at', null)
+            ->where('o.order_date >=', $start)
+            ->where('o.order_date <=', $end)
+            ->groupBy($productTypeExpr, false)
+            ->orderBy('qty', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getSalesDetailByCategory(string $categoryName, string $start, string $end): array
+    {
+        return $this->db->table('orders o')
+            ->select("
+                p.id as product_id,
+                p.product_name,
+                p.type as product_type,
+                SUM(o.quantity) as sold_qty,
+                GREATEST(COALESCE(p.stock_count, 0) - COALESCE(p.reserved_count, 0), 0) as remaining_stock,
+                MAX(o.order_date) as last_sale_date
+            ")
+            ->join('products p', 'p.id = o.product_id', 'inner')
+            ->join('categories c', 'c.id = p.category_id', 'inner')
+            ->where('o.deleted_at', null)
+            ->where('p.deleted_at', null)
+            ->where('o.order_date >=', $start)
+            ->where('o.order_date <=', $end)
+            ->where('c.category_name', $categoryName)
+            ->groupBy('p.id, p.product_name, p.type, p.stock_count, p.reserved_count')
+            ->orderBy('sold_qty', 'DESC')
+            ->orderBy('p.product_name', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getSalesDetailByProductType(string $normalizedType, string $start, string $end): array
+    {
+        $productTypeExpr = "CASE
+            WHEN LOWER(TRIM(COALESCE(p.type, ''))) IN ('digital', 'dijital', 'ebook', 'e-book') THEN 'digital'
+            ELSE 'print'
+        END";
+        $normalizedType = strtolower(trim($normalizedType)) === 'digital' ? 'digital' : 'print';
+
+        return $this->db->table('orders o')
+            ->select("
+                p.id as product_id,
+                p.product_name,
+                " . $productTypeExpr . " as normalized_type,
+                SUM(o.quantity) as sold_qty,
+                GREATEST(COALESCE(p.stock_count, 0) - COALESCE(p.reserved_count, 0), 0) as remaining_stock,
+                MAX(o.order_date) as last_sale_date
+            ", false)
+            ->join('products p', 'p.id = o.product_id', 'inner')
+            ->where('o.deleted_at', null)
+            ->where('p.deleted_at', null)
+            ->where('o.order_date >=', $start)
+            ->where('o.order_date <=', $end)
+            ->where($productTypeExpr . " = " . $this->db->escape($normalizedType), null, false)
+            ->groupBy('p.id, p.product_name, normalized_type, p.stock_count, p.reserved_count')
+            ->orderBy('sold_qty', 'DESC')
+            ->orderBy('p.product_name', 'ASC')
             ->get()
             ->getResultArray();
     }

@@ -35,6 +35,94 @@ foreach ($builderBlocks as $builderBlock) {
 ?>
 <?= $this->extend('admin/layouts/main') ?>
 
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="<?= base_url('assets/admin/css/plugins/dataTables.bootstrap5.min.css') ?>">
+<style>
+  .builder-chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+
+  .builder-color-chip {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 2px solid rgba(17, 24, 39, .08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .4);
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .builder-color-chip.is-selected {
+    border-color: #111827;
+    box-shadow: 0 0 0 3px rgba(70, 128, 255, .18);
+    transform: scale(1.06);
+  }
+
+  .builder-category-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .75rem 1rem;
+    border: 1px solid rgba(17, 24, 39, .08);
+    border-radius: .75rem;
+    background: rgba(248, 250, 252, .7);
+  }
+
+  .builder-category-row + .builder-category-row {
+    margin-top: .75rem;
+  }
+
+  .builder-detail-trigger {
+    width: 100%;
+    text-align: left;
+    border: 1px solid rgba(17, 24, 39, .08);
+    transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+
+  .builder-detail-trigger:hover {
+    border-color: rgba(70, 128, 255, .35);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, .08);
+    transform: translateY(-1px);
+  }
+
+  .builder-modal-dialog {
+    max-height: calc(100vh - 2rem);
+  }
+
+  .builder-modal-content {
+    max-height: calc(100vh - 2rem);
+  }
+
+  .builder-modal-form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .builder-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .builder-modal-footer {
+    flex-shrink: 0;
+    background: #fff;
+    border-top: 1px solid var(--bs-border-color);
+  }
+
+  @media (max-width: 575.98px) {
+    .builder-modal-dialog,
+    .builder-modal-content {
+      max-height: calc(100vh - 1rem);
+    }
+  }
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 <div class="container-fluid py-4">
   <div class="d-flex align-items-center justify-content-between mb-3">
@@ -113,7 +201,7 @@ foreach ($builderBlocks as $builderBlock) {
                 <div class="<?= esc($colClass) ?>">
                   <?php if (($render['kind'] ?? '') === 'stat_card'): ?>
                     <?php $theme = is_array($render['theme'] ?? null) ? $render['theme'] : []; ?>
-                    <div class="card shadow-sm h-100">
+                    <div class="card shadow-sm h-100" style="border-top: 3px solid <?= esc((string) ($theme['color'] ?? '#4680FF')) ?>;">
                       <div class="card-body">
                         <div class="d-flex align-items-center">
                           <div class="flex-shrink-0">
@@ -161,6 +249,7 @@ foreach ($builderBlocks as $builderBlock) {
                               data-fetch-url="<?= site_url('admin/dashboard/blocks/fetch/' . (string) ($block['id'] ?? '')) ?>"
                               data-update-url="<?= site_url('admin/dashboard/blocks/update/' . (string) ($block['id'] ?? '')) ?>"
                               data-block-id="<?= esc((string) ($block['id'] ?? '')) ?>"
+                              data-category-labels="[]"
                             >Ayarlar</button>
                             <form method="post" action="<?= site_url('admin/dashboard/blocks/delete/' . (string) ($block['id'] ?? '')) ?>" onsubmit="return confirm('Bu dashboard karti silinsin mi?');">
                               <?= csrf_field() ?>
@@ -176,7 +265,8 @@ foreach ($builderBlocks as $builderBlock) {
                       </div>
                     </div>
                   <?php elseif (($render['kind'] ?? '') === 'chart'): ?>
-                    <div class="card shadow-sm h-100">
+                    <?php $chartAccent = (string) (($render['chartOptions']['colors'][0] ?? '#4680FF')); ?>
+                    <div class="card shadow-sm h-100" style="border-top: 3px solid <?= esc($chartAccent) ?>;">
                       <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between gap-2">
                           <div>
@@ -195,6 +285,7 @@ foreach ($builderBlocks as $builderBlock) {
                                 data-fetch-url="<?= site_url('admin/dashboard/blocks/fetch/' . (string) ($block['id'] ?? '')) ?>"
                                 data-update-url="<?= site_url('admin/dashboard/blocks/update/' . (string) ($block['id'] ?? '')) ?>"
                                 data-block-id="<?= esc((string) ($block['id'] ?? '')) ?>"
+                                data-category-labels="<?= esc(json_encode(array_values(array_filter(array_map(static fn($summaryItem) => (string) ($summaryItem['label'] ?? ''), is_array($render['summary'] ?? null) ? $render['summary'] : []))), JSON_UNESCAPED_UNICODE)) ?>"
                               >Ayarlar</button>
                               <form method="post" action="<?= site_url('admin/dashboard/blocks/delete/' . (string) ($block['id'] ?? '')) ?>" onsubmit="return confirm('Bu dashboard karti silinsin mi?');">
                                 <?= csrf_field() ?>
@@ -218,20 +309,45 @@ foreach ($builderBlocks as $builderBlock) {
                         <?php if (!empty($render['summary']) && is_array($render['summary'])): ?>
                           <div class="row g-3 mt-3">
                             <?php foreach ($render['summary'] as $summaryItem): ?>
+                              <?php $detailSource = (string) ($render['detailSource'] ?? ''); ?>
+                              <?php $detailEnabled = in_array($detailSource, ['sales_by_category', 'print_vs_digital_sales'], true); ?>
                               <div class="col-sm-6">
-                                <div class="bg-body p-3 rounded">
-                                  <div class="d-flex align-items-center mb-2">
-                                    <div class="flex-shrink-0">
-                                      <span class="p-1 d-block <?= esc((string) ($summaryItem['dotClass'] ?? 'bg-primary')) ?> rounded-circle">
-                                        <span class="visually-hidden">summary</span>
-                                      </span>
+                                <?php if ($detailEnabled): ?>
+                                  <button
+                                    type="button"
+                                    class="btn bg-body p-3 rounded builder-detail-trigger"
+                                    data-builder-detail="open"
+                                    data-detail-source="<?= esc($detailSource) ?>"
+                                    data-detail-label="<?= esc((string) ($summaryItem['label'] ?? '')) ?>"
+                                  >
+                                    <div class="d-flex align-items-center mb-2">
+                                      <div class="flex-shrink-0">
+                                        <span class="p-1 d-block <?= esc((string) ($summaryItem['dotClass'] ?? 'bg-primary')) ?> rounded-circle">
+                                          <span class="visually-hidden">summary</span>
+                                        </span>
+                                      </div>
+                                      <div class="flex-grow-1 ms-2">
+                                        <p class="mb-0"><?= esc((string) ($summaryItem['label'] ?? '-')) ?></p>
+                                      </div>
+                                      <div class="flex-shrink-0 text-muted small">Detay</div>
                                     </div>
-                                    <div class="flex-grow-1 ms-2">
-                                      <p class="mb-0"><?= esc((string) ($summaryItem['label'] ?? '-')) ?></p>
+                                    <h6 class="mb-0"><?= esc((string) ($summaryItem['value'] ?? '0')) ?></h6>
+                                  </button>
+                                <?php else: ?>
+                                  <div class="bg-body p-3 rounded">
+                                    <div class="d-flex align-items-center mb-2">
+                                      <div class="flex-shrink-0">
+                                        <span class="p-1 d-block <?= esc((string) ($summaryItem['dotClass'] ?? 'bg-primary')) ?> rounded-circle">
+                                          <span class="visually-hidden">summary</span>
+                                        </span>
+                                      </div>
+                                      <div class="flex-grow-1 ms-2">
+                                        <p class="mb-0"><?= esc((string) ($summaryItem['label'] ?? '-')) ?></p>
+                                      </div>
                                     </div>
+                                    <h6 class="mb-0"><?= esc((string) ($summaryItem['value'] ?? '0')) ?></h6>
                                   </div>
-                                  <h6 class="mb-0"><?= esc((string) ($summaryItem['value'] ?? '0')) ?></h6>
-                                </div>
+                                <?php endif; ?>
                               </div>
                             <?php endforeach; ?>
                           </div>
@@ -266,6 +382,7 @@ foreach ($builderBlocks as $builderBlock) {
                             data-fetch-url="<?= site_url('admin/dashboard/blocks/fetch/' . (string) ($block['id'] ?? '')) ?>"
                             data-update-url="<?= site_url('admin/dashboard/blocks/update/' . (string) ($block['id'] ?? '')) ?>"
                             data-block-id="<?= esc((string) ($block['id'] ?? '')) ?>"
+                            data-category-labels="[]"
                           >Ayarlar</button>
                           <form method="post" action="<?= site_url('admin/dashboard/blocks/delete/' . (string) ($block['id'] ?? '')) ?>" onsubmit="return confirm('Bu dashboard karti silinsin mi?');">
                             <?= csrf_field() ?>
@@ -358,7 +475,7 @@ foreach ($builderBlocks as $builderBlock) {
             </div>
 
             <div class="row g-3 mt-1 <?= $selectedBlockTypeCode === 'stat_card' ? '' : 'd-none' ?>" data-block-config="stat_card">
-              <div class="col-12">
+              <div class="col-12" id="builderEditStatCustomColorField">
                 <h6 class="mb-0">İstatistik Kartı</h6>
               </div>
               <div class="col-12 col-md-6">
@@ -386,7 +503,7 @@ foreach ($builderBlocks as $builderBlock) {
             </div>
 
             <div class="row g-3 mt-1 <?= $selectedBlockTypeCode === 'chart' ? '' : 'd-none' ?>" data-block-config="chart">
-              <div class="col-12">
+              <div class="col-12" id="builderEditChartCustomColorField">
                 <h6 class="mb-0">Grafik</h6>
               </div>
               <div class="col-12 col-md-6">
@@ -407,7 +524,7 @@ foreach ($builderBlocks as $builderBlock) {
                   <option value="pie" <?= (string) old('chart_type', '') === 'pie' ? 'selected' : '' ?>>Pie / Donut</option>
                 </select>
               </div>
-              <div class="col-12">
+              <div class="col-12" id="builderEditCategoryColorField">
                 <label for="builderChartSubtitle" class="form-label">Alt Açıklama</label>
                 <input type="text" class="form-control" id="builderChartSubtitle" name="subtitle" value="<?= esc((string) old('subtitle', '')) ?>" placeholder="Grafik altında gösterilecek kısa açıklama">
               </div>
@@ -437,9 +554,9 @@ foreach ($builderBlocks as $builderBlock) {
   </div>
 
   <div class="modal fade" id="builderEditModal" tabindex="-1" aria-labelledby="builderEditModalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
-        <form method="post" action="#" id="builderEditForm">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable builder-modal-dialog">
+      <div class="modal-content builder-modal-content">
+        <form method="post" action="#" id="builderEditForm" class="builder-modal-form">
           <div class="modal-header">
             <div>
               <h5 class="modal-title" id="builderEditModalTitle">Kart Ayarlari</h5>
@@ -447,7 +564,7 @@ foreach ($builderBlocks as $builderBlock) {
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body builder-modal-body">
             <?= csrf_field() ?>
 
             <?php if (!empty($builderBlockEditErrors)): ?>
@@ -519,6 +636,27 @@ foreach ($builderBlocks as $builderBlock) {
                 <label for="builderEditFallbackValue" class="form-label">Yedek Deger</label>
                 <input type="text" class="form-control" id="builderEditFallbackValue" name="value" value="">
               </div>
+              <div class="col-12 col-md-6">
+                <label for="builderEditStatPalette" class="form-label">Renk Paleti</label>
+                <select class="form-select" id="builderEditStatPalette" name="color_palette">
+                  <option value="default">Default</option>
+                  <option value="blue">Blue</option>
+                  <option value="orange">Orange</option>
+                  <option value="green">Green</option>
+                  <option value="purple">Purple</option>
+                  <option value="finance">Finance</option>
+                  <option value="analytics">Analytics</option>
+                  <option value="pastel">Pastel</option>
+                  <option value="dark">Dark</option>
+                  <option value="custom">Ozel Renkler</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label mb-2">Ozel Renkler</label>
+                <input type="hidden" id="builderEditStatCustomColors" name="custom_colors" value="">
+                <div class="builder-chip-grid" id="builderEditStatCustomChips"></div>
+                <small class="text-muted d-block mt-2">Birden fazla vurgu rengi secebilirsiniz. Ilk secim mini chart icin kullanilir.</small>
+              </div>
             </div>
 
             <div class="row g-3 mt-1 d-none" data-edit-block-config="chart">
@@ -554,20 +692,29 @@ foreach ($builderBlocks as $builderBlock) {
               <div class="col-12 col-md-6">
                 <label for="builderEditColorPalette" class="form-label">Renk Paleti</label>
                 <select class="form-select" id="builderEditColorPalette" name="color_palette">
-                  <option value="default">Varsayilan</option>
-                  <option value="warm">Sicak</option>
-                  <option value="cool">Soguk</option>
-                  <option value="mono">Monokrom</option>
+                  <option value="default">Default</option>
+                  <option value="blue">Blue</option>
+                  <option value="orange">Orange</option>
+                  <option value="green">Green</option>
+                  <option value="purple">Purple</option>
+                  <option value="finance">Finance</option>
+                  <option value="analytics">Analytics</option>
+                  <option value="pastel">Pastel</option>
+                  <option value="dark">Dark</option>
                   <option value="custom">Ozel Renkler</option>
                 </select>
               </div>
               <div class="col-12">
                 <label for="builderEditCustomColors" class="form-label">Ozel Renkler</label>
-                <textarea class="form-control" id="builderEditCustomColors" name="custom_colors" rows="2" placeholder="#F97316, #7C3AED, #2CA87F"></textarea>
+                <input type="hidden" id="builderEditCustomColors" name="custom_colors" value="">
+                <div class="builder-chip-grid" id="builderEditCustomColorChips"></div>
+                <small class="text-muted d-block mt-2">Grafik renklerini chip secerek ozellestirebilirsiniz.</small>
               </div>
               <div class="col-12">
                 <label for="builderEditCategoryColors" class="form-label">Kategori Renk Esleme</label>
-                <textarea class="form-control" id="builderEditCategoryColors" name="category_colors" rows="3" placeholder="Roman=#F97316&#10;Siir=#7C3AED"></textarea>
+                <input type="hidden" id="builderEditCategoryColors" name="category_colors" value="">
+                <div id="builderEditCategoryColorRows"></div>
+                <small class="text-muted d-block mt-2">Sadece kategori bazli grafiklerde gorunen kategoriler burada listelenir.</small>
               </div>
             </div>
 
@@ -588,11 +735,55 @@ foreach ($builderBlocks as $builderBlock) {
               </div>
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer builder-modal-footer">
             <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Iptal</button>
             <button type="submit" class="btn btn-primary">Degisiklikleri Kaydet</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="builderDetailModal" tabindex="-1" aria-labelledby="builderDetailModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable builder-modal-dialog">
+      <div class="modal-content builder-modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title" id="builderDetailModalTitle">Satis Detayi</h5>
+            <div class="small text-muted" id="builderDetailModalSubtitle">Secilen kirilima gore urun listesi</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body builder-modal-body">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+            <div class="btn-group btn-group-sm" role="group" aria-label="detail-period">
+              <button type="button" class="btn btn-primary" data-detail-period="weekly">Haftalik</button>
+              <button type="button" class="btn btn-outline-primary" data-detail-period="daily">Gunluk</button>
+              <button type="button" class="btn btn-outline-primary" data-detail-period="monthly">Aylik</button>
+            </div>
+            <div class="small text-muted" id="builderDetailMeta">Detay verisi hazirlaniyor</div>
+          </div>
+
+          <div id="builderDetailAlert" class="alert alert-danger d-none"></div>
+
+          <div class="dt-responsive table-responsive">
+            <table id="builderDetailTable" class="table table-hover table-striped align-middle mb-0 w-100">
+              <thead>
+                <tr>
+                  <th>Kitap Adi</th>
+                  <th>Tur / Format</th>
+                  <th>Satilan Adet</th>
+                  <th>Kalan Stok</th>
+                  <th>Son Satis Tarihi</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer builder-modal-footer">
+          <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Kapat</button>
+        </div>
       </div>
     </div>
   </div>
@@ -802,6 +993,9 @@ foreach ($builderBlocks as $builderBlock) {
 
 <?= $this->section('pageScripts') ?>
 <script src="<?= base_url('assets/admin/js/plugins/datepicker-full.min.js') ?>"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.bootstrap5.min.js') ?>"></script>
 <script src="<?= base_url('assets/admin/js/widgets/new-orders-graph.js') ?>"></script>
 <script src="<?= base_url('assets/admin/js/widgets/new-users-graph.js') ?>"></script>
 <script src="<?= base_url('assets/admin/js/widgets/overview-chart.js') ?>"></script>
@@ -814,11 +1008,25 @@ foreach ($builderBlocks as $builderBlock) {
     var builderCharts = <?= json_encode($builderCharts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     var editModalElement = document.getElementById('builderEditModal');
     var editForm = document.getElementById('builderEditForm');
+    var detailModalElement = document.getElementById('builderDetailModal');
+    var detailModalTitle = document.getElementById('builderDetailModalTitle');
+    var detailMeta = document.getElementById('builderDetailMeta');
+    var detailAlert = document.getElementById('builderDetailAlert');
+    var detailTableSelector = '#builderDetailTable';
+    var detailTableInstance = null;
+    var detailTableMode = null;
+    var detailState = {
+      source: '',
+      label: '',
+      period: 'weekly'
+    };
     var editState = {
       modal: '<?= esc($builderBlockModal) ?>',
       blockId: '<?= esc($builderBlockEditId) ?>',
       old: <?= json_encode($builderBlockEditOld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
     };
+    var colorChoices = ['#4680FF', '#3B82F6', '#2563EB', '#F97316', '#FB923C', '#F59E0B', '#2CA87F', '#22C55E', '#16A34A', '#7C3AED', '#A855F7', '#8B5CF6', '#14B8A6', '#06B6D4', '#0F172A', '#111827', '#F9A8D4', '#FCD34D'];
+    var currentCategoryLabels = [];
 
     function renderBuilderCharts() {
       if (!Array.isArray(builderCharts) || typeof ApexCharts === 'undefined') {
@@ -834,6 +1042,166 @@ foreach ($builderBlocks as $builderBlock) {
         var chart = new ApexCharts(element, item.options);
         chart.render();
       });
+    }
+
+    function setDetailPeriodButtons(period) {
+      document.querySelectorAll('[data-detail-period]').forEach(function (button) {
+        var active = button.getAttribute('data-detail-period') === period;
+        button.classList.toggle('btn-primary', active);
+        button.classList.toggle('btn-outline-primary', !active);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value === undefined || value === null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderDetailRows(rows) {
+      var tableBody = document.querySelector(detailTableSelector + ' tbody');
+      if (!tableBody) {
+        return;
+      }
+
+      tableBody.innerHTML = '';
+
+      rows.forEach(function (row) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + escapeHtml(row.book_name) + '</td>' +
+          '<td>' + escapeHtml(row.format) + '</td>' +
+          '<td>' + escapeHtml(row.sold_qty) + '</td>' +
+          '<td>' + escapeHtml(row.remaining_stock) + '</td>' +
+          '<td>' + escapeHtml(row.last_sale_date) + '</td>';
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function destroyDetailDataTable() {
+      if (typeof jQuery !== 'undefined' && jQuery.fn && jQuery.fn.DataTable && jQuery.fn.DataTable.isDataTable(detailTableSelector)) {
+        jQuery(detailTableSelector).DataTable().clear().destroy();
+      }
+
+      detailTableInstance = null;
+      detailTableMode = null;
+    }
+
+    function initDetailDataTable() {
+      destroyDetailDataTable();
+
+      if (typeof jQuery === 'undefined' || !jQuery.fn || !jQuery.fn.DataTable) {
+        return;
+      }
+
+      detailTableInstance = jQuery(detailTableSelector).DataTable({
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        order: [[2, 'desc']],
+        scrollX: true,
+        autoWidth: false,
+        dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        language: {
+          lengthMenu: '_MENU_ kayit goster',
+          search: 'Ara:',
+          zeroRecords: 'Kayit bulunamadi',
+          info: '_TOTAL_ kayittan _START_ - _END_ arasi gosteriliyor',
+          infoEmpty: '0 kayittan 0 - 0 arasi gosteriliyor',
+          infoFiltered: '(_MAX_ kayit icinden filtrelendi)',
+          processing: 'Yukleniyor...',
+          paginate: {
+            first: 'Ilk',
+            last: 'Son',
+            next: 'Sonraki',
+            previous: 'Onceki'
+          }
+        },
+        initComplete: function () {
+          var wrapper = document.querySelector('#builderDetailTable_wrapper');
+          var lengthLabel = wrapper ? wrapper.querySelector('.dt-length label') : null;
+          if (!lengthLabel) {
+            return;
+          }
+
+          Array.from(lengthLabel.childNodes).forEach(function (node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+              node.textContent = node.textContent.replace('{select}', '').replace(/\s+/g, ' ').trim();
+            }
+          });
+
+          var select = lengthLabel.querySelector('select');
+          if (select) {
+            lengthLabel.innerHTML = '';
+            lengthLabel.appendChild(select);
+            lengthLabel.appendChild(document.createTextNode(' kayit goster'));
+          }
+        }
+      });
+      detailTableMode = 'jquery';
+    }
+
+    function loadDetailData() {
+      if (!detailState.source || !detailState.label) {
+        return;
+      }
+
+      detailAlert.classList.add('d-none');
+      detailAlert.textContent = '';
+      detailMeta.textContent = 'Veri yukleniyor...';
+
+      var params = new URLSearchParams({
+        source: detailState.source,
+        label: detailState.label,
+        period: detailState.period
+      });
+
+      fetch('<?= site_url('admin/dashboard/blocks/detail') ?>?' + params.toString(), {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('detail_failed');
+          }
+
+          return response.json();
+        })
+        .then(function (payload) {
+          if (!payload || !payload.success) {
+            throw new Error(payload && payload.message ? payload.message : 'detail_invalid');
+          }
+
+          detailModalTitle.textContent = payload.title || 'Satis Detayi';
+          detailMeta.textContent = (payload.rows || []).length + ' kitap listeleniyor, toplam ' + String(payload.totalSoldQty || 0) + ' adet satis';
+          renderDetailRows(payload.rows || []);
+          initDetailDataTable();
+        })
+        .catch(function (error) {
+          detailMeta.textContent = 'Detay verisi alinamadi';
+          renderDetailRows([]);
+          destroyDetailDataTable();
+          detailAlert.textContent = error && error.message && error.message !== 'detail_failed' ? error.message : 'Detay verisi yuklenemedi.';
+          detailAlert.classList.remove('d-none');
+        });
+    }
+
+    function openDetailModal(source, label) {
+      if (!detailModalElement || typeof bootstrap === 'undefined' || !bootstrap.Modal) {
+        return;
+      }
+
+      detailState.source = source;
+      detailState.label = label;
+      detailState.period = 'weekly';
+      setDetailPeriodButtons(detailState.period);
+      detailModalTitle.textContent = label + ' Satis Detayi';
+      detailMeta.textContent = 'Veri yukleniyor...';
+      bootstrap.Modal.getOrCreateInstance(detailModalElement).show();
+      loadDetailData();
     }
 
     function toggleConfigSections(selectElement, selector, selectedCode) {
@@ -852,18 +1220,160 @@ foreach ($builderBlocks as $builderBlock) {
       });
     }
 
-    function textAreaValueFromMap(map) {
-      var lines = [];
-
-      Object.keys(map || {}).forEach(function (key) {
-        lines.push(key + '=' + map[key]);
-      });
-
-      return lines.join('\n');
-    }
-
     function valueOrDefault(value, fallback) {
       return value === undefined || value === null ? fallback : value;
+    }
+
+    function parseColorList(value) {
+      if (Array.isArray(value)) {
+        return value.filter(Boolean);
+      }
+
+      return String(value || '').split(/[\r\n,]+/).map(function (item) {
+        return item.trim();
+      }).filter(Boolean);
+    }
+
+    function parseCategoryMap(value) {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return value;
+      }
+
+      var result = {};
+
+      String(value || '').split(/[\r\n]+/).forEach(function (line) {
+        var parts = line.split('=');
+        if (parts.length < 2) {
+          return;
+        }
+
+        var key = parts[0].trim();
+        var color = parts.slice(1).join('=').trim();
+        if (key && color) {
+          result[key] = color;
+        }
+      });
+
+      return result;
+    }
+
+    function serializeColorList(colors) {
+      return (colors || []).join(',');
+    }
+
+    function serializeCategoryMap(map) {
+      return Object.keys(map || {}).filter(function (key) {
+        return !!map[key];
+      }).map(function (key) {
+        return key + '=' + map[key];
+      }).join('\n');
+    }
+
+    function buildColorChipGroup(container, selectedColors, options) {
+      if (!container) {
+        return;
+      }
+
+      var config = options || {};
+      var allowMultiple = !!config.multiple;
+      var onChange = typeof config.onChange === 'function' ? config.onChange : function () {};
+      var selected = Array.isArray(selectedColors) ? selectedColors.slice() : [];
+
+      container.innerHTML = '';
+
+      colorChoices.forEach(function (color) {
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'builder-color-chip' + (selected.indexOf(color) !== -1 ? ' is-selected' : '');
+        button.style.backgroundColor = color;
+        button.setAttribute('title', color);
+        button.setAttribute('aria-label', color);
+        button.dataset.color = color;
+        button.addEventListener('click', function () {
+          var nextSelected = selected.slice();
+          var index = nextSelected.indexOf(color);
+
+          if (allowMultiple) {
+            if (index === -1) {
+              nextSelected.push(color);
+            } else {
+              nextSelected.splice(index, 1);
+            }
+          } else {
+            nextSelected = index === -1 ? [color] : [];
+          }
+
+          selected = nextSelected;
+          buildColorChipGroup(container, selected, options);
+          onChange(selected.slice());
+        });
+        container.appendChild(button);
+      });
+    }
+
+    function setPaletteFieldState(selectId, fieldId) {
+      var paletteSelect = document.getElementById(selectId);
+      var field = document.getElementById(fieldId);
+      if (!paletteSelect || !field) {
+        return;
+      }
+
+      field.classList.toggle('opacity-50', paletteSelect.value !== 'custom');
+    }
+
+    function renderCategoryColorRows(labels, selectedMap) {
+      var container = document.getElementById('builderEditCategoryColorRows');
+      var hiddenInput = document.getElementById('builderEditCategoryColors');
+      var field = document.getElementById('builderEditCategoryColorField');
+      var chartSource = document.getElementById('builderEditChartDataSource');
+      var entries = Array.isArray(labels) ? labels.filter(Boolean) : [];
+      var mapping = selectedMap || {};
+
+      if (!container || !hiddenInput || !field) {
+        return;
+      }
+
+      field.classList.toggle('d-none', !(chartSource && chartSource.value === 'sales_by_category'));
+      container.innerHTML = '';
+
+      if (entries.length === 0) {
+        hiddenInput.value = serializeCategoryMap(mapping);
+        if (chartSource && chartSource.value === 'sales_by_category') {
+          container.innerHTML = '<div class="text-muted small">Grafikte gorunen kategori etiketi bulunursa burada secilebilir renk kutulari acilir.</div>';
+        }
+        return;
+      }
+
+      entries.forEach(function (label) {
+        var row = document.createElement('div');
+        row.className = 'builder-category-row';
+
+        var name = document.createElement('div');
+        name.className = 'fw-semibold';
+        name.textContent = label;
+
+        var chips = document.createElement('div');
+        chips.className = 'builder-chip-grid';
+
+        buildColorChipGroup(chips, mapping[label] ? [mapping[label]] : [], {
+          multiple: false,
+          onChange: function (colors) {
+            if (colors.length) {
+              mapping[label] = colors[0];
+            } else {
+              delete mapping[label];
+            }
+
+            hiddenInput.value = serializeCategoryMap(mapping);
+          }
+        });
+
+        row.appendChild(name);
+        row.appendChild(chips);
+        container.appendChild(row);
+      });
+
+      hiddenInput.value = serializeCategoryMap(mapping);
     }
 
     function populateEditForm(block, overrideValues) {
@@ -885,8 +1395,9 @@ foreach ($builderBlocks as $builderBlock) {
       var fallbackValue = valueOrDefault(overrides.value, config.value || '');
       var noteContent = valueOrDefault(overrides.content, config.content || '');
       var colorPalette = valueOrDefault(overrides.color_palette, config.color_palette || 'default');
-      var customColors = valueOrDefault(overrides.custom_colors, Array.isArray(config.custom_colors) ? config.custom_colors.join(', ') : '');
-      var categoryColors = valueOrDefault(overrides.category_colors, textAreaValueFromMap(config.category_colors || {}));
+      var statCustomColors = parseColorList(valueOrDefault(overrides.custom_colors, config.custom_colors || []));
+      var chartCustomColors = parseColorList(valueOrDefault(overrides.custom_colors, config.custom_colors || []));
+      var categoryColors = parseCategoryMap(valueOrDefault(overrides.category_colors, config.category_colors || {}));
 
       editForm.setAttribute('action', block.update_url || '#');
       document.getElementById('builderEditBlockId').value = block.id || '';
@@ -900,15 +1411,36 @@ foreach ($builderBlocks as $builderBlock) {
       document.getElementById('builderEditStatVariant').value = variant || 'mini_spark';
       document.getElementById('builderEditValueLabel').value = valueLabel;
       document.getElementById('builderEditFallbackValue').value = fallbackValue;
+      document.getElementById('builderEditStatPalette').value = colorPalette;
+      document.getElementById('builderEditStatCustomColors').value = serializeColorList(statCustomColors);
       document.getElementById('builderEditChartDataSource').value = dataSource;
       document.getElementById('builderEditChartType').value = chartType;
       document.getElementById('builderEditChartVariant').value = variant || 'line_trend';
       document.getElementById('builderEditColorPalette').value = colorPalette;
-      document.getElementById('builderEditCustomColors').value = customColors;
-      document.getElementById('builderEditCategoryColors').value = categoryColors;
+      document.getElementById('builderEditCustomColors').value = serializeColorList(chartCustomColors);
+      document.getElementById('builderEditCategoryColors').value = serializeCategoryMap(categoryColors);
       document.getElementById('builderEditNoteVariant').value = variant || 'simple_note';
       document.getElementById('builderEditNoteContent').value = noteContent;
 
+      currentCategoryLabels = Array.isArray(block.category_labels) ? block.category_labels.slice() : [];
+
+      buildColorChipGroup(document.getElementById('builderEditStatCustomChips'), statCustomColors, {
+        multiple: true,
+        onChange: function (colors) {
+          document.getElementById('builderEditStatCustomColors').value = serializeColorList(colors);
+        }
+      });
+
+      buildColorChipGroup(document.getElementById('builderEditCustomColorChips'), chartCustomColors, {
+        multiple: true,
+        onChange: function (colors) {
+          document.getElementById('builderEditCustomColors').value = serializeColorList(colors);
+        }
+      });
+
+      setPaletteFieldState('builderEditStatPalette', 'builderEditStatCustomColorField');
+      setPaletteFieldState('builderEditColorPalette', 'builderEditChartCustomColorField');
+      renderCategoryColorRows(currentCategoryLabels, categoryColors);
       toggleConfigSections(null, '[data-edit-block-config]', blockCode);
     }
 
@@ -935,6 +1467,7 @@ foreach ($builderBlocks as $builderBlock) {
           }
 
           payload.block.update_url = button.dataset.updateUrl || '#';
+          payload.block.category_labels = JSON.parse(button.dataset.categoryLabels || '[]');
           populateEditForm(payload.block, overrideValues || {});
           bootstrap.Modal.getOrCreateInstance(editModalElement).show();
         })
@@ -952,11 +1485,57 @@ foreach ($builderBlocks as $builderBlock) {
       toggleConfigSections(blockTypeSelect, '[data-block-config]');
     }
 
+    ['builderEditStatPalette', 'builderEditColorPalette'].forEach(function (id) {
+      var select = document.getElementById(id);
+      if (!select) {
+        return;
+      }
+
+      select.addEventListener('change', function () {
+        if (id === 'builderEditStatPalette') {
+          setPaletteFieldState('builderEditStatPalette', 'builderEditStatCustomColorField');
+        } else {
+          setPaletteFieldState('builderEditColorPalette', 'builderEditChartCustomColorField');
+        }
+      });
+    });
+
+    var chartSourceSelect = document.getElementById('builderEditChartDataSource');
+    if (chartSourceSelect) {
+      chartSourceSelect.addEventListener('change', function () {
+        renderCategoryColorRows(currentCategoryLabels, parseCategoryMap(document.getElementById('builderEditCategoryColors').value));
+      });
+    }
+
     document.querySelectorAll('[data-builder-action="edit"]').forEach(function (button) {
       button.addEventListener('click', function () {
         openEditModalFromButton(button, {});
       });
     });
+
+    document.querySelectorAll('[data-builder-detail="open"]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        openDetailModal(button.getAttribute('data-detail-source') || '', button.getAttribute('data-detail-label') || '');
+      });
+    });
+
+    document.querySelectorAll('[data-detail-period]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        detailState.period = button.getAttribute('data-detail-period') || 'weekly';
+        setDetailPeriodButtons(detailState.period);
+        loadDetailData();
+      });
+    });
+
+    if (detailModalElement) {
+      detailModalElement.addEventListener('hidden.bs.modal', function () {
+        destroyDetailDataTable();
+        renderDetailRows([]);
+        detailMeta.textContent = '';
+        detailAlert.classList.add('d-none');
+        detailAlert.textContent = '';
+      });
+    }
 
     if (editModalElement) {
       toggleConfigSections(null, '[data-edit-block-config]', '');

@@ -74,6 +74,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     // Admin Dashboard
     $routes->get('dashboard', 'Admin\DashboardController::index');
     $routes->get('dashboard/blocks/fetch/(:segment)', 'Admin\DashboardBlockController::fetch/$1');
+    $routes->get('dashboard/blocks/detail', 'Admin\DashboardBlockController::detail');
     $routes->post('dashboard/blocks/store', 'Admin\DashboardBlockController::store');
     $routes->post('dashboard/blocks/update/(:segment)', 'Admin\DashboardBlockController::update/$1');
     $routes->post('dashboard/blocks/delete/(:segment)', 'Admin\DashboardBlockController::delete/$1');

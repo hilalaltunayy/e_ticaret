@@ -11,7 +11,7 @@ class DashboardBlockService
     private const CHART_VARIANTS = ['line_trend', 'bar_overview', 'donut_summary', 'pie_breakdown'];
     private const NOTE_VARIANTS = ['simple_note', 'accent_note'];
     private const CHART_TYPES = ['bar', 'line', 'pie'];
-    private const COLOR_PALETTES = ['default', 'warm', 'cool', 'mono', 'custom'];
+    private const COLOR_PALETTES = ['default', 'blue', 'orange', 'green', 'purple', 'finance', 'analytics', 'pastel', 'dark', 'custom'];
 
     public function __construct(
         private ?DashboardBlockModel $dashboardBlockModel = null,
@@ -224,6 +224,8 @@ class DashboardBlockService
             $config['value_label'] = trim((string) ($data['value_label'] ?? $defaults['value_label'] ?? ''));
             $config['value'] = trim((string) ($data['value'] ?? $defaults['value'] ?? ''));
             $config['variant'] = $this->normalizeVariant('stat_card', (string) ($data['variant'] ?? $defaults['variant'] ?? 'mini_spark'));
+            $config['color_palette'] = $this->normalizeColorPalette((string) ($data['color_palette'] ?? $defaults['color_palette'] ?? 'default'));
+            $config['custom_colors'] = $this->normalizeColorList($data['custom_colors'] ?? ($defaults['custom_colors'] ?? []));
         } elseif ($blockCode === 'chart') {
             $dataSource = trim((string) ($data['data_source'] ?? $defaults['data_source'] ?? ''));
             if ($dataSource === '') {

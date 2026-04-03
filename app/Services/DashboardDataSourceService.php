@@ -31,6 +31,53 @@ class DashboardDataSourceService
         return $hydrated;
     }
 
+    public function getChartBreakdownDetail(string $source, string $label, string $period): array
+    {
+        $source = trim($source);
+        $label = trim($label);
+        $period = strtolower(trim($period));
+
+        if (! in_array($source, ['sales_by_category', 'print_vs_digital_sales'], true) || $label === '') {
+            return [
+                'success' => false,
+                'message' => 'Gecerli detay kirilimi bulunamadi.',
+            ];
+        }
+
+        [$start, $end] = $this->periodRange($period);
+        $rows = [];
+        $title = $label . ' Satis Detayi';
+
+        if ($source === 'sales_by_category') {
+            $rows = $this->orderModel->getSalesDetailByCategory($label, $start, $end);
+            $title = $label . ' Satis Detayi';
+        }
+
+        if ($source === 'print_vs_digital_sales') {
+            $normalizedType = $this->normalizeProductTypeLabel($label);
+            $rows = $this->orderModel->getSalesDetailByProductType($normalizedType, $start, $end);
+            $title = ($normalizedType === 'digital' ? 'Dijital' : 'Baski') . ' Urun Satis Detayi';
+        }
+
+        return [
+            'success' => true,
+            'title' => $title,
+            'period' => $period,
+            'totalSoldQty' => array_sum(array_map(static fn(array $row) => (int) ($row['sold_qty'] ?? 0), $rows)),
+            'rows' => array_map(function (array $row) {
+                $type = trim((string) ($row['normalized_type'] ?? $row['product_type'] ?? ''));
+
+                return [
+                    'book_name' => (string) ($row['product_name'] ?? '-'),
+                    'format' => $this->formatProductTypeLabel($type),
+                    'sold_qty' => (int) ($row['sold_qty'] ?? 0),
+                    'remaining_stock' => isset($row['remaining_stock']) ? (int) $row['remaining_stock'] : '-',
+                    'last_sale_date' => $this->formatDateTime((string) ($row['last_sale_date'] ?? '')),
+                ];
+            }, $rows),
+        ];
+    }
+
     private function resolveRenderPayload(array $block, array $config): array
     {
         $blockType = trim((string) ($block['block_type_code'] ?? ''));
@@ -63,6 +110,10 @@ class DashboardDataSourceService
         $fallbackValue = trim((string) ($config['value'] ?? ''));
         $dateRange = $this->normalizeDateRange((string) ($config['date_range'] ?? '7d'));
         $variant = $this->normalizeVariant('stat_card', (string) ($config['variant'] ?? 'mini_spark'));
+        $colorPalette = $this->normalizeColorPalette((string) ($config['color_palette'] ?? 'default'));
+        $customColors = $this->normalizeColorList($config['custom_colors'] ?? []);
+        $accentColor = $this->palettePrimaryColor($colorPalette, $theme['color'], $customColors);
+        $theme['color'] = $accentColor;
 
         if ($source === '') {
             return [
@@ -168,6 +219,7 @@ class DashboardDataSourceService
             'variant' => $variant,
             'title' => $title,
             'subtitle' => $subtitle !== '' ? $subtitle : $dataset['subtitle'],
+            'detailSource' => $source,
             'chartId' => $chartId,
             'chartOptions' => $this->buildChartOptions($chartId, $chartType, $dataset, $variant),
             'message' => null,
@@ -356,7 +408,7 @@ class DashboardDataSourceService
                 'name' => $dataset['seriesName'],
                 'data' => $dataset['values'],
             ]],
-            'colors' => [$dataset['colors'][0] ?? '#4680FF'],
+            'colors' => $chartType === 'bar' ? $dataset['colors'] : [$dataset['colors'][0] ?? '#4680FF'],
             'dataLabels' => ['enabled' => false],
             'stroke' => [
                 'curve' => 'smooth',
@@ -375,6 +427,7 @@ class DashboardDataSourceService
                 'bar' => [
                     'borderRadius' => 4,
                     'columnWidth' => '46%',
+                    'distributed' => true,
                 ],
             ];
         }
@@ -584,11 +637,23 @@ class DashboardDataSourceService
         }
 
         return match ($palette) {
-            'warm' => ['#F97316', '#FB923C', '#F59E0B', '#EF4444', '#DC2626', '#FDBA74'],
-            'cool' => ['#0EA5E9', '#06B6D4', '#14B8A6', '#22C55E', '#3B82F6', '#6366F1'],
-            'mono' => ['#111827', '#374151', '#4B5563', '#6B7280', '#9CA3AF', '#D1D5DB'],
+            'blue' => ['#4680FF', '#3B82F6', '#2563EB', '#60A5FA', '#1D4ED8', '#93C5FD'],
+            'orange' => ['#F97316', '#FB923C', '#F59E0B', '#EA580C', '#FDBA74', '#FFEDD5'],
+            'green' => ['#2CA87F', '#22C55E', '#16A34A', '#86EFAC', '#15803D', '#DCFCE7'],
+            'purple' => ['#7C3AED', '#8B5CF6', '#A855F7', '#C084FC', '#6D28D9', '#E9D5FF'],
+            'finance' => ['#0F172A', '#1D4ED8', '#2CA87F', '#14B8A6', '#38BDF8', '#CBD5E1'],
+            'analytics' => ['#4680FF', '#06B6D4', '#7C3AED', '#EC4899', '#F97316', '#2CA87F'],
+            'pastel' => ['#93C5FD', '#F9A8D4', '#C4B5FD', '#86EFAC', '#FCD34D', '#FDBA74'],
+            'dark' => ['#111827', '#1F2937', '#374151', '#4B5563', '#6B7280', '#9CA3AF'],
             default => $defaultColors,
         };
+    }
+
+    private function palettePrimaryColor(string $palette, string $defaultColor, array $customColors): string
+    {
+        $paletteColors = $this->paletteColors($palette, [$defaultColor], $customColors);
+
+        return (string) ($paletteColors[0] ?? $defaultColor);
     }
 
     private function normalizeColorList(mixed $colors): array
@@ -662,7 +727,7 @@ class DashboardDataSourceService
     {
         $palette = strtolower(trim($palette));
 
-        return in_array($palette, ['default', 'warm', 'cool', 'mono', 'custom'], true) ? $palette : 'default';
+        return in_array($palette, ['default', 'blue', 'orange', 'green', 'purple', 'finance', 'analytics', 'pastel', 'dark', 'custom'], true) ? $palette : 'default';
     }
 
     private function normalizeChartType(string $chartType): string
@@ -689,6 +754,64 @@ class DashboardDataSourceService
         $dateRange = strtolower(trim($dateRange));
 
         return in_array($dateRange, ['7d', '14d', '30d'], true) ? $dateRange : '7d';
+    }
+
+    private function periodRange(string $period): array
+    {
+        $referenceTimestamp = $this->detailReferenceTimestamp();
+
+        return match ($period) {
+            'daily' => [
+                date('Y-m-d 00:00:00', $referenceTimestamp),
+                date('Y-m-d 23:59:59', $referenceTimestamp),
+            ],
+            'monthly' => [
+                date('Y-m-d 00:00:00', strtotime('-29 days', $referenceTimestamp)),
+                date('Y-m-d 23:59:59', $referenceTimestamp),
+            ],
+            default => [
+                date('Y-m-d 00:00:00', strtotime('-6 days', $referenceTimestamp)),
+                date('Y-m-d 23:59:59', $referenceTimestamp),
+            ],
+        };
+    }
+
+    private function detailReferenceTimestamp(): int
+    {
+        $latestOrderDate = $this->orderModel->getLatestOrderDate();
+        if ($latestOrderDate === null) {
+            return time();
+        }
+
+        $timestamp = strtotime($latestOrderDate);
+
+        return $timestamp ?: time();
+    }
+
+    private function normalizeProductTypeLabel(string $label): string
+    {
+        $label = strtolower(trim($label));
+
+        return in_array($label, ['digital', 'dijital', 'ebook', 'e-book'], true) ? 'digital' : 'print';
+    }
+
+    private function formatProductTypeLabel(string $type): string
+    {
+        $type = strtolower(trim($type));
+
+        return in_array($type, ['digital', 'dijital', 'ebook', 'e-book'], true) ? 'Dijital' : 'Baski';
+    }
+
+    private function formatDateTime(string $value): string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return '-';
+        }
+
+        $timestamp = strtotime($value);
+
+        return $timestamp ? date('d.m.Y H:i', $timestamp) : $value;
     }
 
     private function chartId(array $block, string $suffix): string
