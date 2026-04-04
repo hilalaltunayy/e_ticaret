@@ -32,15 +32,50 @@
 
   .builder-draggable-item {
     cursor: grab;
+    position: relative;
   }
 
   .builder-draggable-item.is-dragging {
     opacity: .55;
   }
 
+  .builder-draggable-item.is-resizing {
+    z-index: 3;
+  }
+
   .builder-draggable-item.drag-over .builder-block-card {
     border-color: #4680ff;
     box-shadow: 0 0 0 3px rgba(70, 128, 255, .16);
+  }
+
+  .builder-block-card {
+    position: relative;
+  }
+
+  .builder-resize-handle {
+    position: absolute;
+    right: .75rem;
+    bottom: .75rem;
+    width: 18px;
+    height: 18px;
+    display: none;
+    align-items: flex-end;
+    justify-content: flex-end;
+    color: #94a3b8;
+    cursor: nwse-resize;
+    user-select: none;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .builder-edit-mode .builder-resize-handle {
+    display: inline-flex;
+  }
+
+  body.builder-resize-active,
+  body.builder-resize-active * {
+    cursor: nwse-resize !important;
+    user-select: none !important;
   }
 
   .builder-meta-grid {
@@ -134,6 +169,8 @@ $builderBlockTypes = is_array($builderBlockTypes ?? null) ? $builderBlockTypes :
       data-block-id="<?= esc((string) ($block['id'] ?? '')) ?>"
       data-position-x="<?= esc((string) ($block['position_x'] ?? 0)) ?>"
       data-position-y="<?= esc((string) ($block['position_y'] ?? 0)) ?>"
+      data-width="<?= esc((string) ($block['width'] ?? 4)) ?>"
+      data-height="<?= esc((string) ($block['height'] ?? 2)) ?>"
     >
       <div class="card builder-block-card">
         <div class="card-body">
@@ -160,7 +197,7 @@ $builderBlockTypes = is_array($builderBlockTypes ?? null) ? $builderBlockTypes :
             </div>
             <div class="builder-meta-box">
               <span class="builder-meta-label">Boyut</span>
-              <strong><?= esc((string) ($block['width'] ?? 0)) ?> x <?= esc((string) ($block['height'] ?? 0)) ?></strong>
+              <strong data-size-label><?= esc((string) ($block['width'] ?? 0)) ?> x <?= esc((string) ($block['height'] ?? 0)) ?></strong>
             </div>
             <div class="builder-meta-box">
               <span class="builder-meta-label">Pozisyon X</span>
@@ -182,6 +219,7 @@ $builderBlockTypes = is_array($builderBlockTypes ?? null) ? $builderBlockTypes :
             <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Tasima yakinda</button>
             <button type="button" class="btn btn-sm btn-outline-danger" disabled>Sil yakinda</button>
           </div>
+          <span class="builder-resize-handle" data-resize-handle aria-hidden="true">◢</span>
         </div>
       </div>
     </div>

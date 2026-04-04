@@ -12,6 +12,7 @@ class DashboardBlockService
     private const NOTE_VARIANTS = ['simple_note', 'accent_note'];
     private const CHART_TYPES = ['bar', 'line', 'pie'];
     private const COLOR_PALETTES = ['default', 'blue', 'orange', 'green', 'purple', 'finance', 'analytics', 'pastel', 'dark', 'custom'];
+    private const COMPARISON_TYPES = ['none', 'previous_period', 'previous_week', 'previous_month'];
 
     public function __construct(
         private ?DashboardBlockInstanceModel $dashboardBlockInstanceModel = null,
@@ -53,6 +54,10 @@ class DashboardBlockService
         }
 
         $block['config'] = $this->decodeConfig($block['config_json'] ?? null);
+        $relationColumn = $this->dashboardBlockInstanceModel->relationColumn();
+        $blockTypeId = trim((string) ($block[$relationColumn] ?? ''));
+        $blockType = $blockTypeId !== '' ? $this->dashboardBlockTypeModel->find($blockTypeId) : null;
+        $block['default_config'] = $this->decodeConfig($blockType['default_config'] ?? null);
 
         return $block;
     }
@@ -226,6 +231,7 @@ class DashboardBlockService
             $config['value_label'] = trim((string) ($data['value_label'] ?? $defaults['value_label'] ?? ''));
             $config['value'] = trim((string) ($data['value'] ?? $defaults['value'] ?? ''));
             $config['variant'] = $this->normalizeVariant('stat_card', (string) ($data['variant'] ?? $defaults['variant'] ?? 'mini_spark'));
+            $config['comparison_type'] = $this->normalizeComparisonType((string) ($data['comparison_type'] ?? $defaults['comparison_type'] ?? 'none'));
             $config['color_palette'] = $this->normalizeColorPalette((string) ($data['color_palette'] ?? $defaults['color_palette'] ?? 'default'));
             $config['custom_colors'] = $this->normalizeColorList($data['custom_colors'] ?? ($defaults['custom_colors'] ?? []));
         } elseif ($blockCode === 'chart') {
@@ -309,6 +315,13 @@ class DashboardBlockService
         $palette = strtolower(trim($palette));
 
         return in_array($palette, self::COLOR_PALETTES, true) ? $palette : 'default';
+    }
+
+    private function normalizeComparisonType(string $comparisonType): string
+    {
+        $comparisonType = strtolower(trim($comparisonType));
+
+        return in_array($comparisonType, self::COMPARISON_TYPES, true) ? $comparisonType : 'none';
     }
 
     private function normalizeColorList(mixed $colors): array

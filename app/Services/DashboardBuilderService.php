@@ -209,6 +209,81 @@ class DashboardBuilderService
         ];
     }
 
+    public function resizeBlock(string $userId, string $blockId, mixed $width, mixed $height): array
+    {
+        if (! $this->builderTablesReady()) {
+            return [
+                'success' => false,
+                'message' => 'Builder tablolarina ulasilamadi.',
+            ];
+        }
+
+        $dashboard = $this->getOrCreateAdminDashboard($userId);
+        $dashboardId = trim((string) ($dashboard['id'] ?? ''));
+        if ($dashboardId === '') {
+            return [
+                'success' => false,
+                'message' => 'Aktif dashboard bulunamadi.',
+            ];
+        }
+
+        $blockId = trim($blockId);
+        if ($blockId === '') {
+            return [
+                'success' => false,
+                'message' => 'Blok kimligi eksik.',
+            ];
+        }
+
+        $normalizedWidth = max(2, min(12, (int) $width));
+        $normalizedHeight = max(1, min(6, (int) $height));
+
+        $instance = $this->dashboardBlockInstanceModel
+            ->where('dashboard_id', $dashboardId)
+            ->where('id', $blockId)
+            ->first();
+
+        if (! is_array($instance) || empty($instance['id'])) {
+            return [
+                'success' => false,
+                'message' => 'Blok bu dashboard ile uyusmuyor.',
+            ];
+        }
+
+        $db = db_connect();
+        $db->transStart();
+
+        $updated = $this->dashboardBlockInstanceModel->update($blockId, [
+            'width' => $normalizedWidth,
+            'height' => $normalizedHeight,
+        ]);
+
+        if (! $updated) {
+            $db->transRollback();
+
+            return [
+                'success' => false,
+                'message' => 'Blok boyutu kaydedilemedi.',
+            ];
+        }
+
+        $db->transComplete();
+
+        if (! $db->transStatus()) {
+            return [
+                'success' => false,
+                'message' => 'Blok boyutu kaydedilemedi.',
+            ];
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Blok boyutu kaydedildi.',
+            'width' => $normalizedWidth,
+            'height' => $normalizedHeight,
+        ];
+    }
+
     private function builderTablesReady(): bool
     {
         $db = db_connect();

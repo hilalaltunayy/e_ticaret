@@ -57,6 +57,29 @@ class DashboardBuilder extends BaseController
             ->setJSON($this->withCsrf($result));
     }
 
+    public function resize()
+    {
+        $user = session()->get('user') ?? [];
+        $userId = trim((string) ($user['id'] ?? $user['user_id'] ?? ''));
+        $blockId = trim((string) ($this->request->getPost('id') ?? ''));
+        $width = $this->request->getPost('width');
+        $height = $this->request->getPost('height');
+
+        if ($userId === '') {
+            return $this->response->setStatusCode(403)->setJSON($this->withCsrf([
+                'success' => false,
+                'message' => 'Kullanici bilgisi bulunamadi.',
+            ]));
+        }
+
+        $result = $this->dashboardBuilderService->resizeBlock($userId, $blockId, $width, $height);
+        $status = ($result['success'] ?? false) ? 200 : 422;
+
+        return $this->response
+            ->setStatusCode($status)
+            ->setJSON($this->withCsrf($result));
+    }
+
     private function withCsrf(array $payload): array
     {
         $payload['csrf'] = [

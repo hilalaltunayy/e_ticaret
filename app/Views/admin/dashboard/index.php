@@ -89,6 +89,7 @@ foreach ($builderBlocks as $builderBlock) {
 
   .dashboard-builder-grid .builder-draggable-item {
     cursor: default;
+    position: relative;
   }
 
   .dashboard-builder-grid.builder-edit-mode .builder-draggable-item {
@@ -102,6 +103,40 @@ foreach ($builderBlocks as $builderBlock) {
   .dashboard-builder-grid.builder-edit-mode .builder-draggable-item.drag-over > .card {
     box-shadow: 0 0 0 3px rgba(70, 128, 255, .18);
     border-color: rgba(70, 128, 255, .45);
+  }
+
+  .dashboard-builder-grid .builder-draggable-item.is-resizing {
+    z-index: 3;
+  }
+
+  .dashboard-builder-grid .card {
+    position: relative;
+  }
+
+  .builder-resize-handle {
+    position: absolute;
+    right: .75rem;
+    bottom: .75rem;
+    width: 18px;
+    height: 18px;
+    display: none;
+    align-items: flex-end;
+    justify-content: flex-end;
+    color: #94a3b8;
+    cursor: nwse-resize;
+    user-select: none;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .dashboard-builder-grid.builder-edit-mode .builder-resize-handle {
+    display: inline-flex;
+  }
+
+  body.builder-resize-active,
+  body.builder-resize-active * {
+    cursor: nwse-resize !important;
+    user-select: none !important;
   }
 
   .dashboard-builder-status {
@@ -235,6 +270,8 @@ foreach ($builderBlocks as $builderBlock) {
                   data-block-id="<?= esc((string) ($block['id'] ?? '')) ?>"
                   data-position-x="<?= esc((string) ($block['position_x'] ?? 0)) ?>"
                   data-position-y="<?= esc((string) ($block['position_y'] ?? 0)) ?>"
+                  data-width="<?= esc((string) ($block['width'] ?? 4)) ?>"
+                  data-height="<?= esc((string) ($block['height'] ?? 2)) ?>"
                 >
                   <?php if (($render['kind'] ?? '') === 'stat_card'): ?>
                     <?php $theme = is_array($render['theme'] ?? null) ? $render['theme'] : []; ?>
@@ -299,6 +336,7 @@ foreach ($builderBlocks as $builderBlock) {
                         <?php if (!empty($render['message'])): ?>
                           <div class="alert alert-light border mt-3 mb-0"><?= esc((string) $render['message']) ?></div>
                         <?php endif; ?>
+                        <span class="builder-resize-handle" data-resize-handle aria-hidden="true">◢</span>
                       </div>
                     </div>
                   <?php elseif (($render['kind'] ?? '') === 'chart'): ?>
@@ -389,6 +427,7 @@ foreach ($builderBlocks as $builderBlock) {
                             <?php endforeach; ?>
                           </div>
                         <?php endif; ?>
+                        <span class="builder-resize-handle" data-resize-handle aria-hidden="true">◢</span>
                       </div>
                     </div>
                   <?php elseif (($render['kind'] ?? '') === 'note'): ?>
@@ -427,6 +466,7 @@ foreach ($builderBlocks as $builderBlock) {
                           </form>
                           <button type="button" class="btn btn-sm btn-outline-secondary" title="Tasima akisi bir sonraki sprintte acilacak." disabled>Taşı</button>
                         </div>
+                        <span class="builder-resize-handle" data-resize-handle aria-hidden="true">◢</span>
                       </div>
                     </div>
                   <?php else: ?>
@@ -619,6 +659,12 @@ foreach ($builderBlocks as $builderBlock) {
 
             <div class="row g-3">
               <div class="col-12 col-md-6">
+                <label for="builderEditPreset" class="form-label">Hazir Sablon</label>
+                <select class="form-select" id="builderEditPreset">
+                  <option value="">Seciniz</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-6">
                 <label for="builderEditTitle" class="form-label">Baslik</label>
                 <input type="text" class="form-control" id="builderEditTitle" name="title" value="">
               </div>
@@ -686,6 +732,15 @@ foreach ($builderBlocks as $builderBlock) {
                   <option value="pastel">Pastel</option>
                   <option value="dark">Dark</option>
                   <option value="custom">Ozel Renkler</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="builderEditComparisonType" class="form-label">Karsilastirma Turu</label>
+                <select class="form-select" id="builderEditComparisonType" name="comparison_type">
+                  <option value="none">Yok</option>
+                  <option value="previous_period">Onceki Donem</option>
+                  <option value="previous_week">Onceki Hafta</option>
+                  <option value="previous_month">Onceki Ay</option>
                 </select>
               </div>
               <div class="col-12">
@@ -774,6 +829,7 @@ foreach ($builderBlocks as $builderBlock) {
           </div>
           <div class="modal-footer builder-modal-footer">
             <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Iptal</button>
+            <button type="button" class="btn btn-outline-secondary" id="builderEditResetButton">Varsayilana Don</button>
             <button type="submit" class="btn btn-primary">Degisiklikleri Kaydet</button>
           </div>
         </form>
@@ -1065,6 +1121,74 @@ foreach ($builderBlocks as $builderBlock) {
     };
     var colorChoices = ['#4680FF', '#3B82F6', '#2563EB', '#F97316', '#FB923C', '#F59E0B', '#2CA87F', '#22C55E', '#16A34A', '#7C3AED', '#A855F7', '#8B5CF6', '#14B8A6', '#06B6D4', '#0F172A', '#111827', '#F9A8D4', '#FCD34D'];
     var currentCategoryLabels = [];
+    var currentEditBlock = null;
+    var editPresetSelect = document.getElementById('builderEditPreset');
+    var editResetButton = document.getElementById('builderEditResetButton');
+    var presetDefinitions = {
+      stat_card: {
+        total_orders: {
+          title: 'Toplam Siparis',
+          data_source: 'total_orders',
+          value_label: 'Siparis',
+          subtitle: 'Tum siparislerin genel ozeti',
+          variant: 'mini_spark',
+          color_palette: 'blue',
+          comparison_type: 'previous_period'
+        },
+        revenue_summary: {
+          title: 'Gelir Ozeti',
+          data_source: 'weekly_orders',
+          value_label: 'Gelir',
+          subtitle: 'Gelir egilimini hizli takip edin',
+          variant: 'income_card',
+          color_palette: 'finance',
+          comparison_type: 'previous_week'
+        }
+      },
+      chart: {
+        sales_summary: {
+          title: 'Satis Ozeti',
+          data_source: 'orders_by_period',
+          chart_type: 'bar',
+          subtitle: 'Donemsel siparis hareketi',
+          variant: 'bar_overview',
+          color_palette: 'analytics',
+          date_range: '14d'
+        },
+        category_distribution: {
+          title: 'Kategori Dagilimi',
+          data_source: 'sales_by_category',
+          chart_type: 'pie',
+          subtitle: 'Kategori bazli satis payi',
+          variant: 'pie_breakdown',
+          color_palette: 'pastel',
+          date_range: '30d'
+        },
+        trend_analysis: {
+          title: 'Trend Analizi',
+          data_source: 'orders_by_period',
+          chart_type: 'line',
+          subtitle: 'Siparis trendini izleyin',
+          variant: 'line_trend',
+          color_palette: 'default',
+          date_range: '30d'
+        }
+      },
+      note: {
+        info_note: {
+          title: 'Bilgi Notu',
+          subtitle: 'Kisa aciklama',
+          content: 'Ekibin gormesi gereken kisa bilgilendirme notunu buraya ekleyin.',
+          variant: 'simple_note'
+        },
+        warning_note: {
+          title: 'Uyari Notu',
+          subtitle: 'Dikkat gerektiren durum',
+          content: 'Takip edilmesi gereken kritik dashboard notunu buraya ekleyin.',
+          variant: 'accent_note'
+        }
+      }
+    };
 
     function renderBuilderCharts() {
       if (!Array.isArray(builderCharts) || typeof ApexCharts === 'undefined') {
@@ -1276,6 +1400,106 @@ foreach ($builderBlocks as $builderBlock) {
       return value === undefined || value === null ? fallback : value;
     }
 
+    function presetOptionsForBlock(blockCode) {
+      if (blockCode === 'stat_card') {
+        return [
+          { value: '', label: 'Seciniz' },
+          { value: 'total_orders', label: 'Toplam Siparis' },
+          { value: 'revenue_summary', label: 'Gelir Ozeti' }
+        ];
+      }
+
+      if (blockCode === 'chart') {
+        return [
+          { value: '', label: 'Seciniz' },
+          { value: 'sales_summary', label: 'Satis Ozeti' },
+          { value: 'category_distribution', label: 'Kategori Dagilimi' },
+          { value: 'trend_analysis', label: 'Trend Analizi' }
+        ];
+      }
+
+      if (blockCode === 'note') {
+        return [
+          { value: '', label: 'Seciniz' },
+          { value: 'info_note', label: 'Bilgi Notu' },
+          { value: 'warning_note', label: 'Uyari Notu' }
+        ];
+      }
+
+      return [{ value: '', label: 'Seciniz' }];
+    }
+
+    function renderPresetOptions(blockCode) {
+      if (!editPresetSelect) {
+        return;
+      }
+
+      editPresetSelect.innerHTML = '';
+      presetOptionsForBlock(blockCode).forEach(function (option) {
+        var node = document.createElement('option');
+        node.value = option.value;
+        node.textContent = option.label;
+        editPresetSelect.appendChild(node);
+      });
+      editPresetSelect.value = '';
+    }
+
+    function applyPresetSelection() {
+      if (!currentEditBlock || !editPresetSelect) {
+        return;
+      }
+
+      var blockCode = currentEditBlock.block_type_code || '';
+      var presetKey = editPresetSelect.value || '';
+      if (!blockCode || !presetKey || !presetDefinitions[blockCode] || !presetDefinitions[blockCode][presetKey]) {
+        return;
+      }
+
+      populateEditForm(currentEditBlock, presetDefinitions[blockCode][presetKey]);
+      editPresetSelect.value = presetKey;
+    }
+
+    function resetEditFormToDefaults() {
+      if (!currentEditBlock) {
+        return;
+      }
+
+      populateEditForm(currentEditBlock, buildResetDefaults(currentEditBlock));
+    }
+
+    function buildResetDefaults(block) {
+      var blockCode = block && block.block_type_code ? block.block_type_code : '';
+      var defaults = block && block.default_config && typeof block.default_config === 'object' ? block.default_config : {};
+      var result = {
+        title: valueOrDefault(defaults.title, ''),
+        is_visible: valueOrDefault(defaults.is_visible, '1'),
+        date_range: valueOrDefault(defaults.date_range, '7d'),
+        subtitle: valueOrDefault(defaults.subtitle, '')
+      };
+
+      if (blockCode === 'stat_card') {
+        result.data_source = valueOrDefault(defaults.data_source, '');
+        result.variant = valueOrDefault(defaults.variant, 'mini_spark');
+        result.value_label = valueOrDefault(defaults.value_label, '');
+        result.value = valueOrDefault(defaults.value, '');
+        result.color_palette = valueOrDefault(defaults.color_palette, 'default');
+        result.custom_colors = Array.isArray(defaults.custom_colors) ? defaults.custom_colors : [];
+        result.comparison_type = valueOrDefault(defaults.comparison_type, 'none');
+      } else if (blockCode === 'chart') {
+        result.data_source = valueOrDefault(defaults.data_source, '');
+        result.chart_type = valueOrDefault(defaults.chart_type, 'line');
+        result.variant = valueOrDefault(defaults.variant, 'line_trend');
+        result.color_palette = valueOrDefault(defaults.color_palette, 'default');
+        result.custom_colors = Array.isArray(defaults.custom_colors) ? defaults.custom_colors : [];
+        result.category_colors = defaults.category_colors && typeof defaults.category_colors === 'object' ? defaults.category_colors : {};
+      } else if (blockCode === 'note') {
+        result.variant = valueOrDefault(defaults.variant, 'simple_note');
+        result.content = valueOrDefault(defaults.content, '');
+      }
+
+      return result;
+    }
+
     function parseColorList(value) {
       if (Array.isArray(value)) {
         return value.filter(Boolean);
@@ -1447,6 +1671,7 @@ foreach ($builderBlocks as $builderBlock) {
       var fallbackValue = valueOrDefault(overrides.value, config.value || '');
       var noteContent = valueOrDefault(overrides.content, config.content || '');
       var colorPalette = valueOrDefault(overrides.color_palette, config.color_palette || 'default');
+      var comparisonType = valueOrDefault(overrides.comparison_type, config.comparison_type || 'none');
       var statCustomColors = parseColorList(valueOrDefault(overrides.custom_colors, config.custom_colors || []));
       var chartCustomColors = parseColorList(valueOrDefault(overrides.custom_colors, config.custom_colors || []));
       var categoryColors = parseCategoryMap(valueOrDefault(overrides.category_colors, config.category_colors || {}));
@@ -1464,6 +1689,7 @@ foreach ($builderBlocks as $builderBlock) {
       document.getElementById('builderEditValueLabel').value = valueLabel;
       document.getElementById('builderEditFallbackValue').value = fallbackValue;
       document.getElementById('builderEditStatPalette').value = colorPalette;
+      document.getElementById('builderEditComparisonType').value = comparisonType;
       document.getElementById('builderEditStatCustomColors').value = serializeColorList(statCustomColors);
       document.getElementById('builderEditChartDataSource').value = dataSource;
       document.getElementById('builderEditChartType').value = chartType;
@@ -1494,6 +1720,10 @@ foreach ($builderBlocks as $builderBlock) {
       setPaletteFieldState('builderEditColorPalette', 'builderEditChartCustomColorField');
       renderCategoryColorRows(currentCategoryLabels, categoryColors);
       toggleConfigSections(null, '[data-edit-block-config]', blockCode);
+      renderPresetOptions(blockCode);
+      if (editPresetSelect) {
+        editPresetSelect.value = '';
+      }
     }
 
     function openEditModalFromButton(button, overrideValues) {
@@ -1518,6 +1748,7 @@ foreach ($builderBlocks as $builderBlock) {
             throw new Error('invalid_payload');
           }
 
+          currentEditBlock = payload.block;
           payload.block.update_url = button.dataset.updateUrl || '#';
           payload.block.category_labels = JSON.parse(button.dataset.categoryLabels || '[]');
           populateEditForm(payload.block, overrideValues || {});
@@ -1556,6 +1787,16 @@ foreach ($builderBlocks as $builderBlock) {
     if (chartSourceSelect) {
       chartSourceSelect.addEventListener('change', function () {
         renderCategoryColorRows(currentCategoryLabels, parseCategoryMap(document.getElementById('builderEditCategoryColors').value));
+      });
+    }
+
+    if (editPresetSelect) {
+      editPresetSelect.addEventListener('change', applyPresetSelection);
+    }
+
+    if (editResetButton) {
+      editResetButton.addEventListener('click', function () {
+        resetEditFormToDefaults();
       });
     }
 

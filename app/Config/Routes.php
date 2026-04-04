@@ -75,6 +75,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('dashboard', 'Admin\DashboardController::index');
     $routes->get('dashboard-builder', 'Admin\DashboardBuilder::index');
     $routes->post('dashboard-builder/reorder', 'Admin\DashboardBuilder::reorder');
+    $routes->post('dashboard-builder/resize', 'Admin\DashboardBuilder::resize');
     $routes->get('dashboard/blocks/fetch/(:segment)', 'Admin\DashboardBlockController::fetch/$1');
     $routes->get('dashboard/blocks/detail', 'Admin\DashboardBlockController::detail');
     $routes->post('dashboard/blocks/store', 'Admin\DashboardBlockController::store');
