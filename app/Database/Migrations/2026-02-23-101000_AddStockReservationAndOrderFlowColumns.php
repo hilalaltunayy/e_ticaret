@@ -21,14 +21,14 @@ class AddStockReservationAndOrderFlowColumns extends Migration
         }
 
         $orderFields = [];
-        if (! $this->db->fieldExists('status', 'orders')) {
-            $orderFields['status'] = [
-                'type' => 'VARCHAR',
-                'constraint' => 30,
-                'default' => 'draft',
-                'null' => false,
-            ];
-        }
+        //if (! $this->db->fieldExists('status', 'orders')) {
+          //  $orderFields['status'] = [
+            //    'type' => 'VARCHAR',
+              //  'constraint' => 30,
+                //'default' => 'draft',
+                //'null' => false,
+            //];
+        //}
         if (! $this->db->fieldExists('reserved_at', 'orders')) {
             $orderFields['reserved_at'] = ['type' => 'DATETIME', 'null' => true];
         }

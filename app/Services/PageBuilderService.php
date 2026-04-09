@@ -81,9 +81,11 @@ class PageBuilderService
         if (($page['code'] ?? '') === 'product_list') {
             $productListLayout = $this->ensureProductListLayoutBlock((string) $draft['id']);
             $builderData['productListLayoutBlock'] = $productListLayout;
-            $builderData['productListConfig'] = is_array($productListLayout)
-                ? $this->decodeJson((string) ($productListLayout['config_json'] ?? ''))
-                : $this->defaultProductListConfig();
+            $builderData['productListConfig'] = $this->normalizeProductListConfig(
+                is_array($productListLayout)
+                    ? $this->decodeJson((string) ($productListLayout['config_json'] ?? ''))
+                    : []
+            );
         }
 
         return $builderData;
@@ -1016,32 +1018,48 @@ class PageBuilderService
     private function defaultProductListConfig(): array
     {
         return [
-            'page_title' => 'Kategori Sayfasi',
-            'page_subtitle' => 'One cikan urunleri ve filtreleri duzenleyin',
-            'show_breadcrumb' => true,
-            'show_top_banner' => true,
-            'banner_image' => '',
-            'banner_title' => 'Secili Kategori',
-            'banner_subtitle' => 'Listeleme sayfasinin ust alanini yonetin',
-            'show_filters' => true,
-            'filter_position' => 'left',
-            'show_filter_summary' => true,
-            'show_sort_bar' => true,
-            'default_grid_density' => '3',
-            'show_result_count' => true,
-            'card_variant' => 'classic',
-            'grid_density' => '3',
-            'show_badges' => true,
-            'show_quick_actions' => false,
-            'show_favorite_button' => true,
-            'empty_title' => 'Sonuc bulunamadi',
-            'empty_description' => 'Filtreleri degistirerek tekrar deneyin.',
-            'empty_notice_tone' => 'warning',
-            'show_notice' => true,
-            'notice_title' => 'Kargo Bilgisi',
-            'notice_text' => '250 TL ve uzeri siparislerde ucretsiz kargo.',
-            'notice_tone' => 'info',
-            'notice_image' => '',
+            'sections' => [
+                'sayfa_ust_alani' => ['active' => true, 'order' => 1],
+                'filtre_alani' => ['active' => true, 'order' => 2],
+                'siralama_sonuc_cubugu' => ['active' => true, 'order' => 3],
+                'urun_listesi_gorunumu' => ['active' => true, 'order' => 4],
+                'bilgilendirme_kampanya_alani' => ['active' => true, 'order' => 5],
+                'bos_sonuc_alani' => ['active' => true, 'order' => 6],
+                'alt_aciklama_alani' => ['active' => false, 'order' => 7],
+            ],
+            'sayfa_basligi' => 'Kategori Sayfasi',
+            'sayfa_alt_basligi' => 'One cikan urunleri ve filtreleri duzenleyin',
+            'breadcrumb_goster' => true,
+            'ust_banner_goster' => true,
+            'banner_gorseli' => '',
+            'banner_basligi' => 'Secili Kategori',
+            'banner_alt_metni' => 'Listeleme sayfasinin ust alanini yonetin',
+            'banner_tonu' => 'soft',
+            'filtreler_goster' => true,
+            'filtre_konumu' => 'left',
+            'filtre_ozeti_goster' => true,
+            'filtre_basligi' => 'Filtreler',
+            'siralama_cubugu_goster' => true,
+            'sonuc_sayisi_goster' => true,
+            'aktif_filtre_etiketleri_goster' => true,
+            'varsayilan_grid_yogunlugu' => '3',
+            'kart_varyanti' => 'classic',
+            'grid_yogunlugu' => '3',
+            'rozetleri_goster' => true,
+            'favori_butonu_goster' => true,
+            'hizli_aksiyonlari_goster' => false,
+            'bilgilendirme_alani_goster' => true,
+            'bilgilendirme_basligi' => 'Kargo Bilgisi',
+            'bilgilendirme_metni' => '250 TL ve uzeri siparislerde ucretsiz kargo.',
+            'bilgilendirme_tonu' => 'info',
+            'bilgilendirme_gorseli' => '',
+            'bos_sonuc_basligi' => 'Sonuc bulunamadi',
+            'bos_sonuc_aciklamasi' => 'Filtreleri degistirerek tekrar deneyin.',
+            'bos_sonuc_tonu' => 'warning',
+            'bos_sonuc_gorseli' => '',
+            'alt_aciklama_goster' => false,
+            'alt_aciklama_basligi' => 'Listeleme Aciklamasi',
+            'alt_aciklama_metni' => 'Bu alan kategoriye ait aciklayici metinler icin kullanilir.',
         ];
     }
 
@@ -1050,32 +1068,125 @@ class PageBuilderService
         $defaults = $this->defaultProductListConfig();
 
         return [
-            'page_title' => trim((string) ($input['page_title'] ?? $defaults['page_title'])),
-            'page_subtitle' => trim((string) ($input['page_subtitle'] ?? $defaults['page_subtitle'])),
-            'show_breadcrumb' => $this->sanitizeBool($input['show_breadcrumb'] ?? null),
-            'show_top_banner' => $this->sanitizeBool($input['show_top_banner'] ?? null),
-            'banner_image' => trim((string) ($input['banner_image'] ?? '')),
-            'banner_title' => trim((string) ($input['banner_title'] ?? $defaults['banner_title'])),
-            'banner_subtitle' => trim((string) ($input['banner_subtitle'] ?? $defaults['banner_subtitle'])),
-            'show_filters' => $this->sanitizeBool($input['show_filters'] ?? null),
-            'filter_position' => $this->sanitizeEnum((string) ($input['filter_position'] ?? 'left'), ['left', 'top'], 'left'),
-            'show_filter_summary' => $this->sanitizeBool($input['show_filter_summary'] ?? null),
-            'show_sort_bar' => $this->sanitizeBool($input['show_sort_bar'] ?? null),
-            'default_grid_density' => $this->sanitizeEnum((string) ($input['default_grid_density'] ?? '3'), ['2', '3', '4'], '3'),
-            'show_result_count' => $this->sanitizeBool($input['show_result_count'] ?? null),
-            'card_variant' => $this->sanitizeEnum((string) ($input['card_variant'] ?? 'classic'), ['classic', 'minimal', 'elevated'], 'classic'),
-            'grid_density' => $this->sanitizeEnum((string) ($input['grid_density'] ?? '3'), ['2', '3', '4'], '3'),
-            'show_badges' => $this->sanitizeBool($input['show_badges'] ?? null),
-            'show_quick_actions' => $this->sanitizeBool($input['show_quick_actions'] ?? null),
-            'show_favorite_button' => $this->sanitizeBool($input['show_favorite_button'] ?? null),
-            'empty_title' => trim((string) ($input['empty_title'] ?? $defaults['empty_title'])),
-            'empty_description' => trim((string) ($input['empty_description'] ?? $defaults['empty_description'])),
-            'empty_notice_tone' => $this->sanitizeEnum((string) ($input['empty_notice_tone'] ?? 'warning'), ['info', 'success', 'warning', 'danger'], 'warning'),
-            'show_notice' => $this->sanitizeBool($input['show_notice'] ?? null),
-            'notice_title' => trim((string) ($input['notice_title'] ?? $defaults['notice_title'])),
-            'notice_text' => trim((string) ($input['notice_text'] ?? $defaults['notice_text'])),
-            'notice_tone' => $this->sanitizeEnum((string) ($input['notice_tone'] ?? 'info'), ['info', 'success', 'warning', 'danger'], 'info'),
-            'notice_image' => trim((string) ($input['notice_image'] ?? '')),
+            'sections' => [
+                'sayfa_ust_alani' => [
+                    'active' => $this->sanitizeBool($input['section_sayfa_ust_alani_active'] ?? null),
+                    'order' => $this->sanitizeInt($input['section_sayfa_ust_alani_order'] ?? 1, 1, 7, 1),
+                ],
+                'filtre_alani' => [
+                    'active' => $this->sanitizeBool($input['section_filtre_alani_active'] ?? null),
+                    'order' => $this->sanitizeInt($input['section_filtre_alani_order'] ?? 2, 1, 7, 2),
+                ],
+                'siralama_sonuc_cubugu' => [
+                    'active' => $this->sanitizeBool($input['section_siralama_sonuc_cubugu_active'] ?? null),
+                    'order' => $this->sanitizeInt($input['section_siralama_sonuc_cubugu_order'] ?? 3, 1, 7, 3),
+                ],
+                'urun_listesi_gorunumu' => [
+                    'active' => $this->sanitizeBool($input['section_urun_listesi_gorunumu_active'] ?? null),
+                    'order' => $this->sanitizeInt($input['section_urun_listesi_gorunumu_order'] ?? 4, 1, 7, 4),
+                ],
+                'bilgilendirme_kampanya_alani' => [
+                    'active' => $this->sanitizeBool($input['section_bilgilendirme_kampanya_alani_active'] ?? null),
+                    'order' => $this->sanitizeInt($input['section_bilgilendirme_kampanya_alani_order'] ?? 5, 1, 7, 5),
+                ],
+                'bos_sonuc_alani' => [
+                    'active' => $this->sanitizeBool($input['section_bos_sonuc_alani_active'] ?? null),
+                    'order' => $this->sanitizeInt($input['section_bos_sonuc_alani_order'] ?? 6, 1, 7, 6),
+                ],
+                'alt_aciklama_alani' => [
+                    'active' => $this->sanitizeBool($input['section_alt_aciklama_alani_active'] ?? null),
+                    'order' => $this->sanitizeInt($input['section_alt_aciklama_alani_order'] ?? 7, 1, 7, 7),
+                ],
+            ],
+            'sayfa_basligi' => trim((string) ($input['sayfa_basligi'] ?? $defaults['sayfa_basligi'])),
+            'sayfa_alt_basligi' => trim((string) ($input['sayfa_alt_basligi'] ?? $defaults['sayfa_alt_basligi'])),
+            'breadcrumb_goster' => $this->sanitizeBool($input['breadcrumb_goster'] ?? null),
+            'ust_banner_goster' => $this->sanitizeBool($input['ust_banner_goster'] ?? null),
+            'banner_gorseli' => trim((string) ($input['banner_gorseli'] ?? '')),
+            'banner_basligi' => trim((string) ($input['banner_basligi'] ?? $defaults['banner_basligi'])),
+            'banner_alt_metni' => trim((string) ($input['banner_alt_metni'] ?? $defaults['banner_alt_metni'])),
+            'banner_tonu' => $this->sanitizeEnum((string) ($input['banner_tonu'] ?? 'soft'), ['light', 'dark', 'soft', 'accent'], 'soft'),
+            'filtreler_goster' => $this->sanitizeBool($input['filtreler_goster'] ?? null),
+            'filtre_konumu' => $this->sanitizeEnum((string) ($input['filtre_konumu'] ?? 'left'), ['left', 'top'], 'left'),
+            'filtre_ozeti_goster' => $this->sanitizeBool($input['filtre_ozeti_goster'] ?? null),
+            'filtre_basligi' => trim((string) ($input['filtre_basligi'] ?? $defaults['filtre_basligi'])),
+            'siralama_cubugu_goster' => $this->sanitizeBool($input['siralama_cubugu_goster'] ?? null),
+            'sonuc_sayisi_goster' => $this->sanitizeBool($input['sonuc_sayisi_goster'] ?? null),
+            'aktif_filtre_etiketleri_goster' => $this->sanitizeBool($input['aktif_filtre_etiketleri_goster'] ?? null),
+            'varsayilan_grid_yogunlugu' => $this->sanitizeEnum((string) ($input['varsayilan_grid_yogunlugu'] ?? '3'), ['2', '3', '4'], '3'),
+            'kart_varyanti' => $this->sanitizeEnum((string) ($input['kart_varyanti'] ?? 'classic'), ['classic', 'minimal', 'elevated'], 'classic'),
+            'grid_yogunlugu' => $this->sanitizeEnum((string) ($input['grid_yogunlugu'] ?? '3'), ['2', '3', '4'], '3'),
+            'rozetleri_goster' => $this->sanitizeBool($input['rozetleri_goster'] ?? null),
+            'favori_butonu_goster' => $this->sanitizeBool($input['favori_butonu_goster'] ?? null),
+            'hizli_aksiyonlari_goster' => $this->sanitizeBool($input['hizli_aksiyonlari_goster'] ?? null),
+            'bilgilendirme_alani_goster' => $this->sanitizeBool($input['bilgilendirme_alani_goster'] ?? null),
+            'bilgilendirme_basligi' => trim((string) ($input['bilgilendirme_basligi'] ?? $defaults['bilgilendirme_basligi'])),
+            'bilgilendirme_metni' => trim((string) ($input['bilgilendirme_metni'] ?? $defaults['bilgilendirme_metni'])),
+            'bilgilendirme_tonu' => $this->sanitizeEnum((string) ($input['bilgilendirme_tonu'] ?? 'info'), ['info', 'success', 'warning', 'danger'], 'info'),
+            'bilgilendirme_gorseli' => trim((string) ($input['bilgilendirme_gorseli'] ?? '')),
+            'bos_sonuc_basligi' => trim((string) ($input['bos_sonuc_basligi'] ?? $defaults['bos_sonuc_basligi'])),
+            'bos_sonuc_aciklamasi' => trim((string) ($input['bos_sonuc_aciklamasi'] ?? $defaults['bos_sonuc_aciklamasi'])),
+            'bos_sonuc_tonu' => $this->sanitizeEnum((string) ($input['bos_sonuc_tonu'] ?? 'warning'), ['info', 'success', 'warning', 'danger'], 'warning'),
+            'bos_sonuc_gorseli' => trim((string) ($input['bos_sonuc_gorseli'] ?? '')),
+            'alt_aciklama_goster' => $this->sanitizeBool($input['alt_aciklama_goster'] ?? null),
+            'alt_aciklama_basligi' => trim((string) ($input['alt_aciklama_basligi'] ?? $defaults['alt_aciklama_basligi'])),
+            'alt_aciklama_metni' => trim((string) ($input['alt_aciklama_metni'] ?? $defaults['alt_aciklama_metni'])),
         ];
+    }
+
+    private function normalizeProductListConfig(array $config): array
+    {
+        $defaults = $this->defaultProductListConfig();
+
+        $legacyMap = [
+            'page_title' => 'sayfa_basligi',
+            'page_subtitle' => 'sayfa_alt_basligi',
+            'show_breadcrumb' => 'breadcrumb_goster',
+            'show_top_banner' => 'ust_banner_goster',
+            'banner_image' => 'banner_gorseli',
+            'banner_title' => 'banner_basligi',
+            'banner_subtitle' => 'banner_alt_metni',
+            'show_filters' => 'filtreler_goster',
+            'filter_position' => 'filtre_konumu',
+            'show_filter_summary' => 'filtre_ozeti_goster',
+            'show_sort_bar' => 'siralama_cubugu_goster',
+            'show_result_count' => 'sonuc_sayisi_goster',
+            'default_grid_density' => 'varsayilan_grid_yogunlugu',
+            'card_variant' => 'kart_varyanti',
+            'grid_density' => 'grid_yogunlugu',
+            'show_badges' => 'rozetleri_goster',
+            'show_favorite_button' => 'favori_butonu_goster',
+            'show_quick_actions' => 'hizli_aksiyonlari_goster',
+            'show_notice' => 'bilgilendirme_alani_goster',
+            'notice_title' => 'bilgilendirme_basligi',
+            'notice_text' => 'bilgilendirme_metni',
+            'notice_tone' => 'bilgilendirme_tonu',
+            'notice_image' => 'bilgilendirme_gorseli',
+            'empty_title' => 'bos_sonuc_basligi',
+            'empty_description' => 'bos_sonuc_aciklamasi',
+            'empty_notice_tone' => 'bos_sonuc_tonu',
+        ];
+
+        foreach ($legacyMap as $oldKey => $newKey) {
+            if (! array_key_exists($newKey, $config) && array_key_exists($oldKey, $config)) {
+                $config[$newKey] = $config[$oldKey];
+            }
+        }
+
+        $config['sections'] = is_array($config['sections'] ?? null) ? $config['sections'] : [];
+        foreach ($defaults['sections'] as $key => $sectionDefaults) {
+            $current = is_array($config['sections'][$key] ?? null) ? $config['sections'][$key] : [];
+            $config['sections'][$key] = array_merge($sectionDefaults, $current);
+        }
+
+        unset($defaults['sections']);
+
+        foreach ($defaults as $key => $value) {
+            if (! array_key_exists($key, $config)) {
+                $config[$key] = $value;
+            }
+        }
+
+        return $config;
     }
 }

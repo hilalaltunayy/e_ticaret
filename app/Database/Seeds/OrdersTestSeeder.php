@@ -12,7 +12,7 @@ class OrdersTestSeeder extends Seeder
 
         // Ürün var mı?
         $productIds = array_map(
-            fn($r) => (int)$r['id'],
+            fn($r) => (string)$r['id'],
             $db->table('products')->select('id')->limit(20)->get()->getResultArray()
         );
 
@@ -46,6 +46,7 @@ class OrdersTestSeeder extends Seeder
             $total = $price * $qty;
 
             $db->table('orders')->insert([
+                 'id'            => \App\Models\BaseUuidModel::uuidV4(),
                 'product_id'    => $productId,
                 'quantity'      => $qty,
                 'total_price'   => $total,      // sende var

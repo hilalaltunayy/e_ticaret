@@ -15,7 +15,7 @@ class CreateAdminSettingsTable extends Migration
         if ($this->db->tableExists('admin_settings')) return;
 
         $this->forge->addField([
-            'id' => ['type' => 'CHAR', 'CONSTRAİNT' => 36 ],
+            'id' => ['type' => 'CHAR', 'constraint' => 36 ],
             'setting_key' => ['type' => 'VARCHAR', 'constraint' => 191],
             'setting_value' => ['type' => 'TEXT', 'null' => true],
             'updated_at' => ['type' => 'DATETIME', 'null' => true],

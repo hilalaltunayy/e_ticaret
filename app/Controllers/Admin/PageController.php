@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Services\PageBuilderService;
 use App\Services\PageService;
 use App\Services\PageVersionService;
+use App\Services\ProductListPreviewRenderer;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
 class PageController extends BaseController
@@ -13,11 +14,13 @@ class PageController extends BaseController
     public function __construct(
         private ?PageService $pageService = null,
         private ?PageVersionService $pageVersionService = null,
-        private ?PageBuilderService $pageBuilderService = null
+        private ?PageBuilderService $pageBuilderService = null,
+        private ?ProductListPreviewRenderer $productListPreviewRenderer = null
     ) {
         $this->pageService = $this->pageService ?? new PageService();
         $this->pageVersionService = $this->pageVersionService ?? new PageVersionService();
         $this->pageBuilderService = $this->pageBuilderService ?? new PageBuilderService();
+        $this->productListPreviewRenderer = $this->productListPreviewRenderer ?? new ProductListPreviewRenderer();
     }
 
     public function index()
@@ -91,6 +94,9 @@ class PageController extends BaseController
             'blocks' => $builderData['blocks'],
             'productListLayoutBlock' => $builderData['productListLayoutBlock'] ?? null,
             'productListConfig' => $builderData['productListConfig'] ?? [],
+            'productListPreview' => ($builderData['page']['code'] ?? '') === 'product_list'
+                ? $this->productListPreviewRenderer->build($builderData['productListConfig'] ?? [])
+                : [],
             'builderPolicy' => $builderData['builderPolicy'],
             'builderOptions' => $builderData['builderOptions'],
         ]);

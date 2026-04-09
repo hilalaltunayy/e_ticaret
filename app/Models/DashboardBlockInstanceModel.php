@@ -34,6 +34,20 @@ class DashboardBlockInstanceModel extends BaseUuidModel
     {
         parent::__construct($db, $validation);
 
+        if ($this->db->tableExists('dashboard_block_instances') && $this->db->tableExists('dashboard_blocks')) {
+            $requiredColumns = ['title', 'width', 'height', 'is_visible'];
+            $missingColumns = array_filter(
+                $requiredColumns,
+                fn(string $column): bool => ! $this->db->fieldExists($column, 'dashboard_block_instances')
+            );
+
+            if ($missingColumns !== []) {
+                $this->table = 'dashboard_blocks';
+            }
+        } elseif (! $this->db->tableExists($this->table) && $this->db->tableExists('dashboard_blocks')) {
+            $this->table = 'dashboard_blocks';
+        }
+
         $this->useSoftDeletes = $this->db->fieldExists('deleted_at', $this->table);
     }
 

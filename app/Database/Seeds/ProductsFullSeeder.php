@@ -17,13 +17,16 @@ class ProductsFullSeeder extends Seeder
         foreach (['physical', 'digital'] as $name) {
             $exists = $db->table('types')->select('id')->where('name', $name)->get()->getRowArray();
             if (!$exists) {
-                $db->table('types')->insert(['name' => $name]);
+                $db->table('types')->insert([
+                'id'   => \App\Models\BaseUuidModel::uuidV4(),
+                 'name' => $name,
+                ]);
             }
         }
 
         $typeRows = $db->table('types')->select('id,name')->get()->getResultArray();
         $typeMap = [];
-        foreach ($typeRows as $r) $typeMap[$r['name']] = (int)$r['id'];
+        foreach ($typeRows as $r) { $typeMap[trim((string) $r['name'])] = (string) $r['id'];}
 
         // -------------------------
         // CATEGORIES (id, category_name) -> timestamps YOK
@@ -31,18 +34,21 @@ class ProductsFullSeeder extends Seeder
         foreach (['Roman', 'Bilim', 'Yazılım'] as $catName) {
             $exists = $db->table('categories')->select('id')->where('category_name', $catName)->get()->getRowArray();
             if (!$exists) {
-                $db->table('categories')->insert(['category_name' => $catName]);
+                $db->table('categories')->insert([
+                'id'            => \App\Models\BaseUuidModel::uuidV4(),
+                  'category_name' => $catName,
+                ]);
             }
         }
 
         $categoryRows = $db->table('categories')->select('id')->get()->getResultArray();
-        $categoryIds = array_map(fn($r) => (int)$r['id'], $categoryRows);
+        $categoryIds = array_map(fn($r) => (string)$r['id'], $categoryRows);
 
         // -------------------------
         // AUTHORS (id, name, bio, created_at, updated_at, deleted_at)
         // -------------------------
         $authors = [
-            ['name' => 'Ahmet Yılmaz', 'bio' => 'Test yazar'],
+            ['name' => 'Ahmet Yilmaz', 'bio' => 'Test yazar'],
             ['name' => 'Ayşe Demir',   'bio' => 'Test yazar'],
         ];
 
@@ -50,16 +56,17 @@ class ProductsFullSeeder extends Seeder
             $exists = $db->table('authors')->select('id')->where('name', $a['name'])->get()->getRowArray();
             if (!$exists) {
                 $db->table('authors')->insert([
-                    'name'       => $a['name'],
-                    'bio'        => $a['bio'],
-                    'created_at' => $now,
-                    'updated_at' => $now,
+                'id'         => \App\Models\BaseUuidModel::uuidV4(),
+                'name'       => $a['name'],
+                'bio'        => $a['bio'],
+                'created_at' => $now,
+                'updated_at' => $now,
                 ]);
             }
         }
 
         $authorRows = $db->table('authors')->select('id')->get()->getResultArray();
-        $authorIds = array_map(fn($r) => (int)$r['id'], $authorRows);
+       $authorIds = array_map(fn($r) => (string)$r['id'], $authorRows);
 
         // -------------------------
         // PRODUCTS (senin kolonlar)
@@ -75,24 +82,25 @@ class ProductsFullSeeder extends Seeder
             if ($exists) continue;
 
             $db->table('products')->insert([
-                'author_id'    => $authorIds[array_rand($authorIds)],
-                'type_id'      => $typeMap[$p['type']] ?? null,
-                'category_id'  => $categoryIds ? $categoryIds[array_rand($categoryIds)] : null,
+            'id'           => \App\Models\BaseUuidModel::uuidV4(),
+            'author_id'    => $authorIds[array_rand($authorIds)],
+            'type_id'      => $typeMap[$p['type']] ?? null,
+            'category_id'  => $categoryIds ? $categoryIds[array_rand($categoryIds)] : null,
 
-                'product_name' => $p['product_name'],
-                'author'       => 'Seeder Author',
-                'description'  => 'Seeder açıklama',
-                'price'        => rand(50, 200),
-                'stock_count'  => 100,
+            'product_name' => $p['product_name'],
+            'author'       => 'Seeder Author',
+            'description'  => 'Seeder açıklama',
+            'price'        => rand(50, 200),
+            'stock_count'  => 100,
 
-                'type'         => $p['type'], // string alanın da var
-                'image'        => null,
-                'is_active'    => 1,
-                'stock'        => 100,
+            'type'         => $p['type'],
+            'image'        => null,
+            'is_active'    => 1,
+            'stock'        => 100,
 
-                'created_at'   => $now,
-                'updated_at'   => $now,
-            ]);
+            'created_at'   => $now,
+            'updated_at'   => $now,
+]);
         }
 
         echo "ProductsFullSeeder: types/categories/authors/products eklendi.\n";

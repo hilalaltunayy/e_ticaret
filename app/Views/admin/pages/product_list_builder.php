@@ -5,22 +5,21 @@
 $draftName = trim((string) ($draft['name'] ?? ('Draft ' . (string) ($draft['version_no'] ?? 1))));
 $draftStatus = trim((string) ($draft['status'] ?? 'DRAFT'));
 $config = is_array($productListConfig ?? null) ? $productListConfig : [];
+$sections = is_array($config['sections'] ?? null) ? $config['sections'] : [];
 $scheduledPublishValue = trim((string) ($draft['scheduled_publish_at'] ?? ''));
 $scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i', strtotime($scheduledPublishValue)) : '';
-$gridDensity = (string) ($config['grid_density'] ?? '3');
-$gridColClass = $gridDensity === '2' ? 'col-md-6' : ($gridDensity === '4' ? 'col-xl-3 col-md-6' : 'col-lg-4 col-md-6');
 ?>
 
 <div class="page-header">
     <div class="page-block">
         <div class="row">
-            <div class="col-12"><div class="page-header-title"><h2 class="mb-0"><?= esc($page['name']) ?> Builder</h2></div></div>
+            <div class="col-12"><div class="page-header-title"><h2 class="mb-0"><?= esc($page['name']) ?> Yonetimi</h2></div></div>
             <div class="col-12">
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="<?= site_url('admin/dashboard') ?>">Yonetim</a></li>
                     <li class="breadcrumb-item"><a href="<?= site_url('admin/pages') ?>">Sayfa Yonetimi</a></li>
                     <li class="breadcrumb-item"><a href="<?= site_url('admin/pages/' . $page['code']) ?>"><?= esc($page['name']) ?></a></li>
-                    <li class="breadcrumb-item" aria-current="page"><?= esc($page['name']) ?> Builder</li>
+                    <li class="breadcrumb-item" aria-current="page">Page System Management</li>
                 </ul>
             </div>
         </div>
@@ -35,10 +34,10 @@ $gridColClass = $gridDensity === '2' ? 'col-md-6' : ($gridDensity === '4' ? 'col
                     <div class="d-flex flex-wrap gap-2 mb-2">
                         <span class="badge bg-light-primary"><?= esc($draftStatus) ?></span>
                         <span class="badge bg-light-secondary"><?= esc($page['code']) ?></span>
-                        <span class="badge bg-light-success">Product List Template</span>
+                        <span class="badge bg-light-success">Section Tabanli Yonetim</span>
                     </div>
-                    <h4 class="mb-1">Product List Specific Builder</h4>
-                    <p class="text-muted mb-0"><?= esc((string) ($builderPolicy['message'] ?? 'Urun listeleme sayfasi kontrollu section ayarlariyla yonetilir.')) ?></p>
+                    <h4 class="mb-1">Urun Listeleme Sayfa Sistemi</h4>
+                    <p class="text-muted mb-0"><?= esc((string) ($builderPolicy['message'] ?? 'Bu sayfa generic block builder yerine section tabanli bir sistem ile yonetilir.')) ?></p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
                     <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#draftMetaOffcanvas">Taslak Islemleri</button>
@@ -47,20 +46,21 @@ $gridColClass = $gridDensity === '2' ? 'col-md-6' : ($gridDensity === '4' ? 'col
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-xxl-5 col-xl-6">
+<div class="row">
+    <div class="col-xxl-5">
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="mb-1">Template Ayarlari</h5>
-                <p class="text-muted mb-0">Hazir urun listeleme sablonunun ana section'larini kontrollu sekilde yonetin.</p>
+                <h5 class="mb-1">Section Yonetimi</h5>
+                <p class="text-muted mb-0">Bolumleri acip kapatin, siralayin ve iceriklerini duzenleyin.</p>
             </div>
             <div class="card-body">
                 <?php if (session()->getFlashdata('error')): ?><div class="alert alert-danger"><?= esc(session()->getFlashdata('error')) ?></div><?php endif; ?>
                 <?php if (session()->getFlashdata('success')): ?><div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div><?php endif; ?>
-
-                <div class="alert alert-light border">
-                    <div class="fw-semibold mb-1"><?= esc((string) ($builderPolicy['title'] ?? 'Product list policy')) ?></div>
-                    <div class="small mb-0"><?= esc((string) ($builderPolicy['message'] ?? 'Bu sayfa generic block builder yerine page-specific config ile yonetilir.')) ?></div>
+                <div class="alert alert-light border mb-4">
+                    <div class="fw-semibold mb-1"><?= esc((string) ($builderPolicy['title'] ?? 'Page-specific policy')) ?></div>
+                    <div class="small text-muted mb-0"><?= esc((string) ($builderPolicy['message'] ?? 'Bu sayfa kontrollu section ayarlariyla yonetilir.')) ?></div>
                 </div>
 
                 <form action="<?= site_url('admin/pages/product-list-builder/update') ?>" method="post" id="productListBuilderForm">
@@ -68,96 +68,159 @@ $gridColClass = $gridDensity === '2' ? 'col-md-6' : ($gridDensity === '4' ? 'col
                     <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
                     <input type="hidden" name="version_id" value="<?= esc($draft['id']) ?>">
 
-                    <div class="card border shadow-none mb-3">
-                        <div class="card-header"><h6 class="mb-0">Sayfa Ust Alani</h6></div>
-                        <div class="card-body">
-                            <div class="mb-3"><label class="form-label">Page Title</label><input type="text" name="page_title" class="form-control" value="<?= esc(old('page_title', (string) ($config['page_title'] ?? ''))) ?>"></div>
-                            <div class="mb-3"><label class="form-label">Page Subtitle</label><textarea name="page_subtitle" rows="3" class="form-control"><?= esc(old('page_subtitle', (string) ($config['page_subtitle'] ?? ''))) ?></textarea></div>
-                            <div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="show_breadcrumb" name="show_breadcrumb" value="1" <?= old('show_breadcrumb', ! empty($config['show_breadcrumb'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_breadcrumb">Breadcrumb goster</label></div>
-                            <div class="form-check"><input class="form-check-input" type="checkbox" id="show_top_banner" name="show_top_banner" value="1" <?= old('show_top_banner', ! empty($config['show_top_banner'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_top_banner">Ust banner goster</label></div>
-                        </div>
-                    </div>
-
-                    <div class="card border shadow-none mb-3">
-                        <div class="card-header"><h6 class="mb-0">Gorsel / Banner Ayarlari</h6></div>
-                        <div class="card-body">
-                            <div class="mb-3"><label class="form-label">Banner Title</label><input type="text" name="banner_title" class="form-control" value="<?= esc(old('banner_title', (string) ($config['banner_title'] ?? ''))) ?>"></div>
-                            <div class="mb-3"><label class="form-label">Banner Subtitle</label><textarea name="banner_subtitle" rows="3" class="form-control"><?= esc(old('banner_subtitle', (string) ($config['banner_subtitle'] ?? ''))) ?></textarea></div>
-                            <div class="card border shadow-none mb-3" data-media-group>
-                                <div class="card-body">
-                                    <div class="ratio ratio-16x9 rounded overflow-hidden bg-light mb-3 d-none" data-media-preview-wrap><img src="" alt="Banner preview" class="img-fluid object-fit-cover w-100 h-100" data-media-preview-image></div>
-                                    <div class="border rounded text-center p-4" data-media-placeholder><i class="ti ti-photo-up fs-2 text-muted d-block mb-2"></i><div class="fw-semibold mb-1">Banner gorseli secin</div><div class="small text-muted">Listeleme ust alani gorseli.</div></div>
-                                    <div class="d-flex flex-wrap gap-2 mt-3"><button type="button" class="btn btn-sm btn-primary" data-media-browse>Gorsel Sec</button><button type="button" class="btn btn-sm btn-outline-danger" data-media-clear>Kaldir</button></div>
-                                    <input type="file" class="d-none" accept="image/*" data-media-file>
-                                    <div class="mt-3"><label class="form-label small text-muted">Media Path</label><input type="text" name="banner_image" class="form-control" value="<?= esc(old('banner_image', (string) ($config['banner_image'] ?? ''))) ?>" placeholder="/uploads/product-list-banner.jpg" data-media-path></div>
+                    <div class="accordion" id="productListSectionsAccordion">
+                        <div class="accordion-item border rounded mb-3">
+                            <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#topArea">Sayfa Ust Alani</button></h2>
+                            <div id="topArea" class="accordion-collapse collapse show" data-bs-parent="#productListSectionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_top_active" name="section_sayfa_ust_alani_active" value="1" <?= old('section_sayfa_ust_alani_active', ! empty($sections['sayfa_ust_alani']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_top_active">Aktif</label></div></div>
+                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_sayfa_ust_alani_order" class="form-control" value="<?= esc((string) old('section_sayfa_ust_alani_order', (string) ($sections['sayfa_ust_alani']['order'] ?? 1))) ?>"></div>
+                                    </div>
+                                    <div class="mb-3"><label class="form-label">Sayfa Basligi</label><input type="text" name="sayfa_basligi" class="form-control" value="<?= esc(old('sayfa_basligi', (string) ($config['sayfa_basligi'] ?? ''))) ?>"></div>
+                                    <div class="mb-3"><label class="form-label">Sayfa Alt Basligi</label><textarea name="sayfa_alt_basligi" rows="3" class="form-control"><?= esc(old('sayfa_alt_basligi', (string) ($config['sayfa_alt_basligi'] ?? ''))) ?></textarea></div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="breadcrumb_goster" name="breadcrumb_goster" value="1" <?= old('breadcrumb_goster', ! empty($config['breadcrumb_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="breadcrumb_goster">Breadcrumb goster</label></div></div>
+                                        <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" id="ust_banner_goster" name="ust_banner_goster" value="1" <?= old('ust_banner_goster', ! empty($config['ust_banner_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="ust_banner_goster">Ust banner goster</label></div></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="mb-0"><label class="form-label">Notice Image</label><input type="text" name="notice_image" class="form-control" value="<?= esc(old('notice_image', (string) ($config['notice_image'] ?? ''))) ?>" placeholder="/uploads/product-list-notice.jpg"></div>
+                        </div>
+
+                        <div class="accordion-item border rounded mb-3">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bannerArea">Gorsel ve Banner Ayarlari</button></h2>
+                            <div id="bannerArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="mb-3"><label class="form-label">Banner Basligi</label><input type="text" name="banner_basligi" class="form-control" value="<?= esc(old('banner_basligi', (string) ($config['banner_basligi'] ?? ''))) ?>"></div>
+                                    <div class="mb-3"><label class="form-label">Banner Alt Metni</label><textarea name="banner_alt_metni" rows="3" class="form-control"><?= esc(old('banner_alt_metni', (string) ($config['banner_alt_metni'] ?? ''))) ?></textarea></div>
+                                    <div class="mb-3"><label class="form-label">Banner Tonu</label><select name="banner_tonu" class="form-select"><?php foreach (['light' => 'Acik', 'dark' => 'Koyu', 'soft' => 'Yumusak', 'accent' => 'Vurgulu'] as $value => $label): ?><option value="<?= esc($value) ?>" <?= old('banner_tonu', (string) ($config['banner_tonu'] ?? 'light')) === $value ? 'selected' : '' ?>><?= esc($label) ?></option><?php endforeach; ?></select></div>
+                                    <div class="card border shadow-none mb-0" data-media-group>
+                                        <div class="card-body">
+                                            <div class="ratio ratio-16x9 rounded overflow-hidden bg-light mb-3 d-none" data-media-preview-wrap><img src="" alt="Banner preview" class="img-fluid object-fit-cover w-100 h-100" data-media-preview-image></div>
+                                            <div class="border rounded text-center p-4" data-media-placeholder><i class="ti ti-photo-up fs-2 text-muted d-block mb-2"></i><div class="fw-semibold mb-1">Banner gorseli secin</div><div class="small text-muted">Listeleme ust alani gorseli.</div></div>
+                                            <div class="d-flex flex-wrap gap-2 mt-3"><button type="button" class="btn btn-sm btn-primary" data-media-browse>Gorsel Sec</button><button type="button" class="btn btn-sm btn-outline-danger" data-media-clear>Kaldir</button></div>
+                                            <input type="file" class="d-none" accept="image/*" data-media-file>
+                                            <div class="mt-3"><label class="form-label small text-muted">Gelişmis Yol Alani</label><input type="text" name="banner_gorseli" class="form-control" value="<?= esc(old('banner_gorseli', (string) ($config['banner_gorseli'] ?? ''))) ?>" placeholder="/uploads/product-list-banner.jpg" data-media-path></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border rounded mb-3">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filterArea">Filtre Alani</button></h2>
+                            <div id="filterArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_filter_active" name="section_filtre_alani_active" value="1" <?= old('section_filtre_alani_active', ! empty($sections['filtre_alani']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_filter_active">Aktif</label></div></div>
+                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_filtre_alani_order" class="form-control" value="<?= esc((string) old('section_filtre_alani_order', (string) ($sections['filtre_alani']['order'] ?? 2))) ?>"></div>
+                                    </div>
+                                    <div class="mb-3"><label class="form-label">Filtre Basligi</label><input type="text" name="filtre_basligi" class="form-control" value="<?= esc(old('filtre_basligi', (string) ($config['filtre_basligi'] ?? ''))) ?>"></div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6"><label class="form-label">Filtre Konumu</label><select name="filtre_konumu" class="form-select"><option value="left" <?= old('filtre_konumu', (string) ($config['filtre_konumu'] ?? 'left')) === 'left' ? 'selected' : '' ?>>Sol</option><option value="top" <?= old('filtre_konumu', (string) ($config['filtre_konumu'] ?? 'left')) === 'top' ? 'selected' : '' ?>>Ust</option></select></div>
+                                        <div class="col-md-6 d-flex flex-column justify-content-end gap-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="filtreler_goster" name="filtreler_goster" value="1" <?= old('filtreler_goster', ! empty($config['filtreler_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="filtreler_goster">Filtreleri goster</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="filtre_ozeti_goster" name="filtre_ozeti_goster" value="1" <?= old('filtre_ozeti_goster', ! empty($config['filtre_ozeti_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="filtre_ozeti_goster">Filtre ozetini goster</label></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border rounded mb-3">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#toolbarArea">Siralama ve Sonuc Cubugu</button></h2>
+                            <div id="toolbarArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_toolbar_active" name="section_siralama_sonuc_cubugu_active" value="1" <?= old('section_siralama_sonuc_cubugu_active', ! empty($sections['siralama_sonuc_cubugu']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_toolbar_active">Aktif</label></div></div>
+                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_siralama_sonuc_cubugu_order" class="form-control" value="<?= esc((string) old('section_siralama_sonuc_cubugu_order', (string) ($sections['siralama_sonuc_cubugu']['order'] ?? 3))) ?>"></div>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6"><label class="form-label">Varsayilan Grid Yogunlugu</label><select name="varsayilan_grid_yogunlugu" class="form-select"><?php foreach (['2', '3', '4'] as $value): ?><option value="<?= esc($value) ?>" <?= old('varsayilan_grid_yogunlugu', (string) ($config['varsayilan_grid_yogunlugu'] ?? '3')) === $value ? 'selected' : '' ?>><?= esc($value) ?> Kolon</option><?php endforeach; ?></select></div>
+                                        <div class="col-md-6 d-flex flex-column justify-content-end gap-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="siralama_cubugu_goster" name="siralama_cubugu_goster" value="1" <?= old('siralama_cubugu_goster', ! empty($config['siralama_cubugu_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="siralama_cubugu_goster">Siralama cubugunu goster</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="sonuc_sayisi_goster" name="sonuc_sayisi_goster" value="1" <?= old('sonuc_sayisi_goster', ! empty($config['sonuc_sayisi_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="sonuc_sayisi_goster">Sonuc sayisini goster</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="aktif_filtre_etiketleri_goster" name="aktif_filtre_etiketleri_goster" value="1" <?= old('aktif_filtre_etiketleri_goster', ! empty($config['aktif_filtre_etiketleri_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="aktif_filtre_etiketleri_goster">Aktif filtre etiketlerini goster</label></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border rounded mb-3">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gridArea">Urun Listesi Gorunumu</button></h2>
+                            <div id="gridArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_grid_active" name="section_urun_listesi_gorunumu_active" value="1" <?= old('section_urun_listesi_gorunumu_active', ! empty($sections['urun_listesi_gorunumu']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_grid_active">Aktif</label></div></div>
+                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_urun_listesi_gorunumu_order" class="form-control" value="<?= esc((string) old('section_urun_listesi_gorunumu_order', (string) ($sections['urun_listesi_gorunumu']['order'] ?? 4))) ?>"></div>
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Kart Varyanti</label><select name="kart_varyanti" class="form-select"><?php foreach (['classic' => 'Klasik', 'minimal' => 'Minimal', 'elevated' => 'Yukseltilmis'] as $value => $label): ?><option value="<?= esc($value) ?>" <?= old('kart_varyanti', (string) ($config['kart_varyanti'] ?? 'classic')) === $value ? 'selected' : '' ?>><?= esc($label) ?></option><?php endforeach; ?></select></div>
+                                        <div class="col-md-6"><label class="form-label">Grid Yogunlugu</label><select name="grid_yogunlugu" class="form-select"><?php foreach (['2', '3', '4'] as $value): ?><option value="<?= esc($value) ?>" <?= old('grid_yogunlugu', (string) ($config['grid_yogunlugu'] ?? '3')) === $value ? 'selected' : '' ?>><?= esc($value) ?> Kolon</option><?php endforeach; ?></select></div>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="rozetleri_goster" name="rozetleri_goster" value="1" <?= old('rozetleri_goster', ! empty($config['rozetleri_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="rozetleri_goster">Rozetleri goster</label></div></div>
+                                        <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="favori_butonu_goster" name="favori_butonu_goster" value="1" <?= old('favori_butonu_goster', ! empty($config['favori_butonu_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="favori_butonu_goster">Favori butonunu goster</label></div></div>
+                                        <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="hizli_aksiyonlari_goster" name="hizli_aksiyonlari_goster" value="1" <?= old('hizli_aksiyonlari_goster', ! empty($config['hizli_aksiyonlari_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="hizli_aksiyonlari_goster">Hizli aksiyonlari goster</label></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border rounded mb-3">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#noticeArea">Bilgilendirme / Kampanya Alani</button></h2>
+                            <div id="noticeArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_notice_active" name="section_bilgilendirme_kampanya_alani_active" value="1" <?= old('section_bilgilendirme_kampanya_alani_active', ! empty($sections['bilgilendirme_kampanya_alani']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_notice_active">Aktif</label></div></div>
+                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_bilgilendirme_kampanya_alani_order" class="form-control" value="<?= esc((string) old('section_bilgilendirme_kampanya_alani_order', (string) ($sections['bilgilendirme_kampanya_alani']['order'] ?? 5))) ?>"></div>
+                                    </div>
+                                    <div class="form-check mb-3"><input class="form-check-input" type="checkbox" id="bilgilendirme_alani_goster" name="bilgilendirme_alani_goster" value="1" <?= old('bilgilendirme_alani_goster', ! empty($config['bilgilendirme_alani_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="bilgilendirme_alani_goster">Bilgilendirme alanini goster</label></div>
+                                    <div class="mb-3"><label class="form-label">Bilgilendirme Basligi</label><input type="text" name="bilgilendirme_basligi" class="form-control" value="<?= esc(old('bilgilendirme_basligi', (string) ($config['bilgilendirme_basligi'] ?? ''))) ?>"></div>
+                                    <div class="mb-3"><label class="form-label">Bilgilendirme Metni</label><textarea name="bilgilendirme_metni" rows="3" class="form-control"><?= esc(old('bilgilendirme_metni', (string) ($config['bilgilendirme_metni'] ?? ''))) ?></textarea></div>
+                                    <div class="mb-3"><label class="form-label">Bilgilendirme Tonu</label><select name="bilgilendirme_tonu" class="form-select"><?php foreach (['info' => 'Bilgi', 'success' => 'Basari', 'warning' => 'Uyari', 'danger' => 'Dikkat'] as $value => $label): ?><option value="<?= esc($value) ?>" <?= old('bilgilendirme_tonu', (string) ($config['bilgilendirme_tonu'] ?? 'info')) === $value ? 'selected' : '' ?>><?= esc($label) ?></option><?php endforeach; ?></select></div>
+                                    <div class="card border shadow-none mb-0" data-media-group><div class="card-body"><div class="ratio ratio-16x9 rounded overflow-hidden bg-light mb-3 d-none" data-media-preview-wrap><img src="" alt="Bilgilendirme gorseli" class="img-fluid object-fit-cover w-100 h-100" data-media-preview-image></div><div class="border rounded text-center p-4" data-media-placeholder><i class="ti ti-photo-up fs-2 text-muted d-block mb-2"></i><div class="fw-semibold mb-1">Kampanya gorseli secin</div><div class="small text-muted">Bilgilendirme bolumunde kullanilir.</div></div><div class="d-flex flex-wrap gap-2 mt-3"><button type="button" class="btn btn-sm btn-primary" data-media-browse>Gorsel Sec</button><button type="button" class="btn btn-sm btn-outline-danger" data-media-clear>Kaldir</button></div><input type="file" class="d-none" accept="image/*" data-media-file><div class="mt-3"><label class="form-label small text-muted">Gelişmis Yol Alani</label><input type="text" name="bilgilendirme_gorseli" class="form-control" value="<?= esc(old('bilgilendirme_gorseli', (string) ($config['bilgilendirme_gorseli'] ?? ''))) ?>" placeholder="/uploads/product-list-notice.jpg" data-media-path></div></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border rounded mb-3">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#emptyArea">Bos Sonuc Alani</button></h2>
+                            <div id="emptyArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_empty_active" name="section_bos_sonuc_alani_active" value="1" <?= old('section_bos_sonuc_alani_active', ! empty($sections['bos_sonuc_alani']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_empty_active">Aktif</label></div></div>
+                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_bos_sonuc_alani_order" class="form-control" value="<?= esc((string) old('section_bos_sonuc_alani_order', (string) ($sections['bos_sonuc_alani']['order'] ?? 6))) ?>"></div>
+                                    </div>
+                                    <div class="mb-3"><label class="form-label">Bos Sonuc Basligi</label><input type="text" name="bos_sonuc_basligi" class="form-control" value="<?= esc(old('bos_sonuc_basligi', (string) ($config['bos_sonuc_basligi'] ?? ''))) ?>"></div>
+                                    <div class="mb-3"><label class="form-label">Bos Sonuc Aciklamasi</label><textarea name="bos_sonuc_aciklamasi" rows="3" class="form-control"><?= esc(old('bos_sonuc_aciklamasi', (string) ($config['bos_sonuc_aciklamasi'] ?? ''))) ?></textarea></div>
+                                    <div class="mb-3"><label class="form-label">Bos Sonuc Tonu</label><select name="bos_sonuc_tonu" class="form-select"><?php foreach (['info' => 'Bilgi', 'success' => 'Basari', 'warning' => 'Uyari', 'danger' => 'Dikkat'] as $value => $label): ?><option value="<?= esc($value) ?>" <?= old('bos_sonuc_tonu', (string) ($config['bos_sonuc_tonu'] ?? 'warning')) === $value ? 'selected' : '' ?>><?= esc($label) ?></option><?php endforeach; ?></select></div>
+                                    <div class="card border shadow-none mb-0" data-media-group><div class="card-body"><div class="ratio ratio-16x9 rounded overflow-hidden bg-light mb-3 d-none" data-media-preview-wrap><img src="" alt="Bos sonuc gorseli" class="img-fluid object-fit-cover w-100 h-100" data-media-preview-image></div><div class="border rounded text-center p-4" data-media-placeholder><i class="ti ti-photo-up fs-2 text-muted d-block mb-2"></i><div class="fw-semibold mb-1">Bos sonuc gorseli secin</div><div class="small text-muted">Sonuc bulunmadiginda gosterilir.</div></div><div class="d-flex flex-wrap gap-2 mt-3"><button type="button" class="btn btn-sm btn-primary" data-media-browse>Gorsel Sec</button><button type="button" class="btn btn-sm btn-outline-danger" data-media-clear>Kaldir</button></div><input type="file" class="d-none" accept="image/*" data-media-file><div class="mt-3"><label class="form-label small text-muted">Gelişmis Yol Alani</label><input type="text" name="bos_sonuc_gorseli" class="form-control" value="<?= esc(old('bos_sonuc_gorseli', (string) ($config['bos_sonuc_gorseli'] ?? ''))) ?>" placeholder="/uploads/product-list-empty.jpg" data-media-path></div></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border rounded mb-4">
+                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#footerArea">Alt Aciklama Alani</button></h2>
+                            <div id="footerArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_footer_active" name="section_alt_aciklama_alani_active" value="1" <?= old('section_alt_aciklama_alani_active', ! empty($sections['alt_aciklama_alani']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_footer_active">Aktif</label></div></div>
+                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_alt_aciklama_alani_order" class="form-control" value="<?= esc((string) old('section_alt_aciklama_alani_order', (string) ($sections['alt_aciklama_alani']['order'] ?? 7))) ?>"></div>
+                                    </div>
+                                    <div class="form-check mb-3"><input class="form-check-input" type="checkbox" id="alt_aciklama_goster" name="alt_aciklama_goster" value="1" <?= old('alt_aciklama_goster', ! empty($config['alt_aciklama_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="alt_aciklama_goster">Alt aciklama alanini goster</label></div>
+                                    <div class="mb-3"><label class="form-label">Alt Aciklama Basligi</label><input type="text" name="alt_aciklama_basligi" class="form-control" value="<?= esc(old('alt_aciklama_basligi', (string) ($config['alt_aciklama_basligi'] ?? ''))) ?>"></div>
+                                    <div class="mb-0"><label class="form-label">Alt Aciklama Metni</label><textarea name="alt_aciklama_metni" rows="4" class="form-control"><?= esc(old('alt_aciklama_metni', (string) ($config['alt_aciklama_metni'] ?? ''))) ?></textarea></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card border shadow-none mb-3">
-                        <div class="card-header"><h6 class="mb-0">Filtre ve Toolbar</h6></div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-6"><label class="form-label">Filter Position</label><select name="filter_position" class="form-select"><option value="left" <?= old('filter_position', (string) ($config['filter_position'] ?? 'left')) === 'left' ? 'selected' : '' ?>>Left</option><option value="top" <?= old('filter_position', (string) ($config['filter_position'] ?? 'left')) === 'top' ? 'selected' : '' ?>>Top</option></select></div>
-                                <div class="col-md-6"><label class="form-label">Default Grid Density</label><select name="default_grid_density" class="form-select"><option value="2" <?= old('default_grid_density', (string) ($config['default_grid_density'] ?? '3')) === '2' ? 'selected' : '' ?>>2 Kolon</option><option value="3" <?= old('default_grid_density', (string) ($config['default_grid_density'] ?? '3')) === '3' ? 'selected' : '' ?>>3 Kolon</option><option value="4" <?= old('default_grid_density', (string) ($config['default_grid_density'] ?? '3')) === '4' ? 'selected' : '' ?>>4 Kolon</option></select></div>
-                            </div>
-                            <div class="row g-2 mt-1">
-                                <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="show_filters" name="show_filters" value="1" <?= old('show_filters', ! empty($config['show_filters'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_filters">Filtre panelini goster</label></div></div>
-                                <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="show_filter_summary" name="show_filter_summary" value="1" <?= old('show_filter_summary', ! empty($config['show_filter_summary'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_filter_summary">Filtre ozetini goster</label></div></div>
-                                <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="show_sort_bar" name="show_sort_bar" value="1" <?= old('show_sort_bar', ! empty($config['show_sort_bar'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_sort_bar">Siralama cubugunu goster</label></div></div>
-                                <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="show_result_count" name="show_result_count" value="1" <?= old('show_result_count', ! empty($config['show_result_count'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_result_count">Sonuc sayisini goster</label></div></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border shadow-none mb-3">
-                        <div class="card-header"><h6 class="mb-0">Urun Grid Ayarlari</h6></div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-6"><label class="form-label">Card Variant</label><select name="card_variant" class="form-select"><option value="classic" <?= old('card_variant', (string) ($config['card_variant'] ?? 'classic')) === 'classic' ? 'selected' : '' ?>>Classic</option><option value="minimal" <?= old('card_variant', (string) ($config['card_variant'] ?? 'classic')) === 'minimal' ? 'selected' : '' ?>>Minimal</option><option value="elevated" <?= old('card_variant', (string) ($config['card_variant'] ?? 'classic')) === 'elevated' ? 'selected' : '' ?>>Elevated</option></select></div>
-                                <div class="col-md-6"><label class="form-label">Grid Density</label><select name="grid_density" class="form-select"><option value="2" <?= old('grid_density', (string) ($config['grid_density'] ?? '3')) === '2' ? 'selected' : '' ?>>2 Kolon</option><option value="3" <?= old('grid_density', (string) ($config['grid_density'] ?? '3')) === '3' ? 'selected' : '' ?>>3 Kolon</option><option value="4" <?= old('grid_density', (string) ($config['grid_density'] ?? '3')) === '4' ? 'selected' : '' ?>>4 Kolon</option></select></div>
-                            </div>
-                            <div class="row g-2 mt-1">
-                                <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="show_badges" name="show_badges" value="1" <?= old('show_badges', ! empty($config['show_badges'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_badges">Badge goster</label></div></div>
-                                <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="show_quick_actions" name="show_quick_actions" value="1" <?= old('show_quick_actions', ! empty($config['show_quick_actions'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_quick_actions">Hizli aksiyonlar</label></div></div>
-                                <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="show_favorite_button" name="show_favorite_button" value="1" <?= old('show_favorite_button', ! empty($config['show_favorite_button'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_favorite_button">Favori butonu</label></div></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border shadow-none mb-3">
-                        <div class="card-header"><h6 class="mb-0">Bos Durum ve Notice</h6></div>
-                        <div class="card-body">
-                            <div class="mb-3"><label class="form-label">Empty Title</label><input type="text" name="empty_title" class="form-control" value="<?= esc(old('empty_title', (string) ($config['empty_title'] ?? ''))) ?>"></div>
-                            <div class="mb-3"><label class="form-label">Empty Description</label><textarea name="empty_description" rows="3" class="form-control"><?= esc(old('empty_description', (string) ($config['empty_description'] ?? ''))) ?></textarea></div>
-                            <div class="row g-3">
-                                <div class="col-md-6"><label class="form-label">Empty Tone</label><select name="empty_notice_tone" class="form-select"><?php foreach (['info'=>'Info','success'=>'Success','warning'=>'Warning','danger'=>'Danger'] as $value => $label): ?><option value="<?= esc($value) ?>" <?= old('empty_notice_tone', (string) ($config['empty_notice_tone'] ?? 'warning')) === $value ? 'selected' : '' ?>><?= esc($label) ?></option><?php endforeach; ?></select></div>
-                                <div class="col-md-6 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" id="show_notice" name="show_notice" value="1" <?= old('show_notice', ! empty($config['show_notice'])) ? 'checked' : '' ?>><label class="form-check-label" for="show_notice">Notice alani acik</label></div></div>
-                            </div>
-                            <div class="mb-3 mt-3"><label class="form-label">Notice Title</label><input type="text" name="notice_title" class="form-control" value="<?= esc(old('notice_title', (string) ($config['notice_title'] ?? ''))) ?>"></div>
-                            <div class="mb-3"><label class="form-label">Notice Text</label><textarea name="notice_text" rows="3" class="form-control"><?= esc(old('notice_text', (string) ($config['notice_text'] ?? ''))) ?></textarea></div>
-                            <div class="mb-0"><label class="form-label">Notice Tone</label><select name="notice_tone" class="form-select"><?php foreach (['info'=>'Info','success'=>'Success','warning'=>'Warning','danger'=>'Danger'] as $value => $label): ?><option value="<?= esc($value) ?>" <?= old('notice_tone', (string) ($config['notice_tone'] ?? 'info')) === $value ? 'selected' : '' ?>><?= esc($label) ?></option><?php endforeach; ?></select></div>
-                        </div>
-                    </div>
-
-                    <div class="d-grid"><button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy me-1"></i> Product List Ayarlarini Kaydet</button></div>
+                    <div class="d-grid"><button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy me-1"></i> Sayfa Sistemi Ayarlarini Kaydet</button></div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="col-xxl-7 col-xl-6">
+    <div class="col-xxl-7">
         <div class="card mb-4">
-            <div class="card-header"><h5 class="mb-1">Mini Preview</h5><p class="text-muted mb-0">Sablon uzerindeki degisikliklerin mini etkisini gorun.</p></div>
+            <div class="card-header"><h5 class="mb-1">Mini Sayfa Onizlemesi</h5><p class="text-muted mb-0">Section siralari ve gorunurluk ayarlarinin etkisini inceleyin.</p></div>
             <div class="card-body">
-                <?php if (! empty($config['show_breadcrumb'])): ?><div class="small text-muted mb-3">Ana Sayfa / Kategoriler / <?= esc((string) ($config['page_title'] ?? 'Kategori Sayfasi')) ?></div><?php endif; ?>
-                <div class="card border shadow-none mb-3"><div class="card-body"><div class="d-flex flex-wrap align-items-center justify-content-between gap-3"><div><h4 class="mb-1"><?= esc((string) ($config['page_title'] ?? 'Kategori Sayfasi')) ?></h4><p class="text-muted mb-0"><?= esc((string) ($config['page_subtitle'] ?? 'One cikan urunleri ve filtreleri duzenleyin')) ?></p></div><?php if (! empty($config['show_result_count'])): ?><span class="badge bg-light-secondary">128 sonuc</span><?php endif; ?></div></div></div>
-                <?php if (! empty($config['show_top_banner'])): ?><div class="card border-0 bg-light-primary mb-3"><div class="card-body"><div class="row g-3 align-items-center"><div class="col-md-7"><span class="badge bg-light-secondary mb-2">Top Banner</span><h5 class="mb-1"><?= esc((string) ($config['banner_title'] ?? 'Secili Kategori')) ?></h5><p class="text-muted mb-0"><?= esc((string) ($config['banner_subtitle'] ?? 'Listeleme banner alani')) ?></p></div><div class="col-md-5"><div class="card border shadow-none mb-0"><div class="card-body text-center"><?php if (trim((string) ($config['banner_image'] ?? '')) !== ''): ?><div class="ratio ratio-16x9 mb-2"><img src="<?= esc((string) $config['banner_image'], 'attr') ?>" alt="Banner preview" class="img-fluid rounded object-fit-cover"></div><?php else: ?><i class="ti ti-photo fs-2 text-muted d-block mb-2"></i><div class="small text-muted">Banner media preview</div><?php endif; ?></div></div></div></div></div></div><?php endif; ?>
-                <div class="card border shadow-none mb-3"><div class="card-body"><?php if (($config['filter_position'] ?? 'left') === 'top' && ! empty($config['show_filters'])): ?><div class="card border shadow-none mb-3"><div class="card-body py-2"><div class="d-flex flex-wrap gap-2"><span class="badge bg-light-secondary">Yazar</span><span class="badge bg-light-secondary">Yayinevi</span><span class="badge bg-light-secondary">Fiyat</span><?php if (! empty($config['show_filter_summary'])): ?><span class="badge bg-light-primary">3 aktif filtre</span><?php endif; ?></div></div></div><?php endif; ?><div class="row g-3"><?php if (($config['filter_position'] ?? 'left') === 'left' && ! empty($config['show_filters'])): ?><div class="col-lg-3"><div class="card border shadow-none h-100 mb-0"><div class="card-body"><div class="fw-semibold mb-2">Filtre Paneli</div><div class="small text-muted mb-2">Kategori secenekleri</div><div class="small text-muted mb-2">Fiyat araligi</div><div class="small text-muted">Stok durumu</div></div></div></div><div class="col-lg-9"><?php else: ?><div class="col-12"><?php endif; ?><?php if (! empty($config['show_sort_bar'])): ?><div class="card border shadow-none mb-3"><div class="card-body py-2"><div class="d-flex flex-wrap align-items-center justify-content-between gap-2"><div class="d-flex flex-wrap gap-2"><span class="badge bg-light-primary">En Cok Satanlar</span><span class="badge bg-light-secondary"><?= esc((string) ($config['default_grid_density'] ?? '3')) ?> kolon varsayilan</span></div><?php if (! empty($config['show_result_count'])): ?><div class="small text-muted">128 urun</div><?php endif; ?></div></div></div><?php endif; ?><div class="row g-3"><?php for ($i = 0; $i < (int) ($config['grid_density'] ?? 3) * 2; $i++): ?><div class="<?= esc($gridColClass, 'attr') ?>"><div class="card <?= ($config['card_variant'] ?? 'classic') === 'elevated' ? 'shadow-sm border-0' : 'border shadow-none' ?> h-100 mb-0"><div class="card-body"><div class="bg-light rounded-3 p-4 text-center mb-3"><i class="ti ti-photo text-primary"></i></div><div class="d-flex align-items-start justify-content-between gap-2 mb-2"><div class="fw-semibold text-truncate">Ornek Urun <?= esc((string) ($i + 1)) ?></div><?php if (! empty($config['show_favorite_button'])): ?><i class="ti ti-heart text-muted"></i><?php endif; ?></div><div class="small text-muted mb-2"><?= esc((string) ($config['card_variant'] ?? 'classic')) ?> card preview</div><?php if (! empty($config['show_badges'])): ?><span class="badge bg-light-warning">Yeni</span><?php endif; ?><?php if (! empty($config['show_quick_actions'])): ?><div class="d-flex gap-2 mt-3"><span class="btn btn-sm btn-outline-secondary disabled">Hizli Bakis</span></div><?php endif; ?></div></div></div><?php endfor; ?></div></div></div></div></div>
-                <div class="card border shadow-none mb-3"><div class="card-body"><div class="alert alert-<?= esc((string) ($config['empty_notice_tone'] ?? 'warning')) ?> mb-0"><div class="fw-semibold"><?= esc((string) ($config['empty_title'] ?? 'Sonuc bulunamadi')) ?></div><div class="small"><?= esc((string) ($config['empty_description'] ?? 'Filtreleri degistirerek tekrar deneyin.')) ?></div></div></div></div>
-                <?php if (! empty($config['show_notice'])): ?><div class="card border shadow-none mb-0"><div class="card-body"><div class="alert alert-<?= esc((string) ($config['notice_tone'] ?? 'info')) ?> mb-0"><div class="row g-3 align-items-center"><div class="col-md-8"><div class="fw-semibold"><?= esc((string) ($config['notice_title'] ?? 'Kargo Bilgisi')) ?></div><div class="small"><?= esc((string) ($config['notice_text'] ?? '250 TL ve uzeri siparislerde ucretsiz kargo.')) ?></div></div><div class="col-md-4"><?php if (trim((string) ($config['notice_image'] ?? '')) !== ''): ?><div class="ratio ratio-16x9"><img src="<?= esc((string) $config['notice_image'], 'attr') ?>" alt="Notice preview" class="img-fluid rounded object-fit-cover"></div><?php else: ?><div class="border rounded p-3 text-center bg-white"><i class="ti ti-info-circle text-muted"></i></div><?php endif; ?></div></div></div></div></div><?php endif; ?>
+                <?= view('admin/pages/partials/product_list_preview', ['productListPreview' => $productListPreview ?? []]) ?>
             </div>
         </div>
     </div>
@@ -165,7 +228,10 @@ $gridColClass = $gridDensity === '2' ? 'col-md-6' : ($gridDensity === '4' ? 'col
 
 <div class="offcanvas offcanvas-end w-50" tabindex="-1" id="draftMetaOffcanvas" aria-labelledby="draftMetaOffcanvasLabel">
     <div class="offcanvas-header border-bottom">
-        <div><h5 class="offcanvas-title mb-1" id="draftMetaOffcanvasLabel">Taslak Islemleri</h5><div class="d-flex flex-wrap gap-2"><span class="badge bg-light-primary"><?= esc($draftStatus) ?></span><span class="badge bg-light-secondary"><?= esc($page['code']) ?></span></div></div>
+        <div>
+            <h5 class="offcanvas-title mb-1" id="draftMetaOffcanvasLabel">Taslak Islemleri</h5>
+            <div class="d-flex flex-wrap gap-2"><span class="badge bg-light-primary"><?= esc($draftStatus) ?></span><span class="badge bg-light-secondary"><?= esc($page['code']) ?></span></div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">

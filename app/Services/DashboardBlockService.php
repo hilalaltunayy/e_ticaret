@@ -75,7 +75,7 @@ class DashboardBlockService
         $blockTypeId = trim((string) ($data['block_type_id'] ?? ''));
         $title = trim((string) ($data['title'] ?? ''));
         $blockType = $blockTypeId === '' ? null : $this->dashboardBlockTypeModel->findActiveById($blockTypeId);
-        $blockCode = (string) ($blockType['code'] ?? '');
+        $blockCode = $this->resolveBlockCode($blockType);
         $errors = [];
 
         if ($blockTypeId === '' || ! is_array($blockType)) {
@@ -144,7 +144,7 @@ class DashboardBlockService
             ];
         }
 
-        $blockCode = trim((string) ($block['block_type_code'] ?? ''));
+        $blockCode = $this->resolveBlockCode($block);
         $existingConfig = is_array($block['config'] ?? null) ? $block['config'] : [];
         $configResult = $this->buildConfigForBlock($blockCode, $data, array_merge($existingConfig, ['title' => $title]));
 
@@ -273,6 +273,23 @@ class DashboardBlockService
         }
 
         return ['width' => 4, 'height' => 1];
+    }
+
+    private function resolveBlockCode(?array $source): string
+    {
+        $code = strtolower(trim((string) ($source['code'] ?? $source['block_type_code'] ?? '')));
+        if (in_array($code, ['stat_card', 'chart', 'note'], true)) {
+            return $code;
+        }
+
+        $name = strtolower(trim((string) ($source['name'] ?? $source['block_type_name'] ?? '')));
+
+        return match (true) {
+            str_contains($name, 'stat') => 'stat_card',
+            str_contains($name, 'chart') => 'chart',
+            str_contains($name, 'note') || str_contains($name, 'not') => 'note',
+            default => $code,
+        };
     }
 
     private function decodeConfig(mixed $configJson): array
