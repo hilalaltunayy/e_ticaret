@@ -3,6 +3,8 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Services\CheckoutPageBuilderService;
+use App\Services\CheckoutPreviewRenderer;
 use App\Services\PageBuilderService;
 use App\Services\PageService;
 use App\Services\PageVersionService;
@@ -15,12 +17,16 @@ class PageController extends BaseController
         private ?PageService $pageService = null,
         private ?PageVersionService $pageVersionService = null,
         private ?PageBuilderService $pageBuilderService = null,
-        private ?ProductListPreviewRenderer $productListPreviewRenderer = null
+        private ?ProductListPreviewRenderer $productListPreviewRenderer = null,
+        private ?CheckoutPageBuilderService $checkoutPageBuilderService = null,
+        private ?CheckoutPreviewRenderer $checkoutPreviewRenderer = null
     ) {
         $this->pageService = $this->pageService ?? new PageService();
         $this->pageVersionService = $this->pageVersionService ?? new PageVersionService();
         $this->pageBuilderService = $this->pageBuilderService ?? new PageBuilderService();
         $this->productListPreviewRenderer = $this->productListPreviewRenderer ?? new ProductListPreviewRenderer();
+        $this->checkoutPageBuilderService = $this->checkoutPageBuilderService ?? new CheckoutPageBuilderService();
+        $this->checkoutPreviewRenderer = $this->checkoutPreviewRenderer ?? new CheckoutPreviewRenderer();
     }
 
     public function index()
@@ -83,7 +89,27 @@ class PageController extends BaseController
 
         $view = ($builderData['page']['code'] ?? '') === 'product_list'
             ? 'admin/pages/product_list_builder'
-            : 'admin/pages/builder';
+            : ((($builderData['page']['code'] ?? '') === 'checkout')
+                ? 'admin/pages/checkout_builder'
+                : 'admin/pages/builder');
+
+        $productListPreview = [];
+        if (($builderData['page']['code'] ?? '') === 'product_list') {
+            $oldInput = session()->getFlashdata('_ci_old_input');
+            $productListPreview = is_array($oldInput)
+                ? $this->productListPreviewRenderer->buildFromFormInput($oldInput, $builderData['productListConfig'] ?? [])
+                : $this->productListPreviewRenderer->build($builderData['productListConfig'] ?? []);
+        }
+
+        $checkoutBuilderState = ['layoutBlock' => null, 'config' => []];
+        $checkoutPreview = [];
+        if (($builderData['page']['code'] ?? '') === 'checkout') {
+            $checkoutBuilderState = $this->checkoutPageBuilderService->getBuilderState((string) ($builderData['draft']['id'] ?? ''));
+            $oldInput = session()->getFlashdata('_ci_old_input');
+            $checkoutPreview = is_array($oldInput)
+                ? $this->checkoutPreviewRenderer->buildFromFormInput($oldInput, $checkoutBuilderState['config'] ?? [])
+                : $this->checkoutPreviewRenderer->build($checkoutBuilderState['config'] ?? []);
+        }
 
         return view($view, [
             'title' => 'Page Builder',
@@ -94,9 +120,10 @@ class PageController extends BaseController
             'blocks' => $builderData['blocks'],
             'productListLayoutBlock' => $builderData['productListLayoutBlock'] ?? null,
             'productListConfig' => $builderData['productListConfig'] ?? [],
-            'productListPreview' => ($builderData['page']['code'] ?? '') === 'product_list'
-                ? $this->productListPreviewRenderer->build($builderData['productListConfig'] ?? [])
-                : [],
+            'productListPreview' => $productListPreview,
+            'checkoutLayoutBlock' => $checkoutBuilderState['layoutBlock'] ?? null,
+            'checkoutConfig' => $checkoutBuilderState['config'] ?? [],
+            'checkoutPreview' => $checkoutPreview,
             'builderPolicy' => $builderData['builderPolicy'],
             'builderOptions' => $builderData['builderOptions'],
         ]);
@@ -117,6 +144,23 @@ class PageController extends BaseController
 
         return redirect()->to(site_url('admin/pages/' . $pageCode . '/builder'))
             ->with('success', 'Product list ayarlari guncellendi.');
+    }
+
+    public function updateCheckoutBuilder()
+    {
+        $pageCode = trim((string) $this->request->getPost('page_code'));
+        $versionId = trim((string) $this->request->getPost('version_id'));
+
+        $result = $this->checkoutPageBuilderService->updateConfig($versionId, $this->request->getPost());
+
+        if (! ($result['success'] ?? false)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', (string) ($result['error'] ?? 'Checkout ayarlari guncellenemedi.'));
+        }
+
+        return redirect()->to(site_url('admin/pages/' . $pageCode . '/builder'))
+            ->with('success', 'Checkout ayarlari guncellendi.');
     }
 
     public function createDraft()

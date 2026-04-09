@@ -3,7 +3,32 @@ $preview = is_array($productListPreview ?? null) ? $productListPreview : [];
 $config = is_array($preview['config'] ?? null) ? $preview['config'] : [];
 $sections = is_array($preview['sections'] ?? null) ? $preview['sections'] : [];
 $gridColClass = (string) ($preview['gridColClass'] ?? 'col-lg-4 col-md-6');
+$visibleSectionCount = (int) ($preview['visibleSectionCount'] ?? 0);
+$hiddenSectionCount = (int) ($preview['hiddenSectionCount'] ?? 0);
+$hasVisibleSections = ! empty($preview['hasVisibleSections']);
 ?>
+
+<div class="card border shadow-none bg-light mb-3">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <div class="fw-semibold mb-1">Product List Mini Preview</div>
+                <div class="small text-muted">Kayitli veya formdaki config ile olusturulan sade yonetici onizlemesi.</div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-light-primary"><?= esc((string) $visibleSectionCount) ?> aktif bolum</span>
+                <span class="badge bg-light-secondary"><?= esc((string) $hiddenSectionCount) ?> gizli bolum</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php if (! $hasVisibleSections): ?>
+    <div class="alert alert-light border mb-3">
+        <div class="fw-semibold mb-1">Onizleme bos kalmadi</div>
+        <div class="small text-muted">Bu taslakta tum section alanlari pasif durumda. En az bir bolumu aktiflestirdiginizde sayfa akisi burada gorunur.</div>
+    </div>
+<?php endif; ?>
 
 <?php if (! empty($config['breadcrumb_goster']) && ! empty($config['sections']['sayfa_ust_alani']['active'])): ?>
     <div class="small text-muted mb-3">Ana Sayfa / Kategoriler / <?= esc((string) ($config['sayfa_basligi'] ?? 'Kategori Sayfasi')) ?></div>

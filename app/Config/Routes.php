@@ -79,6 +79,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('pages', 'Admin\PageController::index');
     $routes->get('pages/(:segment)/builder', 'Admin\PageController::builder/$1');
     $routes->post('pages/product-list-builder/update', 'Admin\PageController::updateProductListBuilder');
+    $routes->post('pages/checkout-builder/update', 'Admin\PageController::updateCheckoutBuilder');
     $routes->post('pages/drafts/create', 'Admin\PageController::createDraft');
     $routes->post('pages/drafts/duplicate', 'Admin\PageController::duplicateDraft');
     $routes->post('pages/drafts/archive', 'Admin\PageController::archiveDraft');
