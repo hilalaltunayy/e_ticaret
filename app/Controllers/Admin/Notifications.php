@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Services\NotificationEmailService;
 use App\Services\NotificationLogService;
+use App\Services\NotificationSmsService;
 use App\Services\NotificationTemplateService;
 
 class Notifications extends BaseController
@@ -12,11 +13,13 @@ class Notifications extends BaseController
     public function __construct(
         private ?NotificationEmailService $notificationEmailService = null,
         private ?NotificationTemplateService $notificationTemplateService = null,
-        private ?NotificationLogService $notificationLogService = null
+        private ?NotificationLogService $notificationLogService = null,
+        private ?NotificationSmsService $notificationSmsService = null
     ) {
         $this->notificationEmailService = $this->notificationEmailService ?? new NotificationEmailService();
         $this->notificationTemplateService = $this->notificationTemplateService ?? new NotificationTemplateService();
         $this->notificationLogService = $this->notificationLogService ?? new NotificationLogService();
+        $this->notificationSmsService = $this->notificationSmsService ?? new NotificationSmsService();
     }
 
     public function index()
@@ -27,7 +30,7 @@ class Notifications extends BaseController
             : null;
         $savedTemplates = $this->notificationTemplateService->listSavedTemplates();
         $draftTemplateCount = count(array_filter($savedTemplates, static fn (array $item): bool => ! ($item['is_active'] ?? false)));
-        $recentEmailLogs = $this->notificationLogService->getRecentEmailLogs(5);
+        $recentEmailLogs = $this->notificationLogService->getRecentDeliveryLogs(5);
 
         return view('admin/notifications/index', [
             'title' => 'E-posta / SMS Gönderimi',
@@ -43,11 +46,11 @@ class Notifications extends BaseController
                     'title' => 'SMS Gönderimi',
                     'icon' => 'ti ti-device-mobile-message',
                     'description' => 'Kısa bilgilendirme, hatırlatma ve hızlı erişim mesajları için başlangıç alanı.',
-                    'status' => 'Yakında aktif',
-                    'statusClass' => 'bg-light-secondary text-secondary',
+                    'status' => 'Test gönderimi hazır',
+                    'statusClass' => 'bg-light-warning text-warning',
                 ],
             ],
-            'historySummary' => $this->notificationLogService->getEmailHistorySummary($draftTemplateCount),
+            'historySummary' => $this->notificationLogService->getDeliveryHistorySummary($draftTemplateCount),
             'recentEmailLogs' => $recentEmailLogs,
             'placeholders' => [
                 [
@@ -129,6 +132,50 @@ class Notifications extends BaseController
 
         return redirect()->to(site_url('admin/notifications'))
             ->with('success', 'Test e-postası şablonlu içerikle gönderildi.');
+    }
+
+    public function sendTestSms()
+    {
+        $validator = \Config\Services::validation();
+        $post = [
+            'test_sms_to' => trim((string) $this->request->getPost('test_sms_to')),
+            'test_sms_name' => trim((string) $this->request->getPost('test_sms_name')),
+            'test_sms_message' => trim((string) $this->request->getPost('test_sms_message')),
+        ];
+
+        $validator->setRules([
+            'test_sms_to' => 'required|min_length[10]|max_length[20]|regex_match[/^[0-9+\s\-\(\)]+$/]',
+            'test_sms_name' => 'permit_empty|max_length[120]',
+            'test_sms_message' => 'required|min_length[3]|max_length[612]',
+        ]);
+
+        if (! $validator->run($post)) {
+            $errors = $validator->getErrors();
+            $message = reset($errors);
+
+            return redirect()->to(site_url('admin/notifications'))
+                ->withInput()
+                ->with('error', is_string($message) ? $message : 'SMS form alanlarını kontrol edin.');
+        }
+
+        $result = $this->notificationSmsService->sendTestSms(
+            $post['test_sms_to'],
+            $post['test_sms_name'],
+            $post['test_sms_message'],
+            [
+                'source_type' => 'sms_test',
+                'created_by' => $this->actorId(),
+            ]
+        );
+
+        if (! ($result['success'] ?? false)) {
+            return redirect()->to(site_url('admin/notifications'))
+                ->withInput()
+                ->with('error', (string) ($result['error'] ?? 'Test SMS gönderilemedi.'));
+        }
+
+        return redirect()->to(site_url('admin/notifications'))
+            ->with('success', 'Test SMS gönderimi başlatıldı.');
     }
 
     public function saveTemplate()

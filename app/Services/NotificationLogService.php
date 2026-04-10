@@ -14,13 +14,27 @@ class NotificationLogService
 
     public function recordEmailAttempt(array $payload): void
     {
+        $this->recordAttempt([
+            'channel' => 'email',
+            'recipient' => (string) ($payload['recipient_email'] ?? ''),
+            'subject' => (string) ($payload['subject'] ?? ''),
+            'template_type' => (string) ($payload['template_type'] ?? ''),
+            'source_type' => (string) ($payload['source_type'] ?? 'manual'),
+            'status' => (string) ($payload['status'] ?? 'failed'),
+            'error_message' => (string) ($payload['error_message'] ?? ''),
+            'created_by' => $payload['created_by'] ?? null,
+        ]);
+    }
+
+    public function recordAttempt(array $payload): void
+    {
         if (! $this->logTableExists()) {
             return;
         }
 
         $this->notificationDeliveryLogModel->insert([
-            'channel' => 'email',
-            'recipient_email' => trim((string) ($payload['recipient_email'] ?? '')),
+            'channel' => $this->sanitizeChannel((string) ($payload['channel'] ?? 'email')),
+            'recipient_email' => trim((string) ($payload['recipient'] ?? '')),
             'subject' => $this->truncate((string) ($payload['subject'] ?? ''), 180),
             'template_type' => $this->sanitizeTemplateType((string) ($payload['template_type'] ?? '')),
             'source_type' => $this->sanitizeSourceType((string) ($payload['source_type'] ?? 'manual')),
@@ -31,7 +45,7 @@ class NotificationLogService
         ], false);
     }
 
-    public function getEmailHistorySummary(int $savedTemplateDraftCount = 0): array
+    public function getDeliveryHistorySummary(int $savedTemplateDraftCount = 0): array
     {
         if (! $this->logTableExists()) {
             return [
@@ -42,20 +56,19 @@ class NotificationLogService
         }
 
         $builder = $this->notificationDeliveryLogModel->builder();
-        $todayCount = (int) $builder->where('channel', 'email')
-            ->where('DATE(sent_at)', date('Y-m-d'))
+        $todayCount = (int) $builder->where('DATE(sent_at)', date('Y-m-d'))
             ->countAllResults();
 
-        $lastSuccess = $this->notificationDeliveryLogModel->where('channel', 'email')
-            ->where('status', 'success')
+        $lastSuccess = $this->notificationDeliveryLogModel->where('status', 'success')
             ->orderBy('sent_at', 'DESC')
             ->first();
 
         $lastSuccessLabel = 'Henüz yok';
         if (is_array($lastSuccess)) {
             $time = $this->formatDateLabel((string) ($lastSuccess['sent_at'] ?? ''));
+            $channel = $this->formatChannel((string) ($lastSuccess['channel'] ?? 'email'));
             $recipient = trim((string) ($lastSuccess['recipient_email'] ?? ''));
-            $lastSuccessLabel = trim($time . ($recipient !== '' ? ' · ' . $recipient : ''));
+            $lastSuccessLabel = trim($time . ($recipient !== '' ? ' · ' . $channel . ' · ' . $recipient : ''));
         }
 
         return [
@@ -65,13 +78,13 @@ class NotificationLogService
         ];
     }
 
-    public function getRecentEmailLogs(int $limit = 5): array
+    public function getRecentDeliveryLogs(int $limit = 5): array
     {
         if (! $this->logTableExists()) {
             return [];
         }
 
-        $rows = $this->notificationDeliveryLogModel->where('channel', 'email')
+        $rows = $this->notificationDeliveryLogModel
             ->orderBy('sent_at', 'DESC')
             ->findAll($limit);
 
@@ -80,9 +93,13 @@ class NotificationLogService
             $status = (string) ($row['status'] ?? 'failed');
             $sourceType = (string) ($row['source_type'] ?? 'manual');
             $templateType = trim((string) ($row['template_type'] ?? ''));
+            $channel = (string) ($row['channel'] ?? 'email');
 
             $items[] = [
-                'recipient_email' => (string) ($row['recipient_email'] ?? ''),
+                'channel' => $channel,
+                'channel_label' => $this->formatChannel($channel),
+                'channel_class' => $channel === 'sms' ? 'bg-light-warning text-warning' : 'bg-light-primary text-primary',
+                'recipient' => (string) ($row['recipient_email'] ?? ''),
                 'subject' => (string) ($row['subject'] ?? ''),
                 'template_type' => $templateType !== '' ? $templateType : '-',
                 'template_type_label' => $this->formatTemplateType($templateType),
@@ -115,6 +132,14 @@ class NotificationLogService
         return date('d.m.Y H:i', $timestamp);
     }
 
+    private function formatChannel(string $value): string
+    {
+        return match ($value) {
+            'sms' => 'SMS',
+            default => 'E-posta',
+        };
+    }
+
     private function formatTemplateType(string $value): string
     {
         return match ($value) {
@@ -130,8 +155,16 @@ class NotificationLogService
     {
         return match ($value) {
             'template' => 'Hazır Şablon',
+            'sms_test' => 'SMS Test',
             default => 'Manuel Gönderim',
         };
+    }
+
+    private function sanitizeChannel(string $value): string
+    {
+        $value = trim($value);
+
+        return in_array($value, ['email', 'sms'], true) ? $value : 'email';
     }
 
     private function sanitizeTemplateType(string $value): ?string
@@ -145,7 +178,7 @@ class NotificationLogService
     {
         $value = trim($value);
 
-        return in_array($value, ['manual', 'template'], true) ? $value : 'manual';
+        return in_array($value, ['manual', 'template', 'sms_test'], true) ? $value : 'manual';
     }
 
     private function sanitizeStatus(string $value): string
@@ -157,7 +190,7 @@ class NotificationLogService
 
     private function normalizeError(string $value): ?string
     {
-        $value = $this->truncate(trim(preg_replace('/\s+/', ' ', $value)), 255);
+        $value = $this->truncate(trim((string) preg_replace('/\s+/', ' ', $value)), 255);
 
         return $value !== '' ? $value : null;
     }

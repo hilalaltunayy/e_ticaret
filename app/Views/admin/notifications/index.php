@@ -126,6 +126,39 @@ $drawerFlashSuccess = (string) (session()->getFlashdata('success') ?? '');
         </form>
       </div>
     </div>
+
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0">Test SMS Gönderimi</h5>
+      </div>
+      <div class="card-body">
+        <form action="<?= site_url('admin/notifications/test-sms') ?>" method="post">
+          <?= csrf_field() ?>
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Alıcı Telefon Numarası</label>
+              <input type="text" name="test_sms_to" class="form-control" value="<?= esc(old('test_sms_to', '')) ?>" placeholder="+905551112233" required>
+              <div class="form-text">Twilio için mümkünse E.164 formatı kullanın. Örn: +905551112233</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Alıcı Adı</label>
+              <input type="text" name="test_sms_name" class="form-control" value="<?= esc(old('test_sms_name', '')) ?>" placeholder="Örn. Ayşe Yılmaz">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Mesaj</label>
+              <textarea name="test_sms_message" rows="5" class="form-control" placeholder="Test SMS mesajınızı yazın." required><?= esc(old('test_sms_message', "Merhaba {name},\n\nBu mesaj BeAble Pro admin panelindeki test SMS ekranından gönderilmiştir.")) ?></textarea>
+              <div class="form-text">Maksimum 612 karakter önerilir. `{name}` alanı alıcı adı ile doldurulur.</div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center gap-3 mt-3">
+            <div class="small text-muted">Bu alan yalnızca tek bir numaraya test SMS gönderimi içindir. Toplu SMS ve kuyruk sistemi bu sprint kapsamı dışındadır.</div>
+            <button type="submit" class="btn btn-warning">
+              <i class="ti ti-device-mobile-message me-1"></i> Test SMS Gönder
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <div class="col-12 col-xl-5">
@@ -189,10 +222,13 @@ $drawerFlashSuccess = (string) (session()->getFlashdata('success') ?? '');
                 <div class="border rounded p-3">
                   <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
                     <div>
-                      <div class="fw-semibold"><?= esc((string) $log['recipient_email']) ?></div>
+                      <div class="fw-semibold"><?= esc((string) $log['recipient']) ?></div>
                       <div class="small text-muted mt-1"><?= esc((string) $log['sent_at_label']) ?></div>
                     </div>
-                    <span class="badge <?= esc((string) $log['status_class']) ?>"><?= esc((string) $log['status_label']) ?></span>
+                    <div class="d-flex flex-column align-items-end gap-1">
+                      <span class="badge <?= esc((string) $log['channel_class']) ?>"><?= esc((string) $log['channel_label']) ?></span>
+                      <span class="badge <?= esc((string) $log['status_class']) ?>"><?= esc((string) $log['status_label']) ?></span>
+                    </div>
                   </div>
                   <div class="small mb-1"><span class="text-muted">Konu:</span> <?= esc((string) $log['subject']) ?></div>
                   <div class="small mb-1"><span class="text-muted">Kaynak:</span> <?= esc((string) $log['source_type_label']) ?> · <?= esc((string) $log['template_type_label']) ?></div>

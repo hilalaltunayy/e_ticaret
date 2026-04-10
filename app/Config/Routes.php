@@ -125,6 +125,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('automation', 'Admin\Automation::index');
     $routes->get('notifications', 'Admin\Notifications::index');
     $routes->post('notifications/test-email', 'Admin\Notifications::sendTestEmail');
+    $routes->post('notifications/test-sms', 'Admin\Notifications::sendTestSms');
     $routes->post('notifications/templates/save', 'Admin\Notifications::saveTemplate');
     $routes->post('notifications/templates/send-test', 'Admin\Notifications::sendSavedTemplateTest');
     $routes->get('settings', 'Admin\Settings::index');

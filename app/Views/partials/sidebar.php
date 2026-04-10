@@ -68,7 +68,7 @@ $canManageAuthz = ($roleName === 'admin');
           <label>Admin Erişim</label>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/notifications') ?>" class="pc-link<?= $isActive('admin/notifications') ?>">
+          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
             <span class="pc-micon">
               <svg class="pc-icon"><use xlink:href="#custom-status-up"></use></svg>
             </span>
