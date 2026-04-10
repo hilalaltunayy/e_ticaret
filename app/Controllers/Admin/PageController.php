@@ -3,11 +3,15 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Services\CartPageBuilderService;
+use App\Services\CartPreviewRenderer;
 use App\Services\CheckoutPageBuilderService;
 use App\Services\CheckoutPreviewRenderer;
 use App\Services\PageBuilderService;
 use App\Services\PageService;
 use App\Services\PageVersionService;
+use App\Services\ProductDetailPageBuilderService;
+use App\Services\ProductDetailPreviewRenderer;
 use App\Services\ProductListPreviewRenderer;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
@@ -18,6 +22,10 @@ class PageController extends BaseController
         private ?PageVersionService $pageVersionService = null,
         private ?PageBuilderService $pageBuilderService = null,
         private ?ProductListPreviewRenderer $productListPreviewRenderer = null,
+        private ?ProductDetailPageBuilderService $productDetailPageBuilderService = null,
+        private ?ProductDetailPreviewRenderer $productDetailPreviewRenderer = null,
+        private ?CartPageBuilderService $cartPageBuilderService = null,
+        private ?CartPreviewRenderer $cartPreviewRenderer = null,
         private ?CheckoutPageBuilderService $checkoutPageBuilderService = null,
         private ?CheckoutPreviewRenderer $checkoutPreviewRenderer = null
     ) {
@@ -25,6 +33,10 @@ class PageController extends BaseController
         $this->pageVersionService = $this->pageVersionService ?? new PageVersionService();
         $this->pageBuilderService = $this->pageBuilderService ?? new PageBuilderService();
         $this->productListPreviewRenderer = $this->productListPreviewRenderer ?? new ProductListPreviewRenderer();
+        $this->productDetailPageBuilderService = $this->productDetailPageBuilderService ?? new ProductDetailPageBuilderService();
+        $this->productDetailPreviewRenderer = $this->productDetailPreviewRenderer ?? new ProductDetailPreviewRenderer();
+        $this->cartPageBuilderService = $this->cartPageBuilderService ?? new CartPageBuilderService();
+        $this->cartPreviewRenderer = $this->cartPreviewRenderer ?? new CartPreviewRenderer();
         $this->checkoutPageBuilderService = $this->checkoutPageBuilderService ?? new CheckoutPageBuilderService();
         $this->checkoutPreviewRenderer = $this->checkoutPreviewRenderer ?? new CheckoutPreviewRenderer();
     }
@@ -89,9 +101,13 @@ class PageController extends BaseController
 
         $view = ($builderData['page']['code'] ?? '') === 'product_list'
             ? 'admin/pages/product_list_builder'
+            : ((($builderData['page']['code'] ?? '') === 'product_detail')
+                ? 'admin/pages/product_detail_builder'
+            : ((($builderData['page']['code'] ?? '') === 'cart')
+                ? 'admin/pages/cart_builder'
             : ((($builderData['page']['code'] ?? '') === 'checkout')
                 ? 'admin/pages/checkout_builder'
-                : 'admin/pages/builder');
+                : 'admin/pages/builder')));
 
         $productListPreview = [];
         if (($builderData['page']['code'] ?? '') === 'product_list') {
@@ -99,6 +115,26 @@ class PageController extends BaseController
             $productListPreview = is_array($oldInput)
                 ? $this->productListPreviewRenderer->buildFromFormInput($oldInput, $builderData['productListConfig'] ?? [])
                 : $this->productListPreviewRenderer->build($builderData['productListConfig'] ?? []);
+        }
+
+        $productDetailBuilderState = ['layoutBlock' => null, 'config' => []];
+        $productDetailPreview = [];
+        if (($builderData['page']['code'] ?? '') === 'product_detail') {
+            $productDetailBuilderState = $this->productDetailPageBuilderService->getBuilderState((string) ($builderData['draft']['id'] ?? ''));
+            $oldInput = session()->getFlashdata('_ci_old_input');
+            $productDetailPreview = is_array($oldInput)
+                ? $this->productDetailPreviewRenderer->buildFromFormInput($oldInput, $productDetailBuilderState['config'] ?? [])
+                : $this->productDetailPreviewRenderer->build($productDetailBuilderState['config'] ?? []);
+        }
+
+        $cartBuilderState = ['layoutBlock' => null, 'config' => []];
+        $cartPreview = [];
+        if (($builderData['page']['code'] ?? '') === 'cart') {
+            $cartBuilderState = $this->cartPageBuilderService->getBuilderState((string) ($builderData['draft']['id'] ?? ''));
+            $oldInput = session()->getFlashdata('_ci_old_input');
+            $cartPreview = is_array($oldInput)
+                ? $this->cartPreviewRenderer->buildFromFormInput($oldInput, $cartBuilderState['config'] ?? [])
+                : $this->cartPreviewRenderer->build($cartBuilderState['config'] ?? []);
         }
 
         $checkoutBuilderState = ['layoutBlock' => null, 'config' => []];
@@ -121,6 +157,12 @@ class PageController extends BaseController
             'productListLayoutBlock' => $builderData['productListLayoutBlock'] ?? null,
             'productListConfig' => $builderData['productListConfig'] ?? [],
             'productListPreview' => $productListPreview,
+            'productDetailLayoutBlock' => $productDetailBuilderState['layoutBlock'] ?? null,
+            'productDetailConfig' => $productDetailBuilderState['config'] ?? [],
+            'productDetailPreview' => $productDetailPreview,
+            'cartLayoutBlock' => $cartBuilderState['layoutBlock'] ?? null,
+            'cartConfig' => $cartBuilderState['config'] ?? [],
+            'cartPreview' => $cartPreview,
             'checkoutLayoutBlock' => $checkoutBuilderState['layoutBlock'] ?? null,
             'checkoutConfig' => $checkoutBuilderState['config'] ?? [],
             'checkoutPreview' => $checkoutPreview,
@@ -161,6 +203,40 @@ class PageController extends BaseController
 
         return redirect()->to(site_url('admin/pages/' . $pageCode . '/builder'))
             ->with('success', 'Checkout ayarlari guncellendi.');
+    }
+
+    public function updateProductDetailBuilder()
+    {
+        $pageCode = trim((string) $this->request->getPost('page_code'));
+        $versionId = trim((string) $this->request->getPost('version_id'));
+
+        $result = $this->productDetailPageBuilderService->updateConfig($versionId, $this->request->getPost());
+
+        if (! ($result['success'] ?? false)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', (string) ($result['error'] ?? 'Product detail ayarlari guncellenemedi.'));
+        }
+
+        return redirect()->to(site_url('admin/pages/' . $pageCode . '/builder'))
+            ->with('success', 'Product detail ayarlari guncellendi.');
+    }
+
+    public function updateCartBuilder()
+    {
+        $pageCode = trim((string) $this->request->getPost('page_code'));
+        $versionId = trim((string) $this->request->getPost('version_id'));
+
+        $result = $this->cartPageBuilderService->updateConfig($versionId, $this->request->getPost());
+
+        if (! ($result['success'] ?? false)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', (string) ($result['error'] ?? 'Cart ayarlari guncellenemedi.'));
+        }
+
+        return redirect()->to(site_url('admin/pages/' . $pageCode . '/builder'))
+            ->with('success', 'Cart ayarlari guncellendi.');
     }
 
     public function createDraft()

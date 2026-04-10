@@ -955,14 +955,14 @@ class PageBuilderService
                 'message' => 'Bu sayfa generic block builder yerine hazir urun listeleme sablonu uzerinden kontrollu section ayarlariyla yonetilir.',
             ],
             'product_detail' => [
-                'mode' => 'transition',
-                'title' => 'Product detail icin gecis modu',
-                'message' => 'Bu sayfa ileride layout/config builder mantigiyla yonetilecek. Bu sprintte yalnizca sinirli destek bloklari aciktir.',
+                'mode' => 'page_specific',
+                'title' => 'Product detail icin kontrollu sayfa yonetimi',
+                'message' => 'Urun detay sayfasi, urun veri ve sepet mantigina dokunmadan kontrollu section ayarlariyla yonetilir.',
             ],
             'cart' => [
-                'mode' => 'transition',
-                'title' => 'Cart icin gecis modu',
-                'message' => 'Sepet sayfasi ileride ayri layout/config mantigiyla yonetilecek. Bu sprintte yalnizca operasyonel destek bloklari aciktir.',
+                'mode' => 'page_specific',
+                'title' => 'Cart icin kontrollu sayfa yonetimi',
+                'message' => 'Sepet sayfasi, fiyat ve stok mantigina dokunmadan kontrollu section ayarlariyla yonetilir.',
             ],
             'checkout' => [
                 'mode' => 'transition',

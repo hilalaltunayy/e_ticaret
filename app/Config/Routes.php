@@ -79,7 +79,9 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('pages', 'Admin\PageController::index');
     $routes->get('pages/(:segment)/builder', 'Admin\PageController::builder/$1');
     $routes->post('pages/product-list-builder/update', 'Admin\PageController::updateProductListBuilder');
+    $routes->post('pages/product-detail-builder/update', 'Admin\PageController::updateProductDetailBuilder');
     $routes->post('pages/checkout-builder/update', 'Admin\PageController::updateCheckoutBuilder');
+    $routes->post('pages/cart-builder/update', 'Admin\PageController::updateCartBuilder');
     $routes->post('pages/drafts/create', 'Admin\PageController::createDraft');
     $routes->post('pages/drafts/duplicate', 'Admin\PageController::duplicateDraft');
     $routes->post('pages/drafts/archive', 'Admin\PageController::archiveDraft');
@@ -122,6 +124,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('customers', 'Admin\Customers::index');
     $routes->get('automation', 'Admin\Automation::index');
     $routes->get('notifications', 'Admin\Notifications::index');
+    $routes->post('notifications/test-email', 'Admin\Notifications::sendTestEmail');
     $routes->get('settings', 'Admin\Settings::index');
     $routes->get('settings/permissions', 'Admin\SettingsPermissionsController::index');
     $routes->post('settings/permissions/update', 'Admin\SettingsPermissionsController::update');

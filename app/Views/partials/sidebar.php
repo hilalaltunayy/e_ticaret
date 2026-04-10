@@ -68,7 +68,7 @@ $canManageAuthz = ($roleName === 'admin');
           <label>Admin Erişim</label>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+          <a href="<?= site_url('admin/notifications') ?>" class="pc-link<?= $isActive('admin/notifications') ?>">
             <span class="pc-micon">
               <svg class="pc-icon"><use xlink:href="#custom-status-up"></use></svg>
             </span>
@@ -150,7 +150,7 @@ $canManageAuthz = ($roleName === 'admin');
           </li>
         <?php endif; ?>
         <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+          <a href="<?= site_url('admin/notifications') ?>" class="pc-link<?= $isActive('admin/notifications') ?>">
             <span class="pc-micon">
               <i class="ti ti-mail"></i>
             </span>

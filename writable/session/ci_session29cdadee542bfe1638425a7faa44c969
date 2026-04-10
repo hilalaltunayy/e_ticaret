@@ -1,0 +1,5 @@
+__ci_last_regenerate|i:1775809062;_ci_previous_url|s:41:"http://localhost:8080/admin/notifications";isLoggedIn|b:1;user|a:4:{s:2:"id";s:36:"57f01727-71c9-4921-96c0-1a55eeeabed3";s:4:"role";s:5:"admin";s:5:"email";s:14:"admin@site.com";s:4:"name";s:5:"admin";}user_id|s:36:"57f01727-71c9-4921-96c0-1a55eeeabed3";role|s:5:"admin";_ci_old_input|a:2:{s:3:"get";a:0:{}s:4:"post";a:4:{s:14:"csrf_test_name";s:32:"1483b631342c1e31d8a172c88b2fec87";s:13:"test_email_to";s:24:"altunayhilal14@gmail.com";s:18:"test_email_subject";s:26:"BeAble Pro test e-postası";s:18:"test_email_message";s:129:"Merhaba Hilal,
+
+Bu mesaj BeAble Pro admin panelindeki test e-posta gönderimi ekranından iletilmiştir.
+
+İyi çalışmalar.";}}__ci_vars|a:2:{s:13:"_ci_old_input";s:3:"old";s:5:"error";s:3:"old";}error|s:61:"E-posta gönderimi için `fromEmail` yapılandırması eksik.";
