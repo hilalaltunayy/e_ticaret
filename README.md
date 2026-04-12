@@ -2,11 +2,9 @@
 
 ## Demo Preview
 
-- [Demo 1](./demo1.mp4)  
-- [Demo 2](./demo2.mp4)  
-- [Demo 3](./demo3.mp4)  
-- [Demo 4](./demo4.mp4)  
-- [Demo 5](./demo5.mp4)  
+- [Demo 1](./demo6.mp4)  
+- [Demo 2](./demo7.mp4)  
+- [Demo 3](./demo8.mp4)  
 
 ---
 
