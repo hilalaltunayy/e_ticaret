@@ -1,7 +1,7 @@
 E-Ticaret Platformu
 ## Demo Preview
 
-![Demo GIF](demo1.mp4)
+[![Demo 1](demo1.gif)](./demo1.mp4)
 ![Demo GIF](demo2.mp4)
 ![Demo GIF](demo3.mp4)
 ![Demo GIF](demo4.mp4)
