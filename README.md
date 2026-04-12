@@ -1,7 +1,13 @@
 E-Ticaret Platformu
 ## Demo Preview
 
-[![Demo 1](demo1.gif)](./demo1.mp4)
+[![Demo 1](./demo1.gif)](./demo1.mp4)
+[![Demo 2](./demo2.gif)](./demo2.mp4)
+[![Demo 3](./demo3.gif)](./demo3.mp4)
+[![Demo 4](./demo4.gif)](./demo4.mp4)
+[![Demo 5](./demo5.gif)](./demo5.mp4)
+
+
 
 - [Demo 1](./demo1.mp4)
 - [Demo 2](./demo2.mp4)
