@@ -7,6 +7,7 @@ E-Ticaret Platformu
 ![Demo GIF](demo4.mp4)
 ![Demo GIF](demo5.mp4)
 
+
 Rol Tabanlı, Modüler Yönetim Panelli, Dijital & Basılı Kitap Satış Sistemi
 
 Modern, güvenli ve modüler bir e-ticaret platformu.
