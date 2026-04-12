@@ -1,8 +1,11 @@
 E-Ticaret Platformu
 ## Demo Preview
 
-### Main Screen
-![Main Screen](202604031554.mp4)
+![Demo GIF](demo1.gif)
+![Demo GIF](demo2.gif)
+![Demo GIF](demo3.gif)
+![Demo GIF](demo4.gif)
+![Demo GIF](demo5.gif)
 
 Rol Tabanlı, Modüler Yönetim Panelli, Dijital & Basılı Kitap Satış Sistemi
 
