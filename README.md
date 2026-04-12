@@ -1,11 +1,11 @@
 E-Ticaret Platformu
 ## Demo Preview
 
-![Demo GIF](demo1.gif)
-![Demo GIF](demo2.gif)
-![Demo GIF](demo3.gif)
-![Demo GIF](demo4.gif)
-![Demo GIF](demo5.gif)
+![Demo GIF](demo1.mp4)
+![Demo GIF](demo2.mp4)
+![Demo GIF](demo3.mp4)
+![Demo GIF](demo4.mp4)
+![Demo GIF](demo5.mp4)
 
 Rol Tabanlı, Modüler Yönetim Panelli, Dijital & Basılı Kitap Satış Sistemi
 
