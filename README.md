@@ -1,4 +1,4 @@
-# E-Ticaret Platformu
+# E-Commerce Platform
 
 ## Demo Preview
 
