@@ -1,427 +1,325 @@
-E-Ticaret Platformu
+# E-Commerce Platform
+
 ## Demo Preview
 
-### Main Screen
-![Main Screen](202604031554.mp4)
+- [Demo 1](./demo6.mp4)  
+- [Demo 2](./demo7.mp4)  
+- [Demo 3](./demo8.mp4)  
 
-Rol Tabanlı, Modüler Yönetim Panelli, Dijital & Basılı Kitap Satış Sistemi
+---
 
-Modern, güvenli ve modüler bir e-ticaret platformu.
-Dijital (PDF/EPUB) ve basılı kitap satışı destekler.
-Admin tarafından dinamik olarak tasarlanabilen Dashboard ve Page Builder içerir.
-RBAC (Role Based Access Control) mimarisi ile yetki kontrollü yönetim sunar.
+## Overview
 
- Proje Amacı
+This project is a modular and secure e-commerce platform designed to support both digital (PDF/EPUB) and physical book sales.
 
-Bu platformun amacı:
+The system includes a dynamically configurable Admin Dashboard, a Page Builder, and a robust Role-Based Access Control (RBAC) architecture.
 
-Admin / Sekreter / Kullanıcı rollerinin net ayrıştırılması
+It is designed not only as a working application but also as a scalable and maintainable system architecture.
 
-Deny-by-default RBAC mimarisi
+---
 
-Dijital içerik güvenliği (token + watermark + canvas rendering)
+## Project Goals
 
-Dinamik Dashboard & Page Builder
+- Clear separation of Admin / Secretary / Customer roles  
+- Deny-by-default RBAC architecture  
+- Secure digital content delivery  
+- Dynamic Dashboard and Page Builder  
+- Layered architecture (Controller → Service → Model)  
+- Secure payment, order, and stock management  
+- Full system traceability with audit logs  
 
-Katmanlı (Controller → Service → Model) mimari
+---
 
-Güvenli ödeme, sipariş ve stok yönetimi
+## System Architecture
 
-Audit log ile izlenebilir sistem
-
- Sistem Mimarisi
-Genel Mimari
+### General Flow
 HTTP Request
-   ↓
-Filter (Auth + RBAC + CSRF + SecureHeaders)
-   ↓
-Controller (Thin)
-   ↓
+↓
+Filter (Auth + RBAC + CSRF + Security Headers)
+↓
+Controller (Thin Layer)
+↓
 Service (Business Logic)
-   ↓
+↓
 Repository / Model
-   ↓
+↓
 Database
-Katmanlar
-Katman	Sorumluluk
-Filter	Auth + Permission enforcement (PEP)
-Controller	Request/Response orchestration
-Service	İş kuralları
-DTO	Tip güvenli veri taşıma
-Model	DB erişimi
-Migration	Şema versiyonlama
 
-RBAC (Role-Based Access Control)
-Roller
 
-ADMIN
+### Layers
 
-SECRETARY
+| Layer        | Responsibility |
+|-------------|---------------|
+| Filter      | Authentication and permission enforcement |
+| Controller  | Request/response orchestration |
+| Service     | Business logic |
+| DTO         | Typed data transfer |
+| Model       | Database interaction |
+| Migration   | Schema versioning |
 
-CUSTOMER
+---
 
-Yetki Yapısı
-roles
-permissions
-role_permissions
-user_roles
-user_permissions (override)
-Kritik Özellik
+## RBAC (Role-Based Access Control)
 
-Sekreter minimum rol ile başlar
+### Roles
 
-Admin UI üzerinden özel permission override verebilir
+- ADMIN  
+- SECRETARY  
+- CUSTOMER  
 
-Route bazlı filter ile zorunlu kontrol
+### Structure
 
-Service katmanında ikinci güvenlik kontrolü
+- roles  
+- permissions  
+- role_permissions  
+- user_roles  
+- user_permissions (override)  
 
-Deny by default prensibi uygulanır.
+### Key Principles
 
- Dashboard Builder
+- Deny-by-default access control  
+- Route-level authorization enforcement  
+- Secondary validation in Service layer  
+- Admin-controlled permission overrides  
+- Minimal privilege assignment for secretary role  
 
-Admin kendi dashboard’unu blok bazlı oluşturabilir.
+---
 
-Block Türleri
+## Dashboard Builder
 
-Stat Card
+The admin can dynamically build dashboards using modular blocks.
 
-Chart (Bar / Pie / Line)
+### Block Types
 
-Slider
+- Stat Card  
+- Chart (Bar / Pie / Line)  
+- Slider  
+- Quote  
+- Calendar  
 
-Quote
+### Data Sources
 
-Calendar
+- sales_by_category  
+- top_authors  
+- visitors  
+- favorites_count  
 
-Veri Kaynakları
+### Features
 
-sales_by_category
+- Draft / Published / Archived versions  
+- Cached rendering (no recalculation on each load)  
 
-top_authors
+---
 
-visitors
+## Page Builder
 
-favorites_count
+The admin can construct pages such as:
 
-Versioning
+- Home  
+- Category Listing  
+- Product Detail  
+- Cart  
 
-Draft
+### Design Approach
 
-Published
+Instead of free HTML:
 
-Archived
+- predefined slots are used  
+- controlled rendering structure  
 
-Dashboard her reload’da hesaplanmaz → Cache uygulanır.
+### Benefits
 
- Page Builder
+- Reduced XSS risk  
+- Easier maintenance  
+- UI consistency  
 
-Admin aşağıdaki sayfaları bloklarla oluşturabilir:
+---
 
-Ana Sayfa
+## Domain Model
 
-Kategori Liste
+### Work → SKU Separation
 
-Ürün Detay
+- Work: content identity  
+- SKU: sellable variant (PRINT / DIGITAL / BUNDLE)  
 
-Cart
+### Snapshot Policy
 
-Slot Tabanlı Ürün Kartı
+Each order item stores:
 
-Tam serbest HTML yerine:
+- unit_price_snapshot  
+- product_name_snapshot  
+- tax_snapshot  
+- discount_snapshot  
 
-cover
-title
-author
-price
-favorite
-add_to_cart
-rating
+Ensures historical consistency even if data changes later.
 
-Admin sadece yerleşim ve görünürlük kontrol eder.
+---
 
-Bu yaklaşım:
+## Digital Content Security
 
-XSS riskini azaltır
+### Approach
 
-Bakımı kolaylaştırır
+Not full DRM, but deterrence and traceability.
 
-UI standardizasyonu sağlar
+### Implementation
 
- Domain Model (Core)
-Work → SKU Ayrımı
+- Files stored outside webroot  
+- Token-based access (/reader/{token})  
+- PDF.js canvas rendering  
+- Disabled text selection and printing  
+- Watermark (email, order number, date)  
+- Rate limiting  
+- Access logging  
 
-Work: İçerik kimliği
-SKU: Satılabilir varyant (PRINT / DIGITAL / BUNDLE)
+---
 
-Snapshot Politikası
+## Cart and Stock Management
 
-OrderItem içinde:
+### Cart
 
-unit_price_snapshot
+- cart  
+- cart_items  
+- cart_promotions  
 
-product_name_snapshot
+Checkout includes re-pricing validation.
 
-tax_snapshot
+### Stock
 
-discount_snapshot
+- Stock reduced after payment  
+- Re-checked before payment  
+- Protected with transactions  
 
-Fiyat sonradan değişse bile geçmiş bozulmaz.
+---
 
- Dijital İçerik Güvenliği
-Amaç
+## Shipment System
 
-Tam DRM değil, caydırıcılık + izlenebilirlik.
+### Entities
 
-Uygulama
+- shipments  
+- shipment_events  
 
-Dosyalar webroot dışında
-
-Token bazlı erişim /reader/{token}
-
-PDF.js → Canvas rendering
-
-Text selection disabled
-
-Print disabled
-
-Watermark (email + order no + date)
-
-Rate limiting
-
-Access log
-
-Token İçeriği
-user_id
-product_id
-expire_time
-hash
-🛒 Sepet & Stok Yönetimi
-Sepet
-
-cart
-
-cart_items
-
-cart_promotions
-
-Checkout sırasında reprice yapılır.
-
-Stok
-
-MVP:
-
-Stok ödeme sonrası düşer
-
-Ödeme öncesi tekrar kontrol edilir
-
-Transaction ile korunur
-
- Kargo & Shipment Event Model
-shipments
-shipment_events
-
-Status:
-
+### Flow
 PENDING → PREPARING → SHIPPED → DELIVERED
 
- Ödeme Akışı
+---
 
-State machine:
-
+## Payment Flow
 INITIATED → PENDING → SUCCESS / FAILED → REFUNDED
 
-Webhook idempotency:
+### Webhook Handling
 
-provider_txn_id unique
+- Idempotent processing  
+- provider_txn_id unique constraint  
+- webhook_events tracking  
 
-webhook_events tablosu
+---
 
- State Machines
-Order
+## State Machines
 
-PENDING_PAYMENT
-→ PAID
-→ FULFILLMENT_PENDING
-→ SHIPPED
-→ DELIVERED
+### Order
+PENDING_PAYMENT → PAID → FULFILLMENT_PENDING → SHIPPED → DELIVERED
+### Digital Access
+ACTIVE → EXPIRED → REVOKED
 
-İade süreci ayrı yönetilir.
 
-DigitalAccess
+---
 
-ACTIVE
-→ EXPIRED
-→ REVOKED
+## Security Design
 
- Güvenlik Tasarımı
-✔ Access Control
+- Route-level access control  
+- Service-level authorization checks  
+- CSRF protection  
+- XSS prevention via encoding and schema validation  
+- Secure headers (HSTS, CSP, etc.)  
+- Session security (HttpOnly, Secure, SameSite)  
+- Secure file upload handling  
+- Environment-based secret management  
 
-Route-level filter
+---
 
-Service-level guard
+## Audit Logging
 
-Ownership check
+### Structure
 
-✔ CSRF
+- actor_user_id  
+- action_code  
+- entity_type  
+- entity_id  
+- before_json  
+- after_json  
+- ip  
 
-CI4 filter
+### Logged Events
 
-✔ XSS
+- Permission changes  
+- Product updates  
+- Layout publishing  
+- Comment deletion  
+- Digital access revocation  
+- Shipment status updates  
 
-Output encoding
+---
 
-Builder schema validation
+## Edge Case Handling
 
-Slot-based design
+| Scenario | Solution |
+|--------|---------|
+| Price changes | Checkout re-pricing |
+| Stock race conditions | Transaction + validation |
+| Duplicate webhooks | Idempotent handlers |
+| Unauthorized access attempts | Route guard |
+| Builder misconfiguration | JSON schema validation |
+| Digital content abuse | Watermark + rate limiting |
 
-✔ Secure Headers
+---
 
-HSTS
+## Testing Strategy
 
-X-Content-Type-Options
+- Service layer unit tests  
+- Policy validation tests  
+- State machine tests  
+- Permission matrix tests  
+- Order snapshot tests  
+- Idempotency tests  
 
-CSP
+---
 
-✔ Session Security
+## Migration Strategy
 
-HttpOnly
+- Versioned migrations  
+- Seeder for default roles and permissions  
+- Controlled production migration  
+- Rollback support  
 
-Secure
+---
 
-SameSite
+## Design Decisions
 
-✔ File Upload Security
+- RBAC designed from the beginning  
+- Business logic isolated in Service layer  
+- Snapshot model ensures data integrity  
+- Slot-based UI reduces XSS risk  
+- Audit logs provide full traceability  
+- Builder versioning enables rollback  
+- Token-based access provides controlled digital delivery  
 
-MIME whitelist
+---
 
-Hash doğrulama
+## Scope Limitations
 
-Webroot dışı depolama
+- Native mobile application  
+- AI recommendation system  
+- Marketplace integrations  
+- Multi-currency support  
 
-✔ Secrets
+---
 
-Hardcoded anahtar yok
+## Conclusion
 
-Environment config
+This project is not just a working e-commerce system, but a security-focused, modular, and scalable architecture built for long-term maintainability.
 
- Audit Log
-audit_logs
-- actor_user_id
-- action_code
-- entity_type
-- entity_id
-- before_json
-- after_json
-- ip
+---
 
-Loglanan olaylar:
+## Author
 
-Permission değişikliği
-
-Ürün fiyat/stok değişimi
-
-Layout publish
-
-Yorum silme
-
-Dijital revoke
-
-Shipment status update
-
- Edge Case Düşünülmüş Senaryolar
-Senaryo	Çözüm
-Fiyat değişimi	Checkout reprice
-Stok yarışı	Transaction + tekrar kontrol
-Webhook tekrarı	Idempotent handler
-Sekreter URL hack	Route guard + deny default
-Builder hatalı config	JSON schema validation
-Dijital kopyalama	Watermark + rate limit
-SQL performans	Index + cache
-
-graph TD
-
-User -->|HTTP| Filter
-Filter --> Controller
-Controller --> Service
-Service --> Repository
-Repository --> DB
-
-Service --> PolicyCheck
-PolicyCheck --> RBAC
-
-Admin --> DashboardBuilder
-DashboardBuilder --> BlockRenderer
-BlockRenderer --> DataSource
-
-
-Test Coverage Yaklaşımı
-
-Service katmanı unit test
-
-Policy testleri
-
-State machine testleri
-
-Permission matrix testleri
-
-Order snapshot testleri
-
-Idempotency testleri
-
-
- Migration Stratejisi
-
-Versioned migrations
-
-Seeder ile default roles & permissions
-
-Production’da controlled migrate
-
-Rollback planı mevcut
-
-
- Neden Bu Tasarım?
-
-RBAC en baştan tasarlandı
-
-Business logic Service katmanında
-
-Snapshot modeli ile veri bütünlüğü
-
-Slot-based UI ile XSS risk azaltımı
-
-Audit log ile izlenebilir sistem
-
-Builder versioning ile rollback imkanı
-
-
-Token bazlı dijital erişim ile minimum DRM yaklaşımı
-
-Bu proje, sadece çalışan bir e-ticaret sistemi değil;
-güvenlik, izlenebilirlik ve sürdürülebilirlik düşünülerek tasarlanmış bir mimari çalışmadır.
-
-
- Kapsam Dışı (Şimdilik)
-
-Native mobile app
-
-AI öneri sistemi
-
-Marketplace entegrasyonu
-
-Çoklu para birimi
-
-
-Sonuç
-
-Bu proje:
-
-✔ Rol bazlı
-✔ Modüler
-✔ Güvenli
-✔ Ölçeklenebilir
-✔ Audit destekli
-✔ Builder destekli
-
-bir e-ticaret altyapısıdır.
+Hilal Yeşim Altunay
