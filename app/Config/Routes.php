@@ -73,6 +73,9 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 
     // Admin Dashboard
     $routes->get('dashboard', 'Admin\DashboardController::index');
+    $routes->get('banners', 'Admin\Banners::index');
+    $routes->post('banners/save', 'Admin\Banners::save');
+    $routes->post('banners/toggle/(:segment)', 'Admin\Banners::toggle/$1');
     $routes->get('dashboard-builder', 'Admin\DashboardBuilder::index');
     $routes->post('dashboard-builder/reorder', 'Admin\DashboardBuilder::reorder');
     $routes->post('dashboard-builder/resize', 'Admin\DashboardBuilder::resize');

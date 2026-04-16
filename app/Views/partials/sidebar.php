@@ -158,7 +158,7 @@ $canManageAuthz = ($roleName === 'admin');
           </a>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+          <a href="<?= site_url('admin/banners') ?>" class="pc-link<?= $isActive('admin/banners') ?>">
             <span class="pc-micon">
               <i class="ti ti-photo"></i>
             </span>
