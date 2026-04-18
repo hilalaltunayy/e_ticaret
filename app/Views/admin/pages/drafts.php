@@ -75,6 +75,14 @@
                                         <a href="<?= site_url('admin/pages/' . $page['code'] . '/builder') ?>" class="btn btn-sm btn-outline-primary">Builder</a>
                                     <?php endif; ?>
                                     <a href="<?= site_url('admin/page-versions/' . $draft->id) ?>" class="btn btn-sm btn-outline-secondary">Version Detayi</a>
+                                    <?php if ($draft->status === 'PUBLISHED'): ?>
+                                        <form action="<?= site_url('admin/pages/drafts/start-editing') ?>" method="post" class="d-inline">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                                            <input type="hidden" name="version_id" value="<?= esc($draft->id) ?>">
+                                            <button type="submit" class="btn btn-sm btn-primary">Duzenlemeye Basla</button>
+                                        </form>
+                                    <?php endif; ?>
                                     <?php if ($draft->status !== 'ARCHIVED'): ?>
                                         <form action="<?= site_url('admin/pages/drafts/duplicate') ?>" method="post" class="d-inline">
                                             <?= csrf_field() ?>

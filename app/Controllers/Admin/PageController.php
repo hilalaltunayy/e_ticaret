@@ -273,6 +273,30 @@ class PageController extends BaseController
             ->with('success', 'Version kopyalanarak yeni draft olusturuldu.');
     }
 
+    public function startEditingVersion()
+    {
+        $pageCode = trim((string) $this->request->getPost('page_code'));
+        $versionId = trim((string) $this->request->getPost('version_id'));
+        $version = $this->pageVersionService->findVersionDetail($versionId);
+
+        if (! is_array($version)) {
+            return redirect()->back()->with('draft_error', 'Kaynak surum bulunamadi.');
+        }
+
+        if ((string) ($version['status'] ?? '') !== 'PUBLISHED') {
+            return redirect()->back()->with('draft_error', 'Sadece canli surumden yeni taslak olusturabilirsiniz.');
+        }
+
+        $result = $this->pageBuilderService->duplicateDraft($versionId);
+
+        if (! ($result['success'] ?? false)) {
+            return redirect()->back()->with('draft_error', (string) ($result['error'] ?? 'Yeni taslak olusturulamadi.'));
+        }
+
+        return redirect()->to(site_url('admin/pages/' . $pageCode . '/builder'))
+            ->with('success', 'Canli surumden yeni bir taslak olusturuldu.');
+    }
+
     public function archiveDraft()
     {
         $pageCode = trim((string) $this->request->getPost('page_code'));
@@ -368,6 +392,17 @@ class PageController extends BaseController
     {
         $pageCode = trim((string) $this->request->getPost('page_code'));
         $blockId = trim((string) $this->request->getPost('block_id'));
+        $inlineField = trim((string) $this->request->getPost('inline_field'));
+
+        if ($this->request->isAJAX() && $inlineField !== '') {
+            $inlineValue = (string) $this->request->getPost('inline_value');
+            $result = $this->pageBuilderService->updateInlineTextField($blockId, $inlineField, $inlineValue);
+            $status = ($result['success'] ?? false) ? 200 : 422;
+
+            return $this->response
+                ->setStatusCode($status)
+                ->setJSON($this->withCsrf($result));
+        }
 
         $result = $this->pageBuilderService->updateBlockConfig($blockId, $this->request->getPost());
 

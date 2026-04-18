@@ -30,9 +30,23 @@
                 <div class="d-flex gap-2">
                     <a href="<?= site_url('admin/pages/' . $page['code'] . '/builder') ?>" class="btn btn-sm btn-primary">Builder</a>
                     <a href="<?= site_url('admin/pages/' . $page['code'] . '/drafts') ?>" class="btn btn-sm btn-outline-secondary">Draftlari Gor</a>
+                    <?php if (is_array($publishedVersion) && ! empty($publishedVersion['id'])): ?>
+                        <form action="<?= site_url('admin/pages/drafts/start-editing') ?>" method="post" class="d-inline">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                            <input type="hidden" name="version_id" value="<?= esc($publishedVersion['id']) ?>">
+                            <button type="submit" class="btn btn-sm btn-success">Duzenlemeye Basla</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="card-body">
+                <?php if (session()->getFlashdata('draft_error')): ?>
+                    <div class="alert alert-danger mb-3"><?= esc(session()->getFlashdata('draft_error')) ?></div>
+                <?php endif; ?>
+                <?php if (session()->getFlashdata('success')): ?>
+                    <div class="alert alert-success mb-3"><?= esc(session()->getFlashdata('success')) ?></div>
+                <?php endif; ?>
                 <div class="row g-3">
                     <div class="col-md-3">
                         <div class="border rounded p-3 h-100">

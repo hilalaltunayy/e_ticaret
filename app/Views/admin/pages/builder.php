@@ -183,6 +183,7 @@ foreach ($blockTypes as $availableBlockType) {
                     <div class="small text-muted mb-0">Duzenleme modu acik. Bloklari tasiyarak siralayabilirsiniz.</div>
                 </div>
                 <div class="small text-danger mb-3 d-none" id="builderReorderStatus"></div>
+                <div class="small text-danger mb-3 d-none" id="builderInlineEditStatus"></div>
                 <?php if (session()->getFlashdata('error')): ?>
                     <div class="alert alert-danger" role="alert">
                         <div class="d-flex align-items-start gap-2">
@@ -749,6 +750,25 @@ foreach ($blockTypes as $availableBlockType) {
                             $showIcon = ! array_key_exists('show_icon', $config) || (bool) $config['show_icon'];
                             $dataMode = trim((string) ($config['mode'] ?? 'auto'));
                             $selectedProductCount = is_array($config['selected_product_ids'] ?? null) ? count($config['selected_product_ids']) : 0;
+                            $inlineValueMap = match ($blockTypeCode) {
+                                'hero_banner', 'campaign_banner', 'author_showcase', 'newsletter' => [
+                                    'summary_title' => $titleText,
+                                    'body_text' => $subtitleText,
+                                    'cta_text' => trim((string) ($config['button_text'] ?? '')),
+                                ],
+                                'notice' => [
+                                    'summary_title' => $titleText,
+                                    'body_text' => trim((string) ($config['content'] ?? '')),
+                                ],
+                                'category_grid' => [
+                                    'summary_title' => $titleText,
+                                    'label_text' => trim((string) ($config['label'] ?? '')),
+                                ],
+                                'best_sellers', 'featured_products', 'slider' => [
+                                    'summary_title' => $titleText,
+                                ],
+                                default => [],
+                            };
                             $surfaceClass = match ($variantText) {
                                 'dark' => 'bg-dark text-white',
                                 'soft' => 'bg-light-secondary',
@@ -772,11 +792,41 @@ foreach ($blockTypes as $availableBlockType) {
                                                     <span>Siralamaya hazir</span>
                                                 </div>
                                                 <div class="mb-2">
-                                                    <h6 class="mb-0"><?= esc($block['block_type_name'] ?? 'Block') ?></h6>
+                                                    <h6
+                                                        class="mb-0"
+                                                        data-inline-bind="title_text"
+                                                        data-inline-placeholder="<?= esc((string) ($block['block_type_name'] ?? 'Block'), 'attr') ?>"
+                                                        <?php if (isset($inlineValueMap['summary_title'])): ?>
+                                                            data-inline-editable
+                                                            data-inline-field="summary_title"
+                                                            data-inline-input="text"
+                                                            data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                            data-inline-value-field="title_text"
+                                                            data-inline-value="<?= esc((string) $inlineValueMap['summary_title'], 'attr') ?>"
+                                                            tabindex="0"
+                                                            role="button"
+                                                            aria-label="Blok basligini duzenle"
+                                                        <?php endif; ?>
+                                                    ><?= esc($block['block_type_name'] ?? 'Block') ?></h6>
                                                 </div>
                                                 <div class="border rounded p-3 bg-light mb-3">
                                                     <div class="text-muted small mb-1">Kisa ozet</div>
-                                                    <div class="fw-medium"><?= esc($block['config_summary'] ?? 'Varsayilan ayarlar') ?></div>
+                                                    <div
+                                                        class="fw-medium"
+                                                        data-inline-bind="summary_text"
+                                                        data-inline-placeholder="<?= esc($block['config_summary'] ?? 'Varsayilan ayarlar', 'attr') ?>"
+                                                        <?php if (isset($inlineValueMap['summary_title'])): ?>
+                                                            data-inline-editable
+                                                            data-inline-field="summary_title"
+                                                            data-inline-input="text"
+                                                            data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                            data-inline-value-field="title_text"
+                                                            data-inline-value="<?= esc((string) $inlineValueMap['summary_title'], 'attr') ?>"
+                                                            tabindex="0"
+                                                            role="button"
+                                                            aria-label="Kisa ozeti duzenle"
+                                                        <?php endif; ?>
+                                                    ><?= esc($block['config_summary'] ?? 'Varsayilan ayarlar') ?></div>
                                                 </div>
 
                                                 <div class="border rounded p-3">
@@ -787,9 +837,49 @@ foreach ($blockTypes as $availableBlockType) {
                                                             <div class="card-body">
                                                                 <div class="row g-3 align-items-center">
                                                                     <div class="col-md-8">
-                                                                        <h6 class="mb-1"><?= esc($titleText !== '' ? $titleText : 'Hero Banner') ?></h6>
-                                                                        <p class="small mb-3 <?= $isDarkVariant ? 'text-white-50' : 'text-muted' ?>"><?= esc($subtitleText !== '' ? $subtitleText : 'One cikan mesaj ve call to action alani.') ?></p>
-                                                                        <span class="btn btn-sm <?= $isDarkVariant ? 'btn-light' : 'btn-primary' ?> disabled"><?= esc((string) ($config['button_text'] ?? 'Hemen Kesfet')) ?></span>
+                                                                        <h6
+                                                                            class="mb-1"
+                                                                            data-inline-bind="title_text"
+                                                                            data-inline-placeholder="Hero Banner"
+                                                                            data-inline-editable
+                                                                            data-inline-field="summary_title"
+                                                                            data-inline-input="text"
+                                                                            data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                            data-inline-value-field="title_text"
+                                                                            data-inline-value="<?= esc((string) ($inlineValueMap['summary_title'] ?? ''), 'attr') ?>"
+                                                                            tabindex="0"
+                                                                            role="button"
+                                                                            aria-label="Hero basligini duzenle"
+                                                                        ><?= esc($titleText !== '' ? $titleText : 'Hero Banner') ?></h6>
+                                                                        <p
+                                                                            class="small mb-3 <?= $isDarkVariant ? 'text-white-50' : 'text-muted' ?>"
+                                                                            data-inline-bind="body_text"
+                                                                            data-inline-placeholder="One cikan mesaj ve call to action alani."
+                                                                            data-inline-editable
+                                                                            data-inline-field="body_text"
+                                                                            data-inline-input="textarea"
+                                                                            data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                            data-inline-value-field="body_text"
+                                                                            data-inline-value="<?= esc((string) ($inlineValueMap['body_text'] ?? ''), 'attr') ?>"
+                                                                            tabindex="0"
+                                                                            role="button"
+                                                                            aria-label="Hero metnini duzenle"
+                                                                        ><?= esc($subtitleText !== '' ? $subtitleText : 'One cikan mesaj ve call to action alani.') ?></p>
+                                                                        <span class="btn btn-sm <?= $isDarkVariant ? 'btn-light' : 'btn-primary' ?> disabled">
+                                                                            <span
+                                                                                data-inline-bind="cta_text"
+                                                                                data-inline-placeholder="Hemen Kesfet"
+                                                                                data-inline-editable
+                                                                                data-inline-field="cta_text"
+                                                                                data-inline-input="text"
+                                                                                data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                                data-inline-value-field="cta_text"
+                                                                                data-inline-value="<?= esc((string) ($inlineValueMap['cta_text'] ?? ''), 'attr') ?>"
+                                                                                tabindex="0"
+                                                                                role="button"
+                                                                                aria-label="Hero buton metnini duzenle"
+                                                                            ><?= esc((string) ($config['button_text'] ?? 'Hemen Kesfet')) ?></span>
+                                                                        </span>
                                                                     </div>
                                                                     <div class="col-md-4">
                                                                         <div class="card border shadow-none mb-0">
@@ -814,8 +904,34 @@ foreach ($blockTypes as $availableBlockType) {
                                                             <div class="card-body">
                                                                 <div class="row g-3 align-items-center">
                                                                     <div class="col-md-8">
-                                                                        <h6 class="mb-1"><?= esc($titleText !== '' ? $titleText : 'Kampanya Banner') ?></h6>
-                                                                        <p class="small mb-0 <?= $isDarkVariant ? 'text-white-50' : 'text-muted' ?>"><?= esc($subtitleText !== '' ? $subtitleText : 'Kisa kampanya mesaji burada gorunur.') ?></p>
+                                                                        <h6
+                                                                            class="mb-1"
+                                                                            data-inline-bind="title_text"
+                                                                            data-inline-placeholder="Kampanya Banner"
+                                                                            data-inline-editable
+                                                                            data-inline-field="summary_title"
+                                                                            data-inline-input="text"
+                                                                            data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                            data-inline-value-field="title_text"
+                                                                            data-inline-value="<?= esc((string) ($inlineValueMap['summary_title'] ?? ''), 'attr') ?>"
+                                                                            tabindex="0"
+                                                                            role="button"
+                                                                            aria-label="Kampanya basligini duzenle"
+                                                                        ><?= esc($titleText !== '' ? $titleText : 'Kampanya Banner') ?></h6>
+                                                                        <p
+                                                                            class="small mb-0 <?= $isDarkVariant ? 'text-white-50' : 'text-muted' ?>"
+                                                                            data-inline-bind="body_text"
+                                                                            data-inline-placeholder="Kisa kampanya mesaji burada gorunur."
+                                                                            data-inline-editable
+                                                                            data-inline-field="body_text"
+                                                                            data-inline-input="textarea"
+                                                                            data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                            data-inline-value-field="body_text"
+                                                                            data-inline-value="<?= esc((string) ($inlineValueMap['body_text'] ?? ''), 'attr') ?>"
+                                                                            tabindex="0"
+                                                                            role="button"
+                                                                            aria-label="Kampanya mesajini duzenle"
+                                                                        ><?= esc($subtitleText !== '' ? $subtitleText : 'Kisa kampanya mesaji burada gorunur.') ?></p>
                                                                     </div>
                                                                     <div class="col-md-4 text-md-end">
                                                                         <?php if (trim((string) ($config['image_path'] ?? '')) !== ''): ?>
@@ -823,7 +939,21 @@ foreach ($blockTypes as $availableBlockType) {
                                                                                 <img src="<?= esc((string) $config['image_path'], 'attr') ?>" alt="Campaign media" class="img-fluid rounded object-fit-cover">
                                                                             </div>
                                                                         <?php endif; ?>
-                                                                        <span class="btn btn-sm <?= $isDarkVariant ? 'btn-light' : 'btn-danger' ?> disabled"><?= esc((string) ($config['button_text'] ?? 'Detay')) ?></span>
+                                                                        <span class="btn btn-sm <?= $isDarkVariant ? 'btn-light' : 'btn-danger' ?> disabled">
+                                                                            <span
+                                                                                data-inline-bind="cta_text"
+                                                                                data-inline-placeholder="Detay"
+                                                                                data-inline-editable
+                                                                                data-inline-field="cta_text"
+                                                                                data-inline-input="text"
+                                                                                data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                                data-inline-value-field="cta_text"
+                                                                                data-inline-value="<?= esc((string) ($inlineValueMap['cta_text'] ?? ''), 'attr') ?>"
+                                                                                tabindex="0"
+                                                                                role="button"
+                                                                                aria-label="Kampanya buton metnini duzenle"
+                                                                            ><?= esc((string) ($config['button_text'] ?? 'Detay')) ?></span>
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -843,7 +973,20 @@ foreach ($blockTypes as $availableBlockType) {
                                                                             <div class="<?= ($config['card_style'] ?? 'classic') === 'minimal' ? 'bg-light-secondary' : (($config['card_style'] ?? 'classic') === 'compact' ? 'bg-light-success' : 'bg-light') ?> rounded-2 p-3 text-center mb-2">
                                                                                 <i class="ti ti-book-2 text-primary"></i>
                                                                             </div>
-                                                                            <div class="small fw-semibold text-truncate"><?= esc($titleText !== '' ? $titleText : 'Cok Satanlar') ?></div>
+                                                                            <div
+                                                                                class="small fw-semibold text-truncate"
+                                                                                data-inline-bind="title_text"
+                                                                                data-inline-placeholder="Cok Satanlar"
+                                                                                data-inline-editable
+                                                                                data-inline-field="summary_title"
+                                                                                data-inline-input="text"
+                                                                                data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                                data-inline-value-field="title_text"
+                                                                                data-inline-value="<?= esc((string) ($inlineValueMap['summary_title'] ?? ''), 'attr') ?>"
+                                                                                tabindex="0"
+                                                                                role="button"
+                                                                                aria-label="Cok satanlar basligini duzenle"
+                                                                            ><?= esc($titleText !== '' ? $titleText : 'Cok Satanlar') ?></div>
                                                                             <div class="small text-muted"><?= esc((string) ($config['card_style'] ?? 'classic')) ?> / Urun <?= esc((string) ($i + 1)) ?></div>
                                                                         </div>
                                                                     </div>
@@ -865,7 +1008,20 @@ foreach ($blockTypes as $availableBlockType) {
                                                                             <div class="bg-light-primary rounded-2 p-3 text-center mb-2">
                                                                                 <i class="ti ti-photo text-primary"></i>
                                                                             </div>
-                                                                            <div class="small fw-semibold text-truncate"><?= esc($titleText !== '' ? $titleText : 'One Cikanlar') ?></div>
+                                                                            <div
+                                                                                class="small fw-semibold text-truncate"
+                                                                                data-inline-bind="title_text"
+                                                                                data-inline-placeholder="One Cikanlar"
+                                                                                data-inline-editable
+                                                                                data-inline-field="summary_title"
+                                                                                data-inline-input="text"
+                                                                                data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                                data-inline-value-field="title_text"
+                                                                                data-inline-value="<?= esc((string) ($inlineValueMap['summary_title'] ?? ''), 'attr') ?>"
+                                                                                tabindex="0"
+                                                                                role="button"
+                                                                                aria-label="Urun vitrini basligini duzenle"
+                                                                            ><?= esc($titleText !== '' ? $titleText : 'One Cikanlar') ?></div>
                                                                             <div class="small text-muted"><?= esc($variantText !== '' ? $variantText : 'grid') ?> gorunumu</div>
                                                                         </div>
                                                                     </div>
@@ -887,10 +1043,36 @@ foreach ($blockTypes as $availableBlockType) {
                                                                                     <i class="ti ti-user"></i>
                                                                                 </div>
                                                                             <?php endif; ?>
-                                                                            <div class="small fw-semibold"><?= esc($titleText !== '' ? $titleText : 'Yazar Seckisi') ?></div>
+                                                                            <div
+                                                                                class="small fw-semibold"
+                                                                                data-inline-bind="title_text"
+                                                                                data-inline-placeholder="Yazar Seckisi"
+                                                                                data-inline-editable
+                                                                                data-inline-field="summary_title"
+                                                                                data-inline-input="text"
+                                                                                data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                                data-inline-value-field="title_text"
+                                                                                data-inline-value="<?= esc((string) ($inlineValueMap['summary_title'] ?? ''), 'attr') ?>"
+                                                                                tabindex="0"
+                                                                                role="button"
+                                                                                aria-label="Yazar alani basligini duzenle"
+                                                                            ><?= esc($titleText !== '' ? $titleText : 'Yazar Seckisi') ?></div>
                                                                             <div class="small text-muted"><?= esc((string) ($config['layout_type'] ?? 'grid')) ?></div>
                                                                             <?php if (trim((string) ($config['subtitle'] ?? '')) !== ''): ?>
-                                                                                <div class="small text-muted mt-1 text-truncate"><?= esc((string) $config['subtitle']) ?></div>
+                                                                                <div
+                                                                                    class="small text-muted mt-1 text-truncate"
+                                                                                    data-inline-bind="body_text"
+                                                                                    data-inline-placeholder=""
+                                                                                    data-inline-editable
+                                                                                    data-inline-field="body_text"
+                                                                                    data-inline-input="textarea"
+                                                                                    data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                                    data-inline-value-field="body_text"
+                                                                                    data-inline-value="<?= esc((string) ($inlineValueMap['body_text'] ?? ''), 'attr') ?>"
+                                                                                    tabindex="0"
+                                                                                    role="button"
+                                                                                    aria-label="Yazar aciklamasini duzenle"
+                                                                                ><?= esc((string) $config['subtitle']) ?></div>
                                                                             <?php endif; ?>
                                                                         </div>
                                                                     </div>
@@ -909,7 +1091,20 @@ foreach ($blockTypes as $availableBlockType) {
                                                                         <?php else: ?>
                                                                             <i class="ti ti-category-2 d-block mb-2 text-primary"></i>
                                                                         <?php endif; ?>
-                                                                        <span class="small fw-semibold"><?= esc((string) ($config['label'] ?? 'Kategori')) ?> <?= esc((string) ($i + 1)) ?></span>
+                                                                        <span
+                                                                            class="small fw-semibold"
+                                                                            data-inline-bind="label_text"
+                                                                            data-inline-placeholder="Kategori"
+                                                                            data-inline-editable
+                                                                            data-inline-field="label_text"
+                                                                            data-inline-input="text"
+                                                                            data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                            data-inline-value-field="label_text"
+                                                                            data-inline-value="<?= esc((string) ($inlineValueMap['label_text'] ?? ''), 'attr') ?>"
+                                                                            tabindex="0"
+                                                                            role="button"
+                                                                            aria-label="Kategori etiketini duzenle"
+                                                                        ><?= esc((string) ($config['label'] ?? 'Kategori')) ?></span> <?= esc((string) ($i + 1)) ?>
                                                                         <div class="small text-muted"><?= esc((string) ($config['grid_type'] ?? '4_col')) ?></div>
                                                                     </div>
                                                                 </div>
@@ -922,15 +1117,55 @@ foreach ($blockTypes as $availableBlockType) {
                                                                     <div class="col-md-7">
                                                                         <div class="d-flex align-items-center gap-2 mb-1">
                                                                             <?php if ($showIcon): ?><i class="ti ti-mail fs-5"></i><?php endif; ?>
-                                                                            <h6 class="mb-0"><?= esc($titleText !== '' ? $titleText : 'Bultene Katil') ?></h6>
+                                                                            <h6
+                                                                                class="mb-0"
+                                                                                data-inline-bind="title_text"
+                                                                                data-inline-placeholder="Bultene Katil"
+                                                                                data-inline-editable
+                                                                                data-inline-field="summary_title"
+                                                                                data-inline-input="text"
+                                                                                data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                                data-inline-value-field="title_text"
+                                                                                data-inline-value="<?= esc((string) ($inlineValueMap['summary_title'] ?? ''), 'attr') ?>"
+                                                                                tabindex="0"
+                                                                                role="button"
+                                                                                aria-label="Bulten basligini duzenle"
+                                                                            ><?= esc($titleText !== '' ? $titleText : 'Bultene Katil') ?></h6>
                                                                         </div>
-                                                                        <p class="small <?= $variantText === 'primary' ? 'text-white-50' : 'text-muted' ?> mb-0"><?= esc($subtitleText !== '' ? $subtitleText : 'Kampanya ve yeni urun duyurulari icin kayit alani.') ?></p>
+                                                                        <p
+                                                                            class="small <?= $variantText === 'primary' ? 'text-white-50' : 'text-muted' ?> mb-0"
+                                                                            data-inline-bind="body_text"
+                                                                            data-inline-placeholder="Kampanya ve yeni urun duyurulari icin kayit alani."
+                                                                            data-inline-editable
+                                                                            data-inline-field="body_text"
+                                                                            data-inline-input="textarea"
+                                                                            data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                            data-inline-value-field="body_text"
+                                                                            data-inline-value="<?= esc((string) ($inlineValueMap['body_text'] ?? ''), 'attr') ?>"
+                                                                            tabindex="0"
+                                                                            role="button"
+                                                                            aria-label="Bulten aciklamasini duzenle"
+                                                                        ><?= esc($subtitleText !== '' ? $subtitleText : 'Kampanya ve yeni urun duyurulari icin kayit alani.') ?></p>
                                                                     </div>
                                                                     <div class="col-md-5">
                                                                         <div class="input-group input-group-sm">
                                                                             <?php if ($showIcon): ?><span class="input-group-text"><i class="ti ti-mail"></i></span><?php endif; ?>
                                                                             <input type="text" class="form-control" value="<?= esc((string) ($config['input_placeholder'] ?? 'email@example.com')) ?>" disabled>
-                                                                            <button class="btn <?= $variantText === 'primary' ? 'btn-light' : 'btn-primary' ?>" type="button" disabled><?= esc((string) ($config['button_text'] ?? 'Hemen Basla')) ?></button>
+                                                                            <span class="btn <?= $variantText === 'primary' ? 'btn-light' : 'btn-primary' ?> disabled">
+                                                                                <span
+                                                                                    data-inline-bind="cta_text"
+                                                                                    data-inline-placeholder="Hemen Basla"
+                                                                                    data-inline-editable
+                                                                                    data-inline-field="cta_text"
+                                                                                    data-inline-input="text"
+                                                                                    data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                                    data-inline-value-field="cta_text"
+                                                                                    data-inline-value="<?= esc((string) ($inlineValueMap['cta_text'] ?? ''), 'attr') ?>"
+                                                                                    tabindex="0"
+                                                                                    role="button"
+                                                                                    aria-label="Bulten buton metnini duzenle"
+                                                                                ><?= esc((string) ($config['button_text'] ?? 'Hemen Basla')) ?></span>
+                                                                            </span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -941,8 +1176,34 @@ foreach ($blockTypes as $availableBlockType) {
                                                             <div class="d-flex align-items-start gap-2">
                                                                 <?php if ($showIcon): ?><i class="ti ti-info-circle mt-1"></i><?php endif; ?>
                                                                 <div>
-                                                                    <div class="fw-semibold"><?= esc($titleText !== '' ? $titleText : 'Bilgilendirme') ?></div>
-                                                                    <div class="small mb-0"><?= esc((string) ($config['content'] ?? $subtitleText ?: 'Kisa duyuru veya operasyonel notice alani.')) ?></div>
+                                                                    <div
+                                                                        class="fw-semibold"
+                                                                        data-inline-bind="title_text"
+                                                                        data-inline-placeholder="Bilgilendirme"
+                                                                        data-inline-editable
+                                                                        data-inline-field="summary_title"
+                                                                        data-inline-input="text"
+                                                                        data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                        data-inline-value-field="title_text"
+                                                                        data-inline-value="<?= esc((string) ($inlineValueMap['summary_title'] ?? ''), 'attr') ?>"
+                                                                        tabindex="0"
+                                                                        role="button"
+                                                                        aria-label="Duyuru basligini duzenle"
+                                                                    ><?= esc($titleText !== '' ? $titleText : 'Bilgilendirme') ?></div>
+                                                                    <div
+                                                                        class="small mb-0"
+                                                                        data-inline-bind="body_text"
+                                                                        data-inline-placeholder="Kisa duyuru veya operasyonel notice alani."
+                                                                        data-inline-editable
+                                                                        data-inline-field="body_text"
+                                                                        data-inline-input="textarea"
+                                                                        data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                        data-inline-value-field="body_text"
+                                                                        data-inline-value="<?= esc((string) ($inlineValueMap['body_text'] ?? ''), 'attr') ?>"
+                                                                        tabindex="0"
+                                                                        role="button"
+                                                                        aria-label="Duyuru metnini duzenle"
+                                                                    ><?= esc((string) ($config['content'] ?? $subtitleText ?: 'Kisa duyuru veya operasyonel notice alani.')) ?></div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -950,7 +1211,20 @@ foreach ($blockTypes as $availableBlockType) {
                                                         <div class="card bg-light border-0 mb-0">
                                                             <div class="card-body">
                                                                 <div class="d-flex align-items-center justify-content-between mb-2">
-                                                                    <div class="fw-semibold"><?= esc($titleText !== '' ? $titleText : 'Slider') ?></div>
+                                                                    <div
+                                                                        class="fw-semibold"
+                                                                        data-inline-bind="title_text"
+                                                                        data-inline-placeholder="Slider"
+                                                                        data-inline-editable
+                                                                        data-inline-field="summary_title"
+                                                                        data-inline-input="text"
+                                                                        data-inline-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>"
+                                                                        data-inline-value-field="title_text"
+                                                                        data-inline-value="<?= esc((string) ($inlineValueMap['summary_title'] ?? ''), 'attr') ?>"
+                                                                        tabindex="0"
+                                                                        role="button"
+                                                                        aria-label="Slider basligini duzenle"
+                                                                    ><?= esc($titleText !== '' ? $titleText : 'Slider') ?></div>
                                                                     <div class="d-flex gap-2">
                                                                         <span class="rounded-circle bg-light-secondary" style="width:8px; height:8px;"></span>
                                                                         <span class="rounded-circle bg-primary" style="width:8px; height:8px;"></span>
@@ -987,7 +1261,7 @@ foreach ($blockTypes as $availableBlockType) {
                                                                         <i class="ti ti-layout-grid"></i>
                                                                     </div>
                                                                     <div>
-                                                                        <div class="fw-semibold"><?= esc($titleText !== '' ? $titleText : ($block['block_type_name'] ?? 'Block Preview')) ?></div>
+                                                                        <div class="fw-semibold" data-inline-bind="title_text" data-inline-placeholder="<?= esc((string) ($block['block_type_name'] ?? 'Block Preview'), 'attr') ?>"><?= esc($titleText !== '' ? $titleText : ($block['block_type_name'] ?? 'Block Preview')) ?></div>
                                                                         <div class="small text-muted">Bu block tipi icin sade builder preview gosterilir.</div>
                                                                     </div>
                                                                 </div>
@@ -1994,6 +2268,7 @@ foreach ($blockTypes as $availableBlockType) {
     var builderEditModeToggle = document.getElementById('builderEditModeToggle');
     var builderEditModeNotice = document.getElementById('builderEditModeNotice');
     var builderReorderStatus = document.getElementById('builderReorderStatus');
+    var builderInlineEditStatus = document.getElementById('builderInlineEditStatus');
     var builderCanvasList = document.getElementById('builderCanvasList');
     var builderCanvasCards = document.querySelectorAll('[data-builder-canvas-card]');
     var builderDragHandles = document.querySelectorAll('[data-builder-drag-handle]');
@@ -2010,6 +2285,7 @@ foreach ($blockTypes as $availableBlockType) {
     var editBlockCodeBadge = document.getElementById('editBlockCodeBadge');
     var mediaGroups = document.querySelectorAll('[data-media-group]');
     var reorderEndpoint = <?= json_encode(site_url('admin/pages/builder/blocks/reorder')) ?>;
+    var inlineUpdateEndpoint = <?= json_encode(site_url('admin/pages/builder/blocks/update')) ?>;
     var pageCode = <?= json_encode((string) ($page['code'] ?? '')) ?>;
     var versionId = <?= json_encode((string) ($draft['id'] ?? '')) ?>;
     var csrfTokenName = <?= json_encode(csrf_token()) ?>;
@@ -2018,6 +2294,7 @@ foreach ($blockTypes as $availableBlockType) {
     var draggedCard = null;
     var draggedHandle = null;
     var dragOriginOrder = [];
+    var activeInlineEditor = null;
     var oldEditState = {
       blockId: <?= json_encode($editBlockId) ?>,
       blockTypeCode: <?= json_encode($editBlockTypeCode) ?>,
@@ -2133,6 +2410,11 @@ foreach ($blockTypes as $availableBlockType) {
         builderEditModeNotice.classList.toggle('d-none', !isBuilderEditMode);
       }
 
+      if (!isBuilderEditMode) {
+        cancelActiveInlineEditor();
+        setBuilderInlineStatus('', 'muted');
+      }
+
       builderCanvasCards.forEach(function (card) {
         card.classList.toggle('border-warning', isBuilderEditMode);
         card.classList.toggle('shadow-sm', isBuilderEditMode);
@@ -2148,6 +2430,17 @@ foreach ($blockTypes as $availableBlockType) {
         handle.classList.toggle('d-inline-flex', isBuilderEditMode);
         handle.setAttribute('draggable', isBuilderEditMode ? 'true' : 'false');
       });
+
+      getInlineEditableTargets().forEach(function (target) {
+        target.classList.toggle('border', isBuilderEditMode);
+        target.classList.toggle('border-warning', isBuilderEditMode);
+        target.classList.toggle('border-opacity-50', isBuilderEditMode);
+        target.classList.toggle('rounded-2', isBuilderEditMode);
+        target.classList.toggle('px-1', isBuilderEditMode);
+        target.classList.toggle('bg-light', isBuilderEditMode);
+        target.classList.toggle('transition-base', isBuilderEditMode);
+        target.setAttribute('tabindex', isBuilderEditMode ? '0' : '-1');
+      });
     }
 
     function setBuilderReorderStatus(message, tone) {
@@ -2161,8 +2454,23 @@ foreach ($blockTypes as $availableBlockType) {
       builderReorderStatus.classList.add(tone === 'success' ? 'text-success' : (tone === 'muted' ? 'text-muted' : 'text-danger'));
     }
 
+    function setBuilderInlineStatus(message, tone) {
+      if (!builderInlineEditStatus) {
+        return;
+      }
+
+      builderInlineEditStatus.textContent = message || '';
+      builderInlineEditStatus.classList.toggle('d-none', !message);
+      builderInlineEditStatus.classList.remove('text-danger', 'text-success', 'text-muted');
+      builderInlineEditStatus.classList.add(tone === 'success' ? 'text-success' : (tone === 'muted' ? 'text-muted' : 'text-danger'));
+    }
+
     function getCanvasCards() {
       return builderCanvasList ? Array.prototype.slice.call(builderCanvasList.querySelectorAll('[data-builder-canvas-card]')) : [];
+    }
+
+    function getInlineEditableTargets() {
+      return builderCanvasList ? Array.prototype.slice.call(builderCanvasList.querySelectorAll('[data-inline-editable]')) : [];
     }
 
     function getCanvasOrder() {
@@ -2252,6 +2560,253 @@ foreach ($blockTypes as $availableBlockType) {
 
         setBuilderReorderStatus('', 'muted');
       });
+    }
+
+    function getInlineDisplayText(target, rawValue) {
+      var nextValue = typeof rawValue === 'string' ? rawValue.trim() : '';
+      if (nextValue !== '') {
+        return nextValue;
+      }
+
+      return target.getAttribute('data-inline-placeholder') || '';
+    }
+
+    function finishInlineEditorState(target) {
+      if (!target) {
+        return;
+      }
+
+      target.classList.remove('bg-light-warning', 'border-2', 'border-success', 'bg-light-success');
+      target.removeAttribute('data-inline-active');
+    }
+
+    function flashInlineSavedState(target) {
+      if (!target) {
+        return;
+      }
+
+      target.classList.add('border-success', 'bg-light-success');
+      window.setTimeout(function () {
+        target.classList.remove('border-success', 'bg-light-success');
+      }, 1200);
+    }
+
+    function cancelActiveInlineEditor() {
+      if (!activeInlineEditor) {
+        return;
+      }
+
+      activeInlineEditor.element.textContent = activeInlineEditor.originalDisplay;
+      activeInlineEditor.element.setAttribute('data-inline-value', activeInlineEditor.originalValue);
+      finishInlineEditorState(activeInlineEditor.element);
+      activeInlineEditor = null;
+    }
+
+    function syncInlineBindings(card, inlinePayload, configJson, summaryText) {
+      if (!card || !inlinePayload) {
+        return;
+      }
+
+      card.querySelectorAll('[data-inline-bind]').forEach(function (node) {
+        var binding = node.getAttribute('data-inline-bind') || '';
+        if (!Object.prototype.hasOwnProperty.call(inlinePayload, binding)) {
+          return;
+        }
+
+        node.textContent = getInlineDisplayText(node, inlinePayload[binding]);
+      });
+
+      card.querySelectorAll('[data-inline-editable]').forEach(function (node) {
+        var valueField = node.getAttribute('data-inline-value-field') || node.getAttribute('data-inline-bind') || '';
+        if (!valueField || !Object.prototype.hasOwnProperty.call(inlinePayload, valueField)) {
+          return;
+        }
+
+        node.setAttribute('data-inline-value', inlinePayload[valueField] || '');
+      });
+
+      var editButton = card.querySelector('.page-builder-edit-btn');
+      if (editButton) {
+        if (typeof summaryText === 'string' && summaryText !== '') {
+          editButton.setAttribute('data-block-summary', summaryText);
+        }
+        if (typeof configJson === 'string' && configJson !== '') {
+          editButton.setAttribute('data-block-config', configJson);
+        }
+
+        if (editBlockStateIdInput && editBlockStateIdInput.value === (card.getAttribute('data-block-id') || '')) {
+          applyEditButtonState(editButton);
+        }
+      }
+    }
+
+    function saveInlineEditor() {
+      if (!activeInlineEditor) {
+        return Promise.resolve();
+      }
+
+      var currentEditor = activeInlineEditor;
+      var nextValue = currentEditor.input.value;
+      var formData = new FormData();
+      formData.append(csrfTokenName, csrfHash);
+      formData.append('page_code', pageCode);
+      formData.append('block_id', currentEditor.blockId);
+      formData.append('inline_field', currentEditor.field);
+      formData.append('inline_value', nextValue);
+
+      currentEditor.saveButton.disabled = true;
+      currentEditor.cancelButton.disabled = true;
+      currentEditor.input.disabled = true;
+      setBuilderInlineStatus('', 'muted');
+
+      return fetch(inlineUpdateEndpoint, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      }).then(function (response) {
+        return response.json().catch(function () {
+          return null;
+        }).then(function (payload) {
+          return {
+            ok: response.ok,
+            payload: payload
+          };
+        });
+      }).then(function (result) {
+        if (result.payload && result.payload.csrf) {
+          csrfTokenName = result.payload.csrf.token || csrfTokenName;
+          csrfHash = result.payload.csrf.hash || csrfHash;
+          syncCsrfInputs();
+        }
+
+        if (!result.payload || !result.payload.success) {
+          throw new Error(result.payload && result.payload.error ? result.payload.error : 'Inline degisiklik kaydedilemedi.');
+        }
+
+        activeInlineEditor = null;
+        finishInlineEditorState(currentEditor.element);
+        syncInlineBindings(currentEditor.card, result.payload.inline || {}, result.payload.config_json || '', result.payload.summary || '');
+        flashInlineSavedState(currentEditor.element);
+        setBuilderInlineStatus('Degisiklik kaydedildi.', 'success');
+      }).catch(function (error) {
+        console.error(error);
+        activeInlineEditor = null;
+        currentEditor.element.textContent = currentEditor.originalDisplay;
+        currentEditor.element.setAttribute('data-inline-value', currentEditor.originalValue);
+        finishInlineEditorState(currentEditor.element);
+        setBuilderInlineStatus(error && error.message ? error.message : 'Inline degisiklik kaydedilemedi.', 'danger');
+        throw error;
+      });
+    }
+
+    function openInlineEditor(target) {
+      if (!isBuilderEditMode || !target) {
+        return;
+      }
+
+      if (activeInlineEditor && activeInlineEditor.element === target) {
+        return;
+      }
+
+      cancelActiveInlineEditor();
+
+      var inputType = target.getAttribute('data-inline-input') === 'textarea' ? 'textarea' : 'text';
+      var originalValue = target.getAttribute('data-inline-value') || '';
+      var originalDisplay = target.textContent || '';
+      var blockId = target.getAttribute('data-inline-block-id') || '';
+      var field = target.getAttribute('data-inline-field') || '';
+      var card = target.closest('[data-builder-canvas-card]');
+      var wrapper = document.createElement('div');
+      var input = document.createElement(inputType === 'textarea' ? 'textarea' : 'input');
+      var actionRow = document.createElement('div');
+      var saveButton = document.createElement('button');
+      var cancelButton = document.createElement('button');
+
+      if (!blockId || !field || !card) {
+        return;
+      }
+
+      wrapper.className = 'd-flex flex-column gap-2';
+      input.className = 'form-control form-control-sm';
+      if (inputType === 'textarea') {
+        input.setAttribute('rows', '3');
+      } else {
+        input.setAttribute('type', 'text');
+      }
+      input.value = originalValue;
+
+      actionRow.className = 'd-flex flex-wrap gap-2';
+
+      saveButton.type = 'button';
+      saveButton.className = 'btn btn-sm btn-primary';
+      saveButton.textContent = 'Kaydet';
+
+      cancelButton.type = 'button';
+      cancelButton.className = 'btn btn-sm btn-outline-secondary';
+      cancelButton.textContent = 'Iptal';
+
+      actionRow.appendChild(saveButton);
+      actionRow.appendChild(cancelButton);
+      wrapper.appendChild(input);
+      wrapper.appendChild(actionRow);
+
+      target.innerHTML = '';
+      target.appendChild(wrapper);
+      target.classList.add('bg-light-warning', 'border-2');
+      target.setAttribute('data-inline-active', '1');
+
+      activeInlineEditor = {
+        card: card,
+        element: target,
+        field: field,
+        blockId: blockId,
+        input: input,
+        saveButton: saveButton,
+        cancelButton: cancelButton,
+        originalDisplay: originalDisplay,
+        originalValue: originalValue
+      };
+
+      saveButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        saveInlineEditor().catch(function () {});
+      });
+
+      cancelButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        cancelActiveInlineEditor();
+      });
+
+      input.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          cancelActiveInlineEditor();
+          return;
+        }
+
+        if (inputType === 'textarea') {
+          if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            saveInlineEditor().catch(function () {});
+          }
+          return;
+        }
+
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          saveInlineEditor().catch(function () {});
+        }
+      });
+
+      window.setTimeout(function () {
+        input.focus();
+        if (typeof input.select === 'function') {
+          input.select();
+        }
+      }, 0);
     }
 
     function setFieldValue(form, name, value) {
@@ -2675,6 +3230,49 @@ foreach ($blockTypes as $availableBlockType) {
     }
 
     applyBuilderEditModeState(false);
+
+    if (builderCanvasList) {
+      builderCanvasList.addEventListener('click', function (event) {
+        if (!isBuilderEditMode) {
+          return;
+        }
+
+        if (event.target.closest('.page-builder-edit-btn, [data-builder-drag-handle], .dropdown, form')) {
+          return;
+        }
+
+        var editableTarget = event.target.closest('[data-inline-editable]');
+        if (!editableTarget || !builderCanvasList.contains(editableTarget)) {
+          return;
+        }
+
+        if (editableTarget.getAttribute('data-inline-active') === '1') {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        openInlineEditor(editableTarget);
+      });
+
+      builderCanvasList.addEventListener('keydown', function (event) {
+        if (!isBuilderEditMode) {
+          return;
+        }
+
+        var editableTarget = event.target.closest('[data-inline-editable]');
+        if (!editableTarget || editableTarget.getAttribute('data-inline-active') === '1') {
+          return;
+        }
+
+        if (event.key !== 'Enter' && event.key !== ' ') {
+          return;
+        }
+
+        event.preventDefault();
+        openInlineEditor(editableTarget);
+      });
+    }
 
     builderDragHandles.forEach(function (handle) {
       handle.addEventListener('dragstart', function (event) {

@@ -34,12 +34,27 @@
                 </div>
                 <?php if (! empty($version['page_code'])): ?>
                     <div class="d-flex gap-2">
+                        <?php if (($version['status'] ?? '') === 'PUBLISHED'): ?>
+                            <form action="<?= site_url('admin/pages/drafts/start-editing') ?>" method="post" class="d-inline">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="page_code" value="<?= esc($version['page_code']) ?>">
+                                <input type="hidden" name="version_id" value="<?= esc($version['id'] ?? '') ?>">
+                                <button type="submit" class="btn btn-sm btn-primary">Duzenlemeye Basla</button>
+                            </form>
+                        <?php else: ?>
                         <a href="<?= site_url('admin/pages/' . $version['page_code'] . '/builder') ?>" class="btn btn-sm btn-primary">Builder</a>
+                        <?php endif; ?>
                         <a href="<?= site_url('admin/pages/' . $version['page_code'] . '/drafts') ?>" class="btn btn-sm btn-outline-secondary">Draft Listesine Don</a>
                     </div>
                 <?php endif; ?>
             </div>
             <div class="card-body">
+                <?php if (session()->getFlashdata('draft_error')): ?>
+                    <div class="alert alert-danger mb-3"><?= esc(session()->getFlashdata('draft_error')) ?></div>
+                <?php endif; ?>
+                <?php if (session()->getFlashdata('success')): ?>
+                    <div class="alert alert-success mb-3"><?= esc(session()->getFlashdata('success')) ?></div>
+                <?php endif; ?>
                 <div class="row g-3">
                     <div class="col-md-3">
                         <div class="border rounded p-3 h-100">

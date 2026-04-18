@@ -372,6 +372,73 @@ class PageBuilderService
         return ['success' => true];
     }
 
+    public function updateInlineTextField(string $blockId, string $inlineField, string $value): array
+    {
+        if (! $this->blockTablesReady() || ! $this->blockTypeTablesReady()) {
+            return ['success' => false, 'error' => 'Builder tablolari hazir degil.'];
+        }
+
+        $block = $this->blockInstanceModel->findByIdDetailed($blockId);
+        if (! is_array($block) || ($block['owner_type'] ?? '') !== 'PAGE') {
+            return ['success' => false, 'error' => 'Guncellenecek block bulunamadi.'];
+        }
+
+        $version = $this->pageVersionService->findVersionDetail((string) ($block['owner_version_id'] ?? ''));
+        if (! is_array($version) || ! in_array((string) ($version['status'] ?? ''), ['DRAFT', 'SCHEDULED'], true)) {
+            return ['success' => false, 'error' => 'Yalnizca draft veya scheduled version uzerindeki blocklar guncellenebilir.'];
+        }
+
+        $blockType = $this->blockTypeModel->find((string) ($block['block_type_id'] ?? ''));
+        if (! is_array($blockType)) {
+            return ['success' => false, 'error' => 'Block type bilgisi bulunamadi.'];
+        }
+
+        $blockTypeCode = (string) ($blockType['code'] ?? '');
+        $editableFields = $this->inlineEditableFieldMap($blockTypeCode);
+        $fieldConfig = $editableFields[$inlineField] ?? null;
+
+        if (! is_array($fieldConfig)) {
+            return ['success' => false, 'error' => 'Bu alan inline duzenleme icin uygun degil.'];
+        }
+
+        $config = $this->decodeJson((string) ($block['config_json'] ?? ''));
+        if ($config === []) {
+            $config = $this->decodeJson((string) ($blockType['default_config_json'] ?? ''));
+        }
+
+        $normalizedValue = trim($value);
+        if (($fieldConfig['required'] ?? false) && $normalizedValue === '') {
+            return ['success' => false, 'error' => 'Bu alan bos birakilamaz.'];
+        }
+
+        $configKey = (string) ($fieldConfig['config_key'] ?? '');
+        if ($configKey === '') {
+            return ['success' => false, 'error' => 'Inline alan eslestirmesi bulunamadi.'];
+        }
+
+        $config[$configKey] = $normalizedValue;
+
+        if ($inlineField === 'cta_text') {
+            $config['button_text_preset'] = 'custom';
+        }
+
+        $configJson = json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $updated = $this->blockInstanceModel->update($blockId, [
+            'config_json' => $configJson,
+        ]);
+
+        if (! $updated) {
+            return ['success' => false, 'error' => 'Inline degisiklik kaydedilemedi.'];
+        }
+
+        return [
+            'success' => true,
+            'config_json' => $configJson,
+            'summary' => $this->summarizeConfig($blockTypeCode, $configJson),
+            'inline' => $this->buildInlineDisplayValues($blockTypeCode, $config),
+        ];
+    }
+
     public function reorderBlock(string $blockId, string $direction): array
     {
         $block = $this->blockInstanceModel->findByIdDetailed($blockId);
@@ -777,6 +844,70 @@ class PageBuilderService
             'category_grid' => trim((string) ($config['title'] ?? 'Kategori Grid')) . ' / ' . trim((string) ($config['grid_type'] ?? '4_col')),
             default => trim((string) ($config['title'] ?? $config['content'] ?? ($config['subtitle'] ?? 'Varsayilan ayarlar'))),
         };
+    }
+
+    private function inlineEditableFieldMap(string $blockTypeCode): array
+    {
+        return match ($blockTypeCode) {
+            'hero_banner' => [
+                'summary_title' => ['config_key' => 'title', 'required' => true],
+                'body_text' => ['config_key' => 'subtitle', 'required' => false],
+                'cta_text' => ['config_key' => 'button_text', 'required' => true],
+            ],
+            'campaign_banner' => [
+                'summary_title' => ['config_key' => 'title', 'required' => true],
+                'body_text' => ['config_key' => 'subtitle', 'required' => false],
+                'cta_text' => ['config_key' => 'button_text', 'required' => true],
+            ],
+            'author_showcase' => [
+                'summary_title' => ['config_key' => 'title', 'required' => true],
+                'body_text' => ['config_key' => 'subtitle', 'required' => false],
+            ],
+            'newsletter' => [
+                'summary_title' => ['config_key' => 'title', 'required' => true],
+                'body_text' => ['config_key' => 'subtitle', 'required' => false],
+                'cta_text' => ['config_key' => 'button_text', 'required' => true],
+            ],
+            'notice' => [
+                'summary_title' => ['config_key' => 'title', 'required' => true],
+                'body_text' => ['config_key' => 'content', 'required' => false],
+            ],
+            'category_grid' => [
+                'summary_title' => ['config_key' => 'title', 'required' => true],
+                'label_text' => ['config_key' => 'label', 'required' => false],
+            ],
+            'best_sellers', 'featured_products', 'category_grid', 'slider' => [
+                'summary_title' => ['config_key' => 'title', 'required' => true],
+            ],
+            default => [],
+        };
+    }
+
+    private function buildInlineDisplayValues(string $blockTypeCode, array $config): array
+    {
+        $bodyText = match ($blockTypeCode) {
+            'hero_banner', 'campaign_banner', 'author_showcase', 'newsletter' => trim((string) ($config['subtitle'] ?? '')),
+            'notice' => trim((string) ($config['content'] ?? '')),
+            default => '',
+        };
+
+        $ctaText = match ($blockTypeCode) {
+            'hero_banner', 'campaign_banner', 'newsletter' => trim((string) ($config['button_text'] ?? '')),
+            default => '',
+        };
+
+        $labelText = match ($blockTypeCode) {
+            'category_grid' => trim((string) ($config['label'] ?? '')),
+            default => '',
+        };
+
+        return [
+            'summary_text' => $this->summarizeConfig($blockTypeCode, json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)),
+            'title_text' => trim((string) ($config['title'] ?? '')),
+            'body_text' => $bodyText,
+            'cta_text' => $ctaText,
+            'label_text' => $labelText,
+        ];
     }
 
     private function builderOptions(): array

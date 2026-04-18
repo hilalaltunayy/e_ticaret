@@ -85,6 +85,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('pages/cart-builder/update', 'Admin\PageController::updateCartBuilder');
     $routes->post('pages/drafts/create', 'Admin\PageController::createDraft');
     $routes->post('pages/drafts/duplicate', 'Admin\PageController::duplicateDraft');
+    $routes->post('pages/drafts/start-editing', 'Admin\PageController::startEditingVersion');
     $routes->post('pages/drafts/archive', 'Admin\PageController::archiveDraft');
     $routes->post('pages/drafts/unpublish', 'Admin\PageController::unpublishVersion');
     $routes->post('pages/builder/draft/update', 'Admin\PageController::updateDraft');
