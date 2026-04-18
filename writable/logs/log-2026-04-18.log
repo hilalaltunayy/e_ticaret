@@ -212,3 +212,77 @@ in APPPATH\DTO\ProductDTO.php on line 19.
  8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
  9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
 10 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+DEBUG - 2026-04-18 11:06:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-04-18 11:08:13 --> TypeError: Cannot assign string to property App\DTO\ProductDTO::$id of type ?int
+[Method: GET, Route: products/detail/0930efb0-82f3-4cc6-8f78-e5df880b8025]
+in APPPATH\DTO\ProductDTO.php on line 19.
+ 1 APPPATH\Services\ProductsService.php(332): App\DTO\ProductDTO->__construct([...])
+ 2 APPPATH\Services\ProductsService.php(112): App\Services\ProductsService->hydrateProductDto([...])
+ 3 APPPATH\Controllers\ProductController.php(40): App\Services\ProductsService->getProductById('0930efb0-82f3-4cc6-8f78-e5df880b8025')
+ 4 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->detail('0930efb0-82f3-4cc6-8f78-e5df880b8025')
+ 5 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 6 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-04-18 11:09:53 --> TypeError: Cannot assign string to property App\DTO\ProductDTO::$id of type ?int
+[Method: GET, Route: products/list/basili]
+in APPPATH\DTO\ProductDTO.php on line 19.
+ 1 APPPATH\Services\ProductsService.php(332): App\DTO\ProductDTO->__construct([...])
+ 2 APPPATH\Services\ProductsService.php(49): App\Services\ProductsService->hydrateProductDto([...])
+ 3 [internal function]: App\Services\ProductsService->App\Services\{closure}([...])
+ 4 APPPATH\Services\ProductsService.php(49): array_map(Object(Closure), [...])
+ 5 APPPATH\Services\ProductsService.php(33): App\Services\ProductsService->getFilteredProducts('basili', 'all')
+ 6 APPPATH\Controllers\ProductController.php(67): App\Services\ProductsService->getProductsByType('basili')
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->listByType('basili')
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+DEBUG - 2026-04-18 11:10:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-04-18 11:10:24 --> TypeError: Cannot assign string to property App\DTO\ProductDTO::$id of type ?int
+[Method: GET, Route: products/list/dijital]
+in APPPATH\DTO\ProductDTO.php on line 19.
+ 1 APPPATH\Services\ProductsService.php(332): App\DTO\ProductDTO->__construct([...])
+ 2 APPPATH\Services\ProductsService.php(49): App\Services\ProductsService->hydrateProductDto([...])
+ 3 [internal function]: App\Services\ProductsService->App\Services\{closure}([...])
+ 4 APPPATH\Services\ProductsService.php(49): array_map(Object(Closure), [...])
+ 5 APPPATH\Services\ProductsService.php(33): App\Services\ProductsService->getFilteredProducts('dijital', 'all')
+ 6 APPPATH\Controllers\ProductController.php(67): App\Services\ProductsService->getProductsByType('dijital')
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->listByType('dijital')
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+CRITICAL - 2026-04-18 11:10:26 --> TypeError: Cannot assign string to property App\DTO\ProductDTO::$id of type ?int
+[Method: GET, Route: products/list/basili]
+in APPPATH\DTO\ProductDTO.php on line 19.
+ 1 APPPATH\Services\ProductsService.php(332): App\DTO\ProductDTO->__construct([...])
+ 2 APPPATH\Services\ProductsService.php(49): App\Services\ProductsService->hydrateProductDto([...])
+ 3 [internal function]: App\Services\ProductsService->App\Services\{closure}([...])
+ 4 APPPATH\Services\ProductsService.php(49): array_map(Object(Closure), [...])
+ 5 APPPATH\Services\ProductsService.php(33): App\Services\ProductsService->getFilteredProducts('basili', 'all')
+ 6 APPPATH\Controllers\ProductController.php(67): App\Services\ProductsService->getProductsByType('basili')
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\ProductController->listByType('basili')
+ 8 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\ProductController))
+ 9 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+DEBUG - 2026-04-18 11:11:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 11:16:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 11:16:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 11:16:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 11:16:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 11:16:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 11:16:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 11:16:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 12:28:02 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 13:04:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-18 13:04:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

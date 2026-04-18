@@ -2,45 +2,39 @@
 
 namespace App\Controllers;
 
-// DÄ±ÅŸarÄ±daki sÄ±nÄ±flarÄ± kullanabilmek iÃ§in 'use' ifadelerini ekliyoruz
 use App\Services\ProductsService;
-use App\DTO\ProductDTO;
+use App\Services\StorefrontHomeService;
 
 class ProductController extends BaseController
 {
-    // Servis katmanÄ±nÄ± saklayacaÄŸÄ±mÄ±z deÄŸiÅŸken
-    protected $productsService;
+    protected ProductsService $productsService;
+    protected StorefrontHomeService $storefrontHomeService;
 
-    /**
-     * Constructor (YapÄ±cÄ± Metot)
-     * HatayÄ± dÃ¼zeltmek iÃ§in dÄ±ÅŸarÄ±dan parametre almayÄ± bÄ±raktÄ±k.
-     */
     public function __construct()
     {
-        // Servisi manuel olarak burada oluÅŸturuyoruz
         $this->productsService = new ProductsService();
+        $this->storefrontHomeService = new StorefrontHomeService();
     }
 
-    /**
-     * ÃœrÃ¼nleri Listeleme EkranÄ±
-     */
     public function index()
     {
         $products = $this->productsService->getActiveProducts();
 
-        return view('site/products/index', [
+        return view('site/products/index', array_merge($this->storefrontViewData(), [
             'products' => $products,
-            'title'    => 'Kitap Dünyası | Tüm Kitaplar'
-        ]);
+            'categories' => [],
+            'selectedCat' => 'all',
+            'type' => '',
+            'title' => 'Tum Urunler',
+        ]));
     }
-
 
     public function detail($id)
     {
         $product = $this->productsService->getProductById($id);
 
         if ($product === null) {
-            return view('site/storefront/fallback_page', [
+            return view('site/storefront/fallback_page', array_merge($this->storefrontViewData(), [
                 'title' => 'Urun bulunamadi',
                 'pageTitle' => 'Urun bulunamadi',
                 'pageDescription' => 'Aradiginiz urun su anda goruntulenemiyor. Dilerseniz urun listesine donerek incelemeye devam edebilirsiniz.',
@@ -48,66 +42,63 @@ class ProductController extends BaseController
                 'primaryActionLabel' => 'Urun Listesine Don',
                 'secondaryActionUrl' => base_url('/'),
                 'secondaryActionLabel' => 'Ana Sayfaya Don',
-            ]);
+            ]));
         }
 
-        return view('site/products/product_detail', [
-            'product' => $product
-        ]);
+        return view('site/products/product_detail', array_merge($this->storefrontViewData(), [
+            'product' => $product,
+        ]));
     }
 
     public function selection()
     {
-        return view('site/products/product_selection');
+        return $this->index();
     }
 
     public function listByType($type)
     {
-        // 1. Service'e gidip "Bana sadece bu tipteki Ã¼rÃ¼nleri getir" diyoruz
-        $products = $this->productsService->getProductsByType($type);
-        $categories = $this->productsService->getCategoriesByType($type);
+        $products = $this->productsService->getProductsByType((string) $type);
+        $categories = $this->productsService->getCategoriesByType((string) $type);
 
-        // 2. Sayfa baÅŸlÄ±ÄŸÄ±nÄ± dinamik yapalÄ±m (Ã–rn: BasÄ±lÄ± ÃœrÃ¼nler Koleksiyonu)
-        $data = [
-            'products'    => $products,
-            'categories'  => $categories, // Bu satÄ±r butonlarÄ±n Ã§Ä±kmasÄ±nÄ± saÄŸlar
-            'selectedCat' => 'all',       // Ä°lk giriÅŸte "TÃœMÃœ" aktif gÃ¶rÃ¼nsÃ¼n
-            'type'        => $type,
-            'title'       => ($type == 'basili' ? 'BasılıKitaplar' : ($type == 'dijital' ? 'Dijital Kitaplar' : 'Ortak Paketler'))
-        ];
-
-        // HatÄ±rlarsan products_view.php iÃ§inde kategori butonlarÄ±nÄ± ve kartlarÄ± tasarlamÄ±ÅŸtÄ±k
-        return view('site/products/index', $data);
+        return view('site/products/index', array_merge($this->storefrontViewData(), [
+            'products' => $products,
+            'categories' => $categories,
+            'selectedCat' => 'all',
+            'type' => (string) $type,
+            'title' => $this->resolveTypeTitle((string) $type),
+        ]));
     }
 
-    public function listByCategory($type, $categoryId = null) {
-            // 1. Kategorileri de Ã§ekiyoruz (MenÃ¼de gÃ¶rÃ¼nmesi iÃ§in)
-            
-        $categories = $this->productsService->getCategoriesByType($type);
-        
-        // 2. FiltrelenmiÅŸ Ã¼rÃ¼nleri Ã§ek (AsÄ±l kitap kartlarÄ± burada geliyor!)
-         $products = $this->productsService->getFilteredProducts($type, $categoryId);
+    public function listByCategory($type, $categoryId = null)
+    {
+        $categories = $this->productsService->getCategoriesByType((string) $type);
+        $products = $this->productsService->getFilteredProducts((string) $type, $categoryId);
 
-        /*$data = [
-            'products'    => $products,
-            'categories'  => $categories, // EKSÄ°KTÄ°: Eklendi
-            'type'        => $type,
-            'selectedCat' => 'all', // VarsayÄ±lan olarak 'all' yaptÄ±k ki hepsi listelensin
-            'title'       => ($type == 'basili' ? 'BasÄ±lÄ± Kitaplar' : ($type == 'dijital' ? 'Dijital Kitaplar' : 'Ortak Paketler'))
-        ];
-
-        return view('products_view', $data);*/
-        return view('site/products/index', [
-        'type'        => $type,
-        'categories'  => $categories,
-        'products'    => $products, // Service'den gelen dolu liste
-        'selectedCat' => $categoryId,
-        'title'       => ($type == 'basili' ? 'Basılı Kitaplar' : 'Dijital Kitaplar')
-        ]);
+        return view('site/products/index', array_merge($this->storefrontViewData(), [
+            'type' => (string) $type,
+            'categories' => $categories,
+            'products' => $products,
+            'selectedCat' => $categoryId ?? 'all',
+            'title' => $this->resolveTypeTitle((string) $type),
+        ]));
     }
 
-    //Formun iÃ§indeki "Kategori" aÃ§Ä±lÄ±r listesini (dropdown) doldurabilmek iÃ§in
-    //veritabanÄ±ndaki tÃ¼m kategorileri Ã§ekip View'a gÃ¶ndermemiz gerekiyor.
-            
+    private function storefrontViewData(): array
+    {
+        return [
+            'headerMenuItems' => $this->storefrontHomeService->getHeaderMenuItems(),
+            'categoryNavItems' => $this->storefrontHomeService->getCategoryNavItems(),
+            'searchQuery' => '',
+        ];
+    }
 
+    private function resolveTypeTitle(string $type): string
+    {
+        return match ($type) {
+            'basili' => 'Basili Kitaplar',
+            'dijital' => 'Dijital Kitaplar',
+            'paket' => 'Ortak Paketler',
+            default => 'Tum Urunler',
+        };
+    }
 }

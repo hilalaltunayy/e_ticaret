@@ -1,4 +1,4 @@
-<?= $this->extend('layouts/main') ?>
+<?= $this->extend('site/layouts/main') ?>
 
 <?= $this->section('content') ?>
 <div class="pc-container">

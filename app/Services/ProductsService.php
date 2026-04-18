@@ -103,7 +103,13 @@ class ProductsService
 
     public function getProductById($id): ?ProductDTO
     {
-        $item = $this->model->find($id);
+        $item = $this->model->builder()
+            ->select('products.*, categories.category_name')
+            ->join('categories', 'categories.id = products.category_id', 'left')
+            ->where('products.id', (string) $id)
+            ->limit(1)
+            ->get()
+            ->getRowArray();
 
         if (!$item) {
             return null;
@@ -332,6 +338,7 @@ class ProductsService
         $dto = new ProductDTO($item);
         $dto->image = normalize_product_image_value($dto->image);
         $dto->image_url = $this->resolveProductImageUrl($dto->image);
+        $dto->detail_url = $dto->id !== null ? base_url('products/detail/' . $dto->id) : null;
 
         return $dto;
     }
