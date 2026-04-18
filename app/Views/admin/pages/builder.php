@@ -12,13 +12,69 @@ $scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i',
 $editBlockId = trim((string) old('edit_block_id'));
 $editBlockTypeCode = trim((string) old('edit_block_type_code'));
 $draftMetaVersionId = trim((string) old('draft_meta_version_id'));
-$variantBadgeClasses = [
-    'light' => 'bg-light-primary',
-    'dark' => 'bg-dark',
-    'soft' => 'bg-light-secondary',
-    'accent' => 'bg-light-warning',
-    'neutral' => 'bg-light',
+$blockPickerPresentation = [
+    'hero_banner' => [
+        'label' => 'Hero Alani',
+        'description' => 'Sayfanin ustunde dikkat ceken baslik, metin ve gorsel gostermek icin kullanilir.',
+        'preview' => 'hero',
+        'tone' => 'warning',
+    ],
+    'best_sellers' => [
+        'label' => 'En Cok Satanlar',
+        'description' => 'En cok ilgi goren urunleri listelemek icin kullanilir.',
+        'preview' => 'products',
+        'tone' => 'danger',
+    ],
+    'featured_products' => [
+        'label' => 'Urun Vitrini',
+        'description' => 'Secili urunleri vitrin gibi one cikarmak icin kullanilir.',
+        'preview' => 'showcase',
+        'tone' => 'primary',
+    ],
+    'campaign_banner' => [
+        'label' => 'Kampanya Banner',
+        'description' => 'Kampanya ve dikkat cekici mesaj gostermek icin kullanilir.',
+        'preview' => 'banner',
+        'tone' => 'success',
+    ],
+    'author_showcase' => [
+        'label' => 'Yazar Alani',
+        'description' => 'Yazar veya editor secimlerini one cikarmak icin kullanilir.',
+        'preview' => 'authors',
+        'tone' => 'info',
+    ],
+    'category_grid' => [
+        'label' => 'Kategori Alani',
+        'description' => 'Kategorileri kutulu veya gorselli sekilde gostermek icin kullanilir.',
+        'preview' => 'categories',
+        'tone' => 'secondary',
+    ],
+    'newsletter' => [
+        'label' => 'Bulten Alani',
+        'description' => 'E-posta toplamak ve ziyaretciyi kayda yonlendirmek icin kullanilir.',
+        'preview' => 'newsletter',
+        'tone' => 'primary',
+    ],
+    'notice' => [
+        'label' => 'Duyuru / Bilgilendirme Alani',
+        'description' => 'Kisa duyuru ve bilgilendirme mesajlari gostermek icin kullanilir.',
+        'preview' => 'notice',
+        'tone' => 'warning',
+    ],
+    'slider' => [
+        'label' => 'Kaydirma Alani',
+        'description' => 'Birden fazla gorsel veya mesaji sirayla gostermek icin kullanilir.',
+        'preview' => 'slider',
+        'tone' => 'dark',
+    ],
 ];
+$selectedBlockTypeCode = '';
+foreach ($blockTypes as $availableBlockType) {
+    if ((string) ($availableBlockType['id'] ?? '') === (string) $selectedBlockTypeId) {
+        $selectedBlockTypeCode = (string) ($availableBlockType['code'] ?? '');
+        break;
+    }
+}
 ?>
 
 <div class="page-header">
@@ -48,15 +104,10 @@ $variantBadgeClasses = [
                 <div class="row align-items-center g-3">
                     <div class="col-xl-7">
                         <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="avtar avtar-l bg-light-primary">
-                                <i class="ti ti-layout-dashboard fs-4"></i>
+                            <div class="rounded-3 bg-light-warning d-flex align-items-center justify-content-center flex-shrink-0" style="width: 64px; height: 64px;">
+                                <i class="ti ti-layout-grid fs-3 text-warning-emphasis"></i>
                             </div>
                             <div>
-                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                                    <span class="badge bg-light-primary"><?= esc($draftStatus) ?></span>
-                                    <span class="badge bg-light-secondary"><?= esc($page['code']) ?></span>
-                                    <span class="badge bg-light-success"><?= esc((string) $blockCount) ?> blok</span>
-                                </div>
                                 <h4 class="mb-1"><?= esc($page['name']) ?> Builder</h4>
                                 <p class="text-muted mb-0">Sayfa akisina uygun bloklar ekle, sira duzenle ve draft yerlesimini yonet.</p>
                             </div>
@@ -101,15 +152,26 @@ $variantBadgeClasses = [
         </div>
     </div>
 
-    <div class="col-xxl-4 col-xl-5">
+    <div class="col-12">
         <div class="card mb-4">
             <div class="card-header">
-                <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                     <div>
-                        <h5 class="mb-1">Block Kutuphanesi</h5>
-                        <p class="text-muted mb-0">Bu draft icin yeni blok ekle ve temel ayarlari yap.</p>
+                        <h5 class="mb-1">Builder Canvas</h5>
+                        <p class="text-muted mb-0">Bloklar sayfa akisina uygun sirayla burada yer alir.</p>
                     </div>
-                    <span class="badge bg-light-primary">Builder</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-light-primary"><?= esc((string) $blockCount) ?> blok</span>
+                        <button
+                            type="button"
+                            class="btn btn-primary btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#builderBlockPickerModal"
+                            aria-controls="builderBlockPickerModal"
+                        >
+                            <i class="ti ti-plus me-1"></i> Blok Ekle
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="card-body">
@@ -131,37 +193,12 @@ $variantBadgeClasses = [
                     </div>
                 <?php endif; ?>
 
-                <div class="alert alert-info">
-                    <div class="fw-semibold mb-1">Kullanim notu</div>
-                    <div class="small">Form alanlari block tipine gore degisir. Bu sprintte agir JS yerine temiz, hizli ve anlasilir bir builder deneyimi hedeflenir.</div>
-                </div>
-
-                <div class="alert <?= $builderPolicy['mode'] === 'full' ? 'alert-light border' : 'alert-warning' ?>">
-                    <div class="fw-semibold mb-1"><?= esc((string) ($builderPolicy['title'] ?? 'Block politikasi')) ?></div>
-                    <div class="small mb-0"><?= esc((string) ($builderPolicy['message'] ?? 'Bu sayfa turu icin block seti sinirlandirildi.')) ?></div>
-                </div>
-
-                <form action="<?= site_url('admin/pages/builder/blocks') ?>" method="post" id="pageBuilderForm">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
-                    <input type="hidden" name="version_id" value="<?= esc($draft['id']) ?>">
-
-                    <div class="border rounded p-3 mb-3">
-                        <label for="block_type_id" class="form-label fw-semibold">Block Type</label>
-                        <select name="block_type_id" id="block_type_id" class="form-select" required>
-                            <option value="">Block seciniz</option>
-                            <?php foreach ($blockTypes as $blockType): ?>
-                                <option
-                                    value="<?= esc($blockType['id']) ?>"
-                                    data-block-code="<?= esc($blockType['code']) ?>"
-                                    <?= $selectedBlockTypeId === $blockType['id'] ? 'selected' : '' ?>
-                                >
-                                    <?= esc($blockType['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <div class="form-text">Bu listede yalnizca <code><?= esc($page['code']) ?></code> sayfasi icin izinli block tipleri gosterilir.</div>
-                    </div>
+                <div class="d-none">
+                    <form action="<?= site_url('admin/pages/builder/blocks') ?>" method="post" id="pageBuilderForm">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                        <input type="hidden" name="version_id" value="<?= esc($draft['id']) ?>">
+                        <input type="hidden" name="block_type_id" id="block_type_id" value="<?= esc((string) $selectedBlockTypeId) ?>" required>
 
                     <div class="border rounded p-3 mb-3 d-none" data-block-form="hero_banner">
                         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -678,74 +715,16 @@ $variantBadgeClasses = [
                         </div>
                     </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="ti ti-plus me-1"></i> Canvas'a Block Ekle
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xxl-8 col-xl-7">
-        <div class="card mb-4 h-100">
-            <div class="card-header">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <h5 class="mb-1">Canvas Ozeti</h5>
-                        <p class="text-muted mb-0">Kutuphane ile draft canvas arasindaki akisi daha rahat yonetin.</p>
-                    </div>
-                    <span class="badge bg-light-primary">Live Draft</span>
+                        <button type="submit" class="d-none" id="pageBuilderSubmitButton">Canvas'a Blok Ekle</button>
+                    </form>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="border rounded p-3 h-100">
-                            <div class="text-muted small mb-1">Toplam Blok</div>
-                            <div class="fw-semibold"><?= esc((string) $blockCount) ?></div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="border rounded p-3 h-100">
-                            <div class="text-muted small mb-1">Akis</div>
-                            <div class="fw-semibold">Sirali Builder Canvas</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="border rounded p-3 h-100">
-                            <div class="text-muted small mb-1">Duzenleme</div>
-                            <div class="fw-semibold">Sag Panel Offcanvas</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="alert alert-light border mb-0 mt-3">
-                    <div class="small text-muted mb-0">Block kutuphanesi ust alanda arac paneli gibi kalir. Asil sayfa akisi ise asagidaki genis canvas bolumunde devam eder.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-12">
-        <div class="card mb-4">
-            <div class="card-header">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div>
-                        <h5 class="mb-1">Builder Canvas</h5>
-                        <p class="text-muted mb-0">Bloklar sayfa akisina uygun sirayla burada yer alir.</p>
-                    </div>
-                    <span class="badge bg-light-primary"><?= esc((string) $blockCount) ?> blok</span>
-                </div>
-            </div>
-            <div class="card-body">
                 <?php if ($blocks === []): ?>
                     <div class="text-center py-5">
                         <div class="avtar avtar-xl bg-light-primary mx-auto mb-3">
                             <i class="ti ti-layout-grid-add fs-2"></i>
                         </div>
                         <h5 class="mb-2">Canvas henuz bos</h5>
-                        <p class="text-muted mb-3">Soldaki block kutuphanesinden bir blok secerek bu draft icin ilk yerlesimi olustur.</p>
+                        <p class="text-muted mb-3">Sag ustteki blok ekleme butonunu kullanarak bu draft icin ilk yerlesimi olustur.</p>
                         <span class="badge bg-light-secondary">Ilk blok eklendiginde sayfa akisi burada gorunur</span>
                     </div>
                 <?php else: ?>
@@ -762,7 +741,6 @@ $variantBadgeClasses = [
                             $showIcon = ! array_key_exists('show_icon', $config) || (bool) $config['show_icon'];
                             $dataMode = trim((string) ($config['mode'] ?? 'auto'));
                             $selectedProductCount = is_array($config['selected_product_ids'] ?? null) ? count($config['selected_product_ids']) : 0;
-                            $variantBadgeClass = $variantBadgeClasses[$variantText] ?? 'bg-light';
                             $surfaceClass = match ($variantText) {
                                 'dark' => 'bg-dark text-white',
                                 'soft' => 'bg-light-secondary',
@@ -778,26 +756,16 @@ $variantBadgeClasses = [
                                                 <span class="fw-semibold"><?= esc((string) ($index + 1)) ?></span>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                                <div class="mb-2">
                                                     <h6 class="mb-0"><?= esc($block['block_type_name'] ?? 'Block') ?></h6>
-                                                    <span class="badge bg-light-primary"><?= esc($blockTypeCode ?: '-') ?></span>
-                                                    <span class="badge bg-light-secondary"><?= esc($block['zone']) ?></span>
-                                                    <span class="badge bg-light-success">Visible</span>
-                                                    <?php if (in_array($blockTypeCode, ['best_sellers', 'featured_products'], true)): ?>
-                                                        <span class="badge <?= $dataMode === 'manual' ? 'bg-light-warning' : 'bg-light-info' ?>"><?= esc($dataMode) ?></span>
-                                                    <?php endif; ?>
                                                 </div>
-                                                <p class="text-muted mb-2 small">Bu blok sayfa akisinda <?= esc((string) ($index + 1)) ?>. sirada yer aliyor.</p>
                                                 <div class="border rounded p-3 bg-light mb-3">
                                                     <div class="text-muted small mb-1">Kisa ozet</div>
                                                     <div class="fw-medium"><?= esc($block['config_summary'] ?? 'Varsayilan ayarlar') ?></div>
                                                 </div>
 
                                                 <div class="border rounded p-3">
-                                                    <div class="d-flex align-items-center justify-content-between mb-3">
-                                                        <div class="small fw-semibold text-muted">Mini Preview</div>
-                                                        <span class="badge <?= esc($variantBadgeClass, 'attr') ?>"><?= esc($variantText !== '' ? $variantText : 'default') ?></span>
-                                                    </div>
+                                                    <div class="small fw-semibold text-muted mb-3">Mini Preview</div>
 
                                                     <?php if ($blockTypeCode === 'hero_banner'): ?>
                                                         <div class="card <?= esc($surfaceClass, 'attr') ?> border-0 mb-0">
@@ -831,7 +799,6 @@ $variantBadgeClasses = [
                                                             <div class="card-body">
                                                                 <div class="row g-3 align-items-center">
                                                                     <div class="col-md-8">
-                                                                        <div class="badge bg-light text-dark mb-2">Campaign</div>
                                                                         <h6 class="mb-1"><?= esc($titleText !== '' ? $titleText : 'Kampanya Banner') ?></h6>
                                                                         <p class="small mb-0 <?= $isDarkVariant ? 'text-white-50' : 'text-muted' ?>"><?= esc($subtitleText !== '' ? $subtitleText : 'Kisa kampanya mesaji burada gorunur.') ?></p>
                                                                     </div>
@@ -848,7 +815,7 @@ $variantBadgeClasses = [
                                                         </div>
                                                     <?php elseif ($blockTypeCode === 'best_sellers'): ?>
                                                         <div class="d-flex align-items-center justify-content-between mb-2">
-                                                            <span class="badge <?= $dataMode === 'manual' ? 'bg-light-warning' : 'bg-light-info' ?>">
+                                                            <span class="small text-muted">
                                                                 <?= $dataMode === 'manual' ? esc($selectedProductCount . ' secili urun') : 'Otomatik veri akisi' ?>
                                                             </span>
                                                             <span class="small text-muted"><?= esc((string) ($config['sort_type'] ?? 'sales_desc')) ?></span>
@@ -863,7 +830,6 @@ $variantBadgeClasses = [
                                                                             </div>
                                                                             <div class="small fw-semibold text-truncate"><?= esc($titleText !== '' ? $titleText : 'Cok Satanlar') ?></div>
                                                                             <div class="small text-muted"><?= esc((string) ($config['card_style'] ?? 'classic')) ?> / Urun <?= esc((string) ($i + 1)) ?></div>
-                                                                            <?php if (! empty($config['show_badge'])): ?><span class="badge bg-light-warning mt-2">Cok Satan</span><?php endif; ?>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -871,8 +837,8 @@ $variantBadgeClasses = [
                                                         </div>
                                                     <?php elseif ($blockTypeCode === 'featured_products'): ?>
                                                         <div class="d-flex align-items-center justify-content-between mb-2">
-                                                            <span class="badge <?= $dataMode === 'manual' ? 'bg-light-warning' : 'bg-light-info' ?>">
-                                                                <?= $dataMode === 'manual' ? esc($selectedProductCount . ' secili urun') : 'Auto source: featured' ?>
+                                                            <span class="small text-muted">
+                                                                <?= $dataMode === 'manual' ? esc($selectedProductCount . ' secili urun') : 'One cikan urun akisi' ?>
                                                             </span>
                                                             <span class="small text-muted"><?= esc($variantText !== '' ? $variantText : 'grid') ?></span>
                                                         </div>
@@ -970,10 +936,10 @@ $variantBadgeClasses = [
                                                             <div class="card-body">
                                                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                                                     <div class="fw-semibold"><?= esc($titleText !== '' ? $titleText : 'Slider') ?></div>
-                                                                    <div class="d-flex gap-1">
-                                                                        <span class="badge bg-light-secondary">1</span>
-                                                                        <span class="badge bg-primary">2</span>
-                                                                        <span class="badge bg-light-secondary">3</span>
+                                                                    <div class="d-flex gap-2">
+                                                                        <span class="rounded-circle bg-light-secondary" style="width:8px; height:8px;"></span>
+                                                                        <span class="rounded-circle bg-primary" style="width:8px; height:8px;"></span>
+                                                                        <span class="rounded-circle bg-light-secondary" style="width:8px; height:8px;"></span>
                                                                     </div>
                                                                 </div>
                                                                 <div class="row g-2">
@@ -1028,38 +994,54 @@ $variantBadgeClasses = [
                                                 data-block-code="<?= esc($block['block_type_code'] ?? '') ?>"
                                                 data-block-summary="<?= esc($block['config_summary'] ?? 'Varsayilan ayarlar') ?>"
                                                 data-block-config="<?= esc($block['config_data_json'] ?? '{}', 'attr') ?>"
+                                                aria-label="Bloku duzenle"
+                                                title="Duzenle"
                                             >
-                                                <i class="ti ti-edit me-1"></i> Duzenle
+                                                <i class="ti ti-edit"></i>
                                             </button>
 
-                                            <form action="<?= site_url('admin/pages/builder/blocks/reorder') ?>" method="post">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
-                                                <input type="hidden" name="block_id" value="<?= esc($block['id']) ?>">
-                                                <input type="hidden" name="direction" value="up">
-                                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="Yukari">
-                                                    <i class="ti ti-arrow-up"></i>
+                                            <div class="dropdown">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-expanded="false"
+                                                    aria-label="Blok aksiyonlari"
+                                                    title="Aksiyonlar"
+                                                >
+                                                    <i class="ti ti-dots-vertical"></i>
                                                 </button>
-                                            </form>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <form action="<?= site_url('admin/pages/builder/blocks/reorder') ?>" method="post">
+                                                        <?= csrf_field() ?>
+                                                        <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                                                        <input type="hidden" name="block_id" value="<?= esc($block['id']) ?>">
+                                                        <input type="hidden" name="direction" value="up">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="ti ti-arrow-up me-2"></i> Uste tasi
+                                                        </button>
+                                                    </form>
 
-                                            <form action="<?= site_url('admin/pages/builder/blocks/reorder') ?>" method="post">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
-                                                <input type="hidden" name="block_id" value="<?= esc($block['id']) ?>">
-                                                <input type="hidden" name="direction" value="down">
-                                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="Asagi">
-                                                    <i class="ti ti-arrow-down"></i>
-                                                </button>
-                                            </form>
+                                                    <form action="<?= site_url('admin/pages/builder/blocks/reorder') ?>" method="post">
+                                                        <?= csrf_field() ?>
+                                                        <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                                                        <input type="hidden" name="block_id" value="<?= esc($block['id']) ?>">
+                                                        <input type="hidden" name="direction" value="down">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="ti ti-arrow-down me-2"></i> Alta tasi
+                                                        </button>
+                                                    </form>
 
-                                            <form action="<?= site_url('admin/pages/builder/blocks/delete') ?>" method="post">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
-                                                <input type="hidden" name="block_id" value="<?= esc($block['id']) ?>">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Sil">
-                                                    <i class="ti ti-trash"></i>
-                                                </button>
-                                            </form>
+                                                    <form action="<?= site_url('admin/pages/builder/blocks/delete') ?>" method="post">
+                                                        <?= csrf_field() ?>
+                                                        <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                                                        <input type="hidden" name="block_id" value="<?= esc($block['id']) ?>">
+                                                        <button type="submit" class="dropdown-item text-danger">
+                                                            <i class="ti ti-trash me-2"></i> Sil
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1067,6 +1049,148 @@ $variantBadgeClasses = [
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="builderBlockPickerModal" tabindex="-1" aria-labelledby="builderBlockPickerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-bottom">
+                <div>
+                    <h5 class="modal-title mb-0" id="builderBlockPickerModalLabel">Blok Ekle</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <?php foreach ($blockTypes as $blockType): ?>
+                        <?php
+                        $blockCode = (string) ($blockType['code'] ?? '');
+                        $cardPresentation = $blockPickerPresentation[$blockCode] ?? [];
+                        $cardLabel = (string) ($cardPresentation['label'] ?? ($blockType['name'] ?? 'Blok'));
+                        $cardDescription = (string) ($cardPresentation['description'] ?? 'Sayfa icinde hazir bir icerik alani eklemek icin kullanilir.');
+                        $cardPreview = (string) ($cardPresentation['preview'] ?? 'default');
+                        $cardTone = (string) ($cardPresentation['tone'] ?? 'primary');
+                        $isSelectedBlock = (string) $selectedBlockTypeId === (string) ($blockType['id'] ?? '');
+                        ?>
+                        <div class="col-md-6 col-xl-4">
+                            <button
+                                type="button"
+                                class="card border shadow-none text-start w-100 h-100 builder-block-picker-card<?= $isSelectedBlock ? ' border-primary shadow-sm' : '' ?>"
+                                data-builder-block-choice
+                                data-block-type-id="<?= esc((string) ($blockType['id'] ?? ''), 'attr') ?>"
+                                data-block-code="<?= esc($blockCode, 'attr') ?>"
+                                title="<?= esc($cardLabel, 'attr') ?>"
+                            >
+                                <div class="card-body d-flex flex-column">
+                                    <div class="rounded-3 bg-light-<?= esc($cardTone, 'attr') ?> border overflow-hidden mb-3 p-3" style="min-height: 120px;">
+                                        <?php if ($cardPreview === 'hero'): ?>
+                                            <div class="row g-2 h-100 align-items-center">
+                                                <div class="col-7">
+                                                    <div class="bg-white rounded-pill mb-2" style="height: 10px; width: 70%;"></div>
+                                                    <div class="bg-white rounded-pill mb-2" style="height: 8px; width: 92%; opacity: .85;"></div>
+                                                    <div class="bg-white rounded-pill mb-3" style="height: 8px; width: 78%; opacity: .65;"></div>
+                                                    <div class="bg-white rounded-pill" style="height: 24px; width: 52%;"></div>
+                                                </div>
+                                                <div class="col-5">
+                                                    <div class="h-100 rounded-3 bg-white bg-opacity-75"></div>
+                                                </div>
+                                            </div>
+                                        <?php elseif ($cardPreview === 'banner'): ?>
+                                            <div class="d-flex flex-column justify-content-between h-100">
+                                                <div class="bg-white rounded-pill" style="height: 10px; width: 58%;"></div>
+                                                <div class="bg-white rounded-3 w-100" style="height: 40px; opacity: .82;"></div>
+                                                <div class="d-flex justify-content-between align-items-end">
+                                                    <div class="bg-white rounded-pill" style="height: 22px; width: 34%;"></div>
+                                                    <div class="rounded-3 bg-white bg-opacity-75" style="width: 58px; height: 44px;"></div>
+                                                </div>
+                                            </div>
+                                        <?php elseif ($cardPreview === 'products' || $cardPreview === 'showcase'): ?>
+                                            <div class="bg-white rounded-pill mb-3" style="height: 10px; width: 52%;"></div>
+                                            <div class="row g-2">
+                                                <?php for ($previewIndex = 0; $previewIndex < 3; $previewIndex++): ?>
+                                                    <div class="col-4">
+                                                        <div class="rounded-3 bg-white bg-opacity-75 p-2">
+                                                            <div class="rounded-2 bg-light" style="height: 34px;"></div>
+                                                            <div class="bg-light rounded-pill mt-2" style="height: 7px; width: 88%;"></div>
+                                                            <div class="bg-light rounded-pill mt-2" style="height: 7px; width: 60%;"></div>
+                                                        </div>
+                                                    </div>
+                                                <?php endfor; ?>
+                                            </div>
+                                        <?php elseif ($cardPreview === 'categories'): ?>
+                                            <div class="row g-2">
+                                                <?php for ($previewIndex = 0; $previewIndex < 4; $previewIndex++): ?>
+                                                    <div class="col-6">
+                                                        <div class="rounded-3 bg-white bg-opacity-75 p-2 text-center">
+                                                            <div class="rounded-circle bg-light mx-auto mb-2" style="width: 26px; height: 26px;"></div>
+                                                            <div class="bg-light rounded-pill mx-auto" style="height: 7px; width: 70%;"></div>
+                                                        </div>
+                                                    </div>
+                                                <?php endfor; ?>
+                                            </div>
+                                        <?php elseif ($cardPreview === 'authors'): ?>
+                                            <div class="row g-2 h-100">
+                                                <?php for ($previewIndex = 0; $previewIndex < 3; $previewIndex++): ?>
+                                                    <div class="col-4">
+                                                        <div class="rounded-3 bg-white bg-opacity-75 p-2 text-center h-100">
+                                                            <div class="rounded-circle bg-light mx-auto mb-2" style="width: 30px; height: 30px;"></div>
+                                                            <div class="bg-light rounded-pill mx-auto mb-2" style="height: 7px; width: 80%;"></div>
+                                                            <div class="bg-light rounded-pill mx-auto" style="height: 6px; width: 58%;"></div>
+                                                        </div>
+                                                    </div>
+                                                <?php endfor; ?>
+                                            </div>
+                                        <?php elseif ($cardPreview === 'newsletter'): ?>
+                                            <div class="d-flex flex-column justify-content-between h-100">
+                                                <div class="bg-white rounded-pill" style="height: 10px; width: 56%;"></div>
+                                                <div class="bg-white rounded-pill" style="height: 8px; width: 86%; opacity: .78;"></div>
+                                                <div class="d-flex gap-2 align-items-center">
+                                                    <div class="rounded-pill bg-white bg-opacity-75 flex-grow-1" style="height: 28px;"></div>
+                                                    <div class="rounded-pill bg-white" style="width: 54px; height: 28px;"></div>
+                                                </div>
+                                            </div>
+                                        <?php elseif ($cardPreview === 'notice'): ?>
+                                            <div class="rounded-3 bg-white bg-opacity-75 p-3 h-100">
+                                                <div class="d-flex align-items-start gap-2">
+                                                    <div class="rounded-circle bg-light flex-shrink-0" style="width: 20px; height: 20px;"></div>
+                                                    <div class="w-100">
+                                                        <div class="bg-light rounded-pill mb-2" style="height: 8px; width: 44%;"></div>
+                                                        <div class="bg-light rounded-pill mb-2" style="height: 7px; width: 92%;"></div>
+                                                        <div class="bg-light rounded-pill" style="height: 7px; width: 68%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php elseif ($cardPreview === 'slider'): ?>
+                                            <div class="d-flex flex-column justify-content-between h-100">
+                                                <div class="rounded-3 bg-white bg-opacity-75 w-100" style="height: 58px;"></div>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="d-flex gap-2">
+                                                        <span class="rounded-circle bg-white" style="width: 8px; height: 8px;"></span>
+                                                        <span class="rounded-circle bg-white bg-opacity-75" style="width: 8px; height: 8px;"></span>
+                                                        <span class="rounded-circle bg-white bg-opacity-75" style="width: 8px; height: 8px;"></span>
+                                                    </div>
+                                                    <div class="rounded-pill bg-white" style="width: 40px; height: 8px;"></div>
+                                                </div>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="d-flex align-items-center justify-content-center h-100">
+                                                <div class="rounded-3 bg-white bg-opacity-75 p-3 text-center w-100">
+                                                    <i class="ti ti-layout-grid fs-2"></i>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="fw-semibold mb-1 text-truncate"><?= esc($cardLabel) ?></div>
+                                    <div class="small text-muted mb-0" style="line-height: 1.45; min-height: 42px;"><?= esc($cardDescription) ?></div>
+                                    <div class="mt-3 small fw-semibold text-primary">Secmek icin tiklayin</div>
+                                </div>
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -1846,7 +1970,12 @@ $variantBadgeClasses = [
     var linkTargetOptions = <?= json_encode($builderOptions['link_targets'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     var ctaPresetLabels = <?= json_encode($builderOptions['cta_presets'] ?? [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     var addForm = document.getElementById('pageBuilderForm');
-    var addSelect = document.getElementById('block_type_id');
+    var addBlockTypeInput = document.getElementById('block_type_id');
+    var blockPickerModalEl = document.getElementById('builderBlockPickerModal');
+    var blockPickerModal = blockPickerModalEl && window.bootstrap && window.bootstrap.Modal
+      ? window.bootstrap.Modal.getOrCreateInstance(blockPickerModalEl)
+      : null;
+    var blockChoiceButtons = document.querySelectorAll('[data-builder-block-choice]');
     var editForm = document.getElementById('blockEditForm');
     var draftOffcanvasEl = document.getElementById('draftMetaOffcanvas');
     var editOffcanvasEl = document.getElementById('blockEditOffcanvas');
@@ -1947,6 +2076,22 @@ $variantBadgeClasses = [
         var isFallback = target === 'fallback';
         var show = blockCode !== '' && (target === blockCode || (isFallback && !hasDirectSection));
         section.classList.toggle('d-none', !show);
+      });
+    }
+
+    function selectBuilderBlockType(blockTypeId, blockCode) {
+      if (!addForm || !addBlockTypeInput) {
+        return;
+      }
+
+      addBlockTypeInput.value = blockTypeId || '';
+      toggleScopedSections(addForm, 'data-block-form', blockCode || '');
+      syncFormEnhancements(addForm);
+
+      blockChoiceButtons.forEach(function (button) {
+        var isActive = button.getAttribute('data-block-type-id') === String(blockTypeId || '');
+        button.classList.toggle('border-primary', isActive);
+        button.classList.toggle('shadow-sm', isActive);
       });
     }
 
@@ -2342,18 +2487,27 @@ $variantBadgeClasses = [
       fillEditForm(config, blockCode);
     }
 
-    if (addSelect) {
-      addSelect.addEventListener('change', function () {
-        var selected = addSelect.options[addSelect.selectedIndex];
-        var blockCode = selected ? selected.getAttribute('data-block-code') : '';
-        toggleScopedSections(addForm, 'data-block-form', blockCode);
-        syncFormEnhancements(addForm);
-        refreshAllMediaGroups();
-      });
+    blockChoiceButtons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        var blockTypeId = button.getAttribute('data-block-type-id') || '';
+        var blockCode = button.getAttribute('data-block-code') || '';
 
-      var initialSelected = addSelect.options[addSelect.selectedIndex];
-      toggleScopedSections(addForm, 'data-block-form', initialSelected ? initialSelected.getAttribute('data-block-code') : '');
-    }
+        selectBuilderBlockType(blockTypeId, blockCode);
+        refreshAllMediaGroups();
+
+        if (blockPickerModal) {
+          blockPickerModal.hide();
+        }
+
+        if (typeof addForm.requestSubmit === 'function') {
+          addForm.requestSubmit();
+        } else {
+          addForm.submit();
+        }
+      });
+    });
+
+    selectBuilderBlockType(<?= json_encode((string) $selectedBlockTypeId) ?>, <?= json_encode($selectedBlockTypeCode) ?>);
 
     editButtons.forEach(function (button) {
       button.addEventListener('click', function () {
