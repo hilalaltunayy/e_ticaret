@@ -39,6 +39,18 @@ class ProductController extends BaseController
     {
         $product = $this->productsService->getProductById($id);
 
+        if ($product === null) {
+            return view('site/storefront/fallback_page', [
+                'title' => 'Urun bulunamadi',
+                'pageTitle' => 'Urun bulunamadi',
+                'pageDescription' => 'Aradiginiz urun su anda goruntulenemiyor. Dilerseniz urun listesine donerek incelemeye devam edebilirsiniz.',
+                'primaryActionUrl' => base_url('products/selection'),
+                'primaryActionLabel' => 'Urun Listesine Don',
+                'secondaryActionUrl' => base_url('/'),
+                'secondaryActionLabel' => 'Ana Sayfaya Don',
+            ]);
+        }
+
         return view('site/products/product_detail', [
             'product' => $product
         ]);

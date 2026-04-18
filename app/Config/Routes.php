@@ -14,6 +14,7 @@ $routes = Services::routes();
 // ACIK ALAN - HERKES ERISEBILIR
 // ----------------------------------------------------
 $routes->get('/', 'StorefrontController::home');
+$routes->get('yardim/(:segment)', 'StorefrontController::placeholder/$1');
 $routes->get('login', 'Login::index');
 $routes->post('login/auth', 'Login::auth');
 
@@ -35,7 +36,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     // ------------------------------------------------
     $routes->get('products', 'ProductController::index');
     //$routes->get('products/new', 'ProductController::new');
-    $routes->get('products/detail/(:num)', 'ProductController::detail/$1');
 
     //$routes->post('products/save', 'ProductController::save');
     //$routes->get('products/delete/(:num)', 'ProductController::delete/$1');
@@ -54,6 +54,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 // ----------------------------------------------------
 
 // En spesifik rota EN USTTE
+$routes->get('products/detail/(:segment)', 'ProductController::detail/$1');
 $routes->get('products/list/(:any)/(:any)', 'ProductController::listByCategory/$1/$2');
 
 // Tip bazli liste

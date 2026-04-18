@@ -82,6 +82,7 @@ class Products extends BaseController
             'authors' => $this->productsService->getAdminAuthors(),
             'types' => $this->productsService->getAdminTypes(),
             'validation' => session('validation'),
+            'productPlaceholderUrl' => $this->productsService->getProductPlaceholderUrl(),
         ]);
     }
 
@@ -151,9 +152,22 @@ class Products extends BaseController
             'is_active' => (int) ($input['is_active'] ?? 1),
         ];
 
+        $imageUpload = $this->productsService->storeProductImage($this->request->getFile('product_image'));
+        if (! ($imageUpload['success'] ?? false)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', (string) ($imageUpload['error'] ?? 'Kapak görseli yuklenemedi.'));
+        }
+        if (($imageUpload['uploaded'] ?? false) === true) {
+            $payload['image'] = (string) ($imageUpload['image'] ?? '');
+        }
+
         $createdId = $this->productsService->createProduct($payload);
 
         if (! $createdId) {
+            if (($imageUpload['uploaded'] ?? false) === true) {
+                $this->productsService->deleteProductImage((string) ($imageUpload['image'] ?? ''));
+            }
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Urun kaydedilemedi. Lutfen tekrar deneyin.');
@@ -179,6 +193,8 @@ class Products extends BaseController
             'product' => $product,
             'authors' => $this->productsService->getAdminAuthors(),
             'validation' => session('validation'),
+            'productImageUrl' => $this->productsService->resolveProductImageUrl((string) ($product['image'] ?? '')),
+            'productPlaceholderUrl' => $this->productsService->getProductPlaceholderUrl(),
         ]);
     }
 
@@ -226,10 +242,27 @@ class Products extends BaseController
             'updated_at' => date('Y-m-d H:i:s'),
         ];
 
+        $imageUpload = $this->productsService->storeProductImage($this->request->getFile('product_image'));
+        if (! ($imageUpload['success'] ?? false)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', (string) ($imageUpload['error'] ?? 'Kapak görseli yuklenemedi.'));
+        }
+        if (($imageUpload['uploaded'] ?? false) === true) {
+            $updateData['image'] = (string) ($imageUpload['image'] ?? '');
+        }
+
         if (! $productsModel->update($id, $updateData)) {
+            if (($imageUpload['uploaded'] ?? false) === true) {
+                $this->productsService->deleteProductImage((string) ($imageUpload['image'] ?? ''));
+            }
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Urun guncellenemedi.');
+        }
+
+        if (($imageUpload['uploaded'] ?? false) === true) {
+            $this->productsService->deleteProductImage((string) ($product['image'] ?? ''));
         }
 
         return redirect()->to(site_url('admin/products'))

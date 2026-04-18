@@ -2,9 +2,11 @@
 <?= $this->section('content') ?>
 
 <?php
+helper('product_media');
 $productId = (string) ($product['id'] ?? '');
 $returnToEditUrl = site_url('admin/products/edit/' . $productId);
 $selectedAuthorId = old('author_id', (string) (session()->getFlashdata('new_author_id') ?? ($product['author_id'] ?? '')));
+$currentImage = (string) ($product['image'] ?? '');
 ?>
 
 <div class="container-fluid">
@@ -30,7 +32,7 @@ $selectedAuthorId = old('author_id', (string) (session()->getFlashdata('new_auth
                     <h5 class="mb-0">Temel Bilgiler</h5>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="<?= site_url('admin/products/update/' . $productId) ?>">
+                    <form method="post" action="<?= site_url('admin/products/update/' . $productId) ?>" enctype="multipart/form-data">
                         <?= csrf_field() ?>
 
                         <div class="mb-3">
@@ -60,6 +62,21 @@ $selectedAuthorId = old('author_id', (string) (session()->getFlashdata('new_auth
                         <div class="mb-3">
                             <label class="form-label">Açıklama (opsiyonel)</label>
                             <textarea name="description" rows="4" class="form-control"><?= esc(old('description', (string) ($product['description'] ?? ''))) ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Kapak Gorseli</label>
+                            <input type="file" name="product_image" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                            <div class="form-text">Yeni bir gorsel secerseniz mevcut kapak gorseli guncellenir. Dosya secmezseniz mevcut gorsel korunur.</div>
+                            <div class="mt-3">
+                                <div class="border rounded p-3 d-inline-flex align-items-center gap-3 bg-light">
+                                    <img src="<?= esc($productImageUrl ?? product_image_url($currentImage)) ?>" alt="Mevcut kapak gorseli" style="width: 72px; height: 96px; object-fit: cover;" class="rounded border">
+                                    <div>
+                                        <div class="small fw-semibold mb-1">Mevcut gorsel</div>
+                                        <div class="small text-muted"><?= esc($currentImage !== '' ? $currentImage : 'Gorsel yuklenmemis, placeholder kullaniliyor.') ?></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">

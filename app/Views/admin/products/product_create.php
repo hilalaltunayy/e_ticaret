@@ -2,6 +2,7 @@
 <?= $this->section('content') ?>
 
 <?php
+helper('product_media');
 $typeOptions = ['basili', 'dijital', 'paket'];
 if (! empty($types ?? [])) {
     $typeOptions = [];
@@ -44,7 +45,7 @@ $returnToCreateUrl = site_url('admin/products/create');
                 <h5 class="mb-0">Ürün Bilgileri</h5>
             </div>
             <div class="card-body">
-                <form action="<?= site_url('admin/products/store') ?>" method="post">
+                <form action="<?= site_url('admin/products/store') ?>" method="post" enctype="multipart/form-data">
                     <?= csrf_field() ?>
 
                     <div class="row g-3">
@@ -118,6 +119,17 @@ $returnToCreateUrl = site_url('admin/products/create');
                         <div class="col-12">
                             <label class="form-label">Açıklama</label>
                             <textarea name="description" class="form-control" rows="4"><?= esc(old('description')) ?></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Kapak Gorseli</label>
+                            <input type="file" name="product_image" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                            <div class="form-text">JPG, JPEG, PNG veya WEBP formatinda ve en fazla 3 MB boyutunda kapak gorseli yukleyebilirsiniz.</div>
+                            <div class="mt-3">
+                                <div class="border rounded p-3 d-inline-flex align-items-center gap-3 bg-light">
+                                    <img src="<?= esc($productPlaceholderUrl ?? product_image_placeholder_url()) ?>" alt="Kapak gorseli placeholder" style="width: 72px; height: 96px; object-fit: cover;" class="rounded border">
+                                    <div class="small text-muted">Gorsel yuklenmezse frontend tarafinda placeholder kullanilir.</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

@@ -32,6 +32,7 @@ class StorefrontHomeService
         private ?CategoryModel $categoryModel = null,
         private ?AuthorModel $authorModel = null
     ) {
+        helper('product_media');
         $this->pageService = $this->pageService ?? new PageService();
         $this->pageVersionModel = $this->pageVersionModel ?? new PageVersionModel();
         $this->blockInstanceModel = $this->blockInstanceModel ?? new BlockInstanceModel();
@@ -64,9 +65,19 @@ class StorefrontHomeService
             'publishedVersion' => $publishedVersion,
             'blocks' => $blocks,
             'hasPublishedHome' => ! empty($blocks),
-            'headerMenuItems' => $this->buildHeaderMenuItems(),
-            'categoryNavItems' => $this->buildCategoryNavItems(),
+            'headerMenuItems' => $this->getHeaderMenuItems(),
+            'categoryNavItems' => $this->getCategoryNavItems(),
         ];
+    }
+
+    public function getHeaderMenuItems(): array
+    {
+        return $this->buildHeaderMenuItems();
+    }
+
+    public function getCategoryNavItems(): array
+    {
+        return $this->buildCategoryNavItems();
     }
 
     private function normalizeBlocks(array $blocks, string $searchQuery): array
@@ -98,6 +109,7 @@ class StorefrontHomeService
                 case 'hero_banner':
                 case 'campaign_banner':
                 case 'slider':
+                    $config['button_link'] = $this->normalizeFrontendLink($config['button_link'] ?? null);
                     $item['template'] = 'banner';
                     break;
 
@@ -130,6 +142,7 @@ class StorefrontHomeService
                     break;
             }
 
+            $item['config'] = $config;
             $normalized[] = $item;
         }
 
@@ -188,7 +201,7 @@ class StorefrontHomeService
                 'type' => $type,
                 'type_label' => $type !== '' ? ucfirst($type) : 'Kitap',
                 'detail_url' => base_url('products/detail/' . (string) ($product['id'] ?? '')),
-                'image_url' => $image !== '' ? base_url('assets/images/books/' . $image) : null,
+                'image_url' => product_image_url($image),
                 'initial' => strtoupper(substr((string) ($product['product_name'] ?? 'K'), 0, 1)),
             ];
         }, $items);
@@ -215,7 +228,7 @@ class StorefrontHomeService
             return [
                 'id' => (string) ($category['id'] ?? ''),
                 'name' => $name,
-                'url' => base_url('products'),
+                'url' => $this->buildCategoryListUrl((string) ($category['id'] ?? '')),
                 'initial' => strtoupper(substr($name, 0, 1)),
             ];
         }, array_slice($categories, 0, $limit));
@@ -332,21 +345,106 @@ class StorefrontHomeService
     {
         return [
             ['label' => 'Anasayfa', 'url' => base_url('/'), 'active' => true],
-            ['label' => 'Favorilerim', 'url' => '#'],
-            ['label' => 'Sepetim', 'url' => '#'],
-            ['label' => 'Siparislerim', 'url' => '#'],
-            ['label' => 'Hesabim', 'url' => '#'],
+            ['label' => 'Favorilerim', 'url' => base_url('yardim/favorilerim')],
+            ['label' => 'Sepetim', 'url' => base_url('yardim/sepetim')],
+            ['label' => 'Siparislerim', 'url' => base_url('yardim/siparislerim')],
+            ['label' => 'Hesabim', 'url' => base_url('yardim/hesabim')],
             ['label' => 'Giris Yap', 'url' => base_url('login')],
         ];
     }
 
     private function buildCategoryNavItems(): array
     {
-        return array_map(static function (string $label): array {
+        return array_map(function (string $label): array {
             return [
                 'label' => $label,
-                'url' => '#',
+                'url' => $this->buildCategoryNavUrl($label),
             ];
         }, self::CATEGORY_NAV_ITEMS);
+    }
+
+    private function buildCategoryNavUrl(string $label): string
+    {
+        $normalized = function_exists('mb_strtolower') ? mb_strtolower(trim($label), 'UTF-8') : strtolower(trim($label));
+
+        if ($normalized === 'basili') {
+            return base_url('products/list/basili');
+        }
+
+        if ($normalized === 'dijital') {
+            return base_url('products/list/dijital');
+        }
+
+        if ($normalized === 'cok satanlar' || $normalized === 'yeni gelenler' || $normalized === 'kampanyalar') {
+            return base_url('products/selection');
+        }
+
+        $category = $this->categoryModel->findByName($label);
+        if (is_array($category) && ! empty($category['id'])) {
+            return $this->buildCategoryListUrl((string) $category['id']);
+        }
+
+        return base_url('products/selection');
+    }
+
+    private function buildCategoryListUrl(string $categoryId): string
+    {
+        $normalizedCategoryId = trim($categoryId);
+        if ($normalizedCategoryId === '') {
+            return base_url('products/selection');
+        }
+
+        return base_url('products/list/' . $this->detectCategoryType($normalizedCategoryId) . '/' . $normalizedCategoryId);
+    }
+
+    private function detectCategoryType(string $categoryId): string
+    {
+        $products = $this->productsModel->where('category_id', $categoryId)
+            ->where('is_active', 1)
+            ->findAll();
+
+        foreach ($products as $product) {
+            $type = trim((string) ($product['type'] ?? ''));
+            if ($type !== '') {
+                return $type;
+            }
+        }
+
+        return 'basili';
+    }
+
+    private function normalizeFrontendLink(mixed $value, string $fallback = 'products/selection'): string
+    {
+        $link = trim((string) $value);
+
+        if ($link === '' || $link === '#' || str_starts_with(strtolower($link), 'javascript:')) {
+            return base_url($fallback);
+        }
+
+        if (preg_match('#^(https?:)?//#i', $link) === 1 || str_starts_with($link, 'mailto:') || str_starts_with($link, 'tel:')) {
+            return $link;
+        }
+
+        $normalized = ltrim($link, '/');
+        if ($normalized === '') {
+            return base_url('/');
+        }
+
+        $allowedPrefixes = [
+            'login',
+            'register',
+            'products/selection',
+            'products/list/',
+            'products/detail/',
+            'yardim/',
+        ];
+
+        foreach ($allowedPrefixes as $prefix) {
+            if (str_starts_with($normalized, $prefix)) {
+                return base_url($normalized);
+            }
+        }
+
+        return base_url($fallback);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\AuthorModel;
 use App\Models\CategoryModel;
 use App\Models\ProductsModel;
 use App\Models\TypeModel;
+use CodeIgniter\HTTP\Files\UploadedFile;
 
 class ProductsService
 {
@@ -15,6 +16,7 @@ class ProductsService
     public function __construct()
     {
         $this->model = new ProductsModel();
+        helper('product_media');
     }
 
     public function getActiveProducts(): array
@@ -22,7 +24,7 @@ class ProductsService
         $results = $this->model->getActiveProducts();
 
         return array_map(function ($item) {
-            return new ProductDTO($item);
+            return $this->hydrateProductDto($item);
         }, $results);
     }
 
@@ -44,7 +46,7 @@ class ProductsService
 
         $results = $this->model->getFilteredByTypeAndCategory($typeOrFilters, $categoryId);
 
-        return array_map(fn($item) => new ProductDTO($item), $results);
+        return array_map(fn ($item) => $this->hydrateProductDto($item), $results);
     }
 
     public function getAdminListWithCategory(): array
@@ -107,7 +109,7 @@ class ProductsService
             return null;
         }
 
-        return new ProductDTO($item);
+        return $this->hydrateProductDto($item);
     }
 
     public function getAdminCategories(): array
@@ -143,6 +145,75 @@ class ProductsService
     public function createProduct(array $data): bool|string
     {
         return $this->model->createProduct($data);
+    }
+
+    public function storeProductImage(?UploadedFile $file): array
+    {
+        if (! $file || $file->getError() === UPLOAD_ERR_NO_FILE) {
+            return ['success' => true, 'uploaded' => false, 'image' => null];
+        }
+
+        if (! $file->isValid()) {
+            return ['success' => false, 'error' => 'Kapak görseli yüklenemedi. Lutfen dosyayi tekrar secin.'];
+        }
+
+        $extension = strtolower((string) ($file->getClientExtension() ?: $file->guessExtension() ?: ''));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        if (! in_array($extension, $allowedExtensions, true)) {
+            return ['success' => false, 'error' => 'Kapak görseli olarak sadece JPG, JPEG, PNG veya WEBP dosyasi yukleyebilirsiniz.'];
+        }
+
+        $maxBytes = 3 * 1024 * 1024;
+        if ((int) $file->getSize() > $maxBytes) {
+            return ['success' => false, 'error' => 'Kapak görseli en fazla 3 MB olabilir.'];
+        }
+
+        $mimeType = strtolower((string) $file->getMimeType());
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (! in_array($mimeType, $allowedMimes, true)) {
+            return ['success' => false, 'error' => 'Yuklenen dosya gecerli bir gorsel degil.'];
+        }
+
+        $targetDirectory = product_upload_directory();
+        if (! is_dir($targetDirectory) && ! @mkdir($targetDirectory, 0775, true) && ! is_dir($targetDirectory)) {
+            return ['success' => false, 'error' => 'Kapak görseli klasoru olusturulamadi.'];
+        }
+
+        $randomName = $file->getRandomName();
+        $file->move($targetDirectory, $randomName, true);
+
+        return [
+            'success' => true,
+            'uploaded' => true,
+            'image' => 'uploads/products/' . $randomName,
+        ];
+    }
+
+    public function deleteProductImage(?string $image): void
+    {
+        $normalized = normalize_product_image_value($image);
+        if ($normalized === null || preg_match('#^https?://#i', $normalized) === 1) {
+            return;
+        }
+
+        if (! str_starts_with($normalized, 'uploads/products/')) {
+            return;
+        }
+
+        $absolutePath = rtrim(FCPATH, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $normalized);
+        if (is_file($absolutePath)) {
+            @unlink($absolutePath);
+        }
+    }
+
+    public function resolveProductImageUrl(?string $image): string
+    {
+        return product_image_url($image);
+    }
+
+    public function getProductPlaceholderUrl(): string
+    {
+        return product_image_placeholder_url();
     }
 
     public function getCriticalStockPrinted(int $threshold = 5): array
@@ -254,6 +325,15 @@ class ProductsService
     public function datatablesList(array $params): array
     {
         return $this->model->datatablesList($params);
+    }
+
+    private function hydrateProductDto(array $item): ProductDTO
+    {
+        $dto = new ProductDTO($item);
+        $dto->image = normalize_product_image_value($dto->image);
+        $dto->image_url = $this->resolveProductImageUrl($dto->image);
+
+        return $dto;
     }
 
     public function reduceStock(int $productId, int $quantity = 1, ?string $actorUserId = null): bool

@@ -11,6 +11,8 @@ class ProductDTO {
     public ?int $stock;
     public string $type; // basili, dijital, paket
     public ?string $image;
+    public ?string $image_url = null;
+    public ?string $created_at = null;
 
         public function __construct(array $data) {
         // null coalescing (??) kullanarak veri yoksa boş string atayalım ki hata vermesin
@@ -21,7 +23,8 @@ class ProductDTO {
         $this->description  = $data['description'] ?? null;
         $this->price  = (float)($data['price'] ?? 0);
         $this->type   = $data['type'] ?? 'basili';
-        $this->image  = $data['image'] ?? 'no-book.jpg';
+        $this->image  = $data['image'] ?? null;
+        $this->created_at = $data['created_at'] ?? null;
 
         // BURASI KRİTİK: Veritabanından stock_count olarak geliyor, biz stock olarak saklıyoruz
         // Hem dijital kontrolünü yapıyoruz hem de stock_count isimlendirmesini çözüyoruz

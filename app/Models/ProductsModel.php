@@ -42,7 +42,7 @@ class ProductsModel extends BaseUuidModel
         $builder = $this->where('type', $type)->where('is_active', 1);
 
         if ($categoryId !== null && $categoryId !== 'all') {
-            $builder->where('category_id', (int) $categoryId);
+            $builder->where('category_id', (string) $categoryId);
         }
 
         return $builder->findAll();
