@@ -160,7 +160,11 @@ foreach ($blockTypes as $availableBlockType) {
                         <h5 class="mb-1">Builder Canvas</h5>
                         <p class="text-muted mb-0">Bloklar sayfa akisina uygun sirayla burada yer alir.</p>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex flex-wrap align-items-center justify-content-end gap-3">
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="builderEditModeToggle">
+                            <label class="form-check-label small fw-semibold" for="builderEditModeToggle">Duzenleme Modu</label>
+                        </div>
                         <span class="badge bg-light-primary"><?= esc((string) $blockCount) ?> blok</span>
                         <button
                             type="button"
@@ -175,6 +179,10 @@ foreach ($blockTypes as $availableBlockType) {
                 </div>
             </div>
             <div class="card-body">
+                <div class="alert alert-light border py-2 px-3 d-none" id="builderEditModeNotice">
+                    <div class="small text-muted mb-0">Duzenleme modu acik. Bloklari tasiyarak siralayabilirsiniz.</div>
+                </div>
+                <div class="small text-danger mb-3 d-none" id="builderReorderStatus"></div>
                 <?php if (session()->getFlashdata('error')): ?>
                     <div class="alert alert-danger" role="alert">
                         <div class="d-flex align-items-start gap-2">
@@ -728,7 +736,7 @@ foreach ($blockTypes as $availableBlockType) {
                         <span class="badge bg-light-secondary">Ilk blok eklendiginde sayfa akisi burada gorunur</span>
                     </div>
                 <?php else: ?>
-                    <div class="d-flex flex-column gap-3">
+                    <div class="d-flex flex-column gap-3" id="builderCanvasList">
                         <?php foreach ($blocks as $index => $block): ?>
                             <?php
                             $blockTypeCode = (string) ($block['block_type_code'] ?? '');
@@ -748,14 +756,21 @@ foreach ($blockTypes as $availableBlockType) {
                                 default => 'bg-light-primary',
                             };
                             ?>
-                            <div class="card border shadow-none mb-0">
+                            <div class="card border shadow-none mb-0" data-builder-canvas-card data-block-id="<?= esc((string) ($block['id'] ?? ''), 'attr') ?>">
                                 <div class="card-body">
                                     <div class="d-flex flex-column flex-lg-row align-items-lg-start justify-content-between gap-3">
                                         <div class="d-flex align-items-start gap-3 flex-grow-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary d-none flex-shrink-0" data-builder-drag-handle aria-label="Bloku tasimak icin surukle" title="Siralamak icin surukle" draggable="false">
+                                                <i class="ti ti-grip-vertical"></i>
+                                            </button>
                                             <div class="avtar avtar-s bg-light-secondary">
-                                                <span class="fw-semibold"><?= esc((string) ($index + 1)) ?></span>
+                                                <span class="fw-semibold" data-builder-order-label><?= esc((string) ($index + 1)) ?></span>
                                             </div>
                                             <div class="flex-grow-1">
+                                                <div class="d-none align-items-center gap-2 small text-muted mb-2" data-builder-edit-hint>
+                                                    <i class="ti ti-grip-vertical"></i>
+                                                    <span>Siralamaya hazir</span>
+                                                </div>
                                                 <div class="mb-2">
                                                     <h6 class="mb-0"><?= esc($block['block_type_name'] ?? 'Block') ?></h6>
                                                 </div>
@@ -1976,6 +1991,13 @@ foreach ($blockTypes as $availableBlockType) {
       ? window.bootstrap.Modal.getOrCreateInstance(blockPickerModalEl)
       : null;
     var blockChoiceButtons = document.querySelectorAll('[data-builder-block-choice]');
+    var builderEditModeToggle = document.getElementById('builderEditModeToggle');
+    var builderEditModeNotice = document.getElementById('builderEditModeNotice');
+    var builderReorderStatus = document.getElementById('builderReorderStatus');
+    var builderCanvasList = document.getElementById('builderCanvasList');
+    var builderCanvasCards = document.querySelectorAll('[data-builder-canvas-card]');
+    var builderDragHandles = document.querySelectorAll('[data-builder-drag-handle]');
+    var builderEditHints = document.querySelectorAll('[data-builder-edit-hint]');
     var editForm = document.getElementById('blockEditForm');
     var draftOffcanvasEl = document.getElementById('draftMetaOffcanvas');
     var editOffcanvasEl = document.getElementById('blockEditOffcanvas');
@@ -1987,6 +2009,15 @@ foreach ($blockTypes as $availableBlockType) {
     var editBlockSummary = document.getElementById('editBlockSummary');
     var editBlockCodeBadge = document.getElementById('editBlockCodeBadge');
     var mediaGroups = document.querySelectorAll('[data-media-group]');
+    var reorderEndpoint = <?= json_encode(site_url('admin/pages/builder/blocks/reorder')) ?>;
+    var pageCode = <?= json_encode((string) ($page['code'] ?? '')) ?>;
+    var versionId = <?= json_encode((string) ($draft['id'] ?? '')) ?>;
+    var csrfTokenName = <?= json_encode(csrf_token()) ?>;
+    var csrfHash = <?= json_encode(csrf_hash()) ?>;
+    var isBuilderEditMode = false;
+    var draggedCard = null;
+    var draggedHandle = null;
+    var dragOriginOrder = [];
     var oldEditState = {
       blockId: <?= json_encode($editBlockId) ?>,
       blockTypeCode: <?= json_encode($editBlockTypeCode) ?>,
@@ -2092,6 +2123,134 @@ foreach ($blockTypes as $availableBlockType) {
         var isActive = button.getAttribute('data-block-type-id') === String(blockTypeId || '');
         button.classList.toggle('border-primary', isActive);
         button.classList.toggle('shadow-sm', isActive);
+      });
+    }
+
+    function applyBuilderEditModeState(enabled) {
+      isBuilderEditMode = enabled === true;
+
+      if (builderEditModeNotice) {
+        builderEditModeNotice.classList.toggle('d-none', !isBuilderEditMode);
+      }
+
+      builderCanvasCards.forEach(function (card) {
+        card.classList.toggle('border-warning', isBuilderEditMode);
+        card.classList.toggle('shadow-sm', isBuilderEditMode);
+      });
+
+      builderEditHints.forEach(function (hint) {
+        hint.classList.toggle('d-none', !isBuilderEditMode);
+        hint.classList.toggle('d-flex', isBuilderEditMode);
+      });
+
+      builderDragHandles.forEach(function (handle) {
+        handle.classList.toggle('d-none', !isBuilderEditMode);
+        handle.classList.toggle('d-inline-flex', isBuilderEditMode);
+        handle.setAttribute('draggable', isBuilderEditMode ? 'true' : 'false');
+      });
+    }
+
+    function setBuilderReorderStatus(message, tone) {
+      if (!builderReorderStatus) {
+        return;
+      }
+
+      builderReorderStatus.textContent = message || '';
+      builderReorderStatus.classList.toggle('d-none', !message);
+      builderReorderStatus.classList.remove('text-danger', 'text-success', 'text-muted');
+      builderReorderStatus.classList.add(tone === 'success' ? 'text-success' : (tone === 'muted' ? 'text-muted' : 'text-danger'));
+    }
+
+    function getCanvasCards() {
+      return builderCanvasList ? Array.prototype.slice.call(builderCanvasList.querySelectorAll('[data-builder-canvas-card]')) : [];
+    }
+
+    function getCanvasOrder() {
+      return getCanvasCards().map(function (card) {
+        return card.getAttribute('data-block-id') || '';
+      }).filter(function (id) {
+        return id !== '';
+      });
+    }
+
+    function refreshCanvasOrderLabels() {
+      getCanvasCards().forEach(function (card, index) {
+        var label = card.querySelector('[data-builder-order-label]');
+        if (label) {
+          label.textContent = String(index + 1);
+        }
+      });
+    }
+
+    function moveCanvasCard(targetIds) {
+      if (!builderCanvasList) {
+        return;
+      }
+
+      targetIds.forEach(function (id) {
+        var card = builderCanvasList.querySelector('[data-builder-canvas-card][data-block-id="' + id + '"]');
+        if (card) {
+          builderCanvasList.appendChild(card);
+        }
+      });
+
+      refreshCanvasOrderLabels();
+    }
+
+    function syncCsrfInputs() {
+      document.querySelectorAll('input[name="' + csrfTokenName + '"]').forEach(function (input) {
+        input.value = csrfHash;
+      });
+    }
+
+    function clearDragVisuals() {
+      getCanvasCards().forEach(function (card) {
+        card.classList.remove('opacity-50', 'border-primary', 'border-2');
+      });
+    }
+
+    function persistCanvasOrder() {
+      if (!builderCanvasList) {
+        return Promise.resolve();
+      }
+
+      var orderedIds = getCanvasOrder();
+      var formData = new FormData();
+      formData.append(csrfTokenName, csrfHash);
+      formData.append('page_code', pageCode);
+      formData.append('version_id', versionId);
+      orderedIds.forEach(function (id) {
+        formData.append('ordered_block_ids[]', id);
+      });
+
+      return fetch(reorderEndpoint, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      }).then(function (response) {
+        return response.json().catch(function () {
+          return null;
+        }).then(function (payload) {
+          return {
+            ok: response.ok,
+            payload: payload
+          };
+        });
+      }).then(function (result) {
+        if (result.payload && result.payload.csrf) {
+          csrfTokenName = result.payload.csrf.token || csrfTokenName;
+          csrfHash = result.payload.csrf.hash || csrfHash;
+          syncCsrfInputs();
+        }
+
+        if (!result.payload || !result.payload.success) {
+          throw new Error(result.payload && result.payload.error ? result.payload.error : 'Block sirasi guncellenemedi.');
+        }
+
+        setBuilderReorderStatus('', 'muted');
       });
     }
 
@@ -2508,6 +2667,104 @@ foreach ($blockTypes as $availableBlockType) {
     });
 
     selectBuilderBlockType(<?= json_encode((string) $selectedBlockTypeId) ?>, <?= json_encode($selectedBlockTypeCode) ?>);
+
+    if (builderEditModeToggle) {
+      builderEditModeToggle.addEventListener('change', function () {
+        applyBuilderEditModeState(builderEditModeToggle.checked);
+      });
+    }
+
+    applyBuilderEditModeState(false);
+
+    builderDragHandles.forEach(function (handle) {
+      handle.addEventListener('dragstart', function (event) {
+        if (!isBuilderEditMode) {
+          event.preventDefault();
+          return;
+        }
+
+        draggedHandle = handle;
+        draggedCard = handle.closest('[data-builder-canvas-card]');
+        dragOriginOrder = getCanvasOrder();
+        setBuilderReorderStatus('', 'muted');
+
+        if (!draggedCard || !event.dataTransfer) {
+          event.preventDefault();
+          return;
+        }
+
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', draggedCard.getAttribute('data-block-id') || '');
+        draggedCard.classList.add('opacity-50', 'border-primary', 'border-2');
+      });
+
+      handle.addEventListener('dragend', function () {
+        clearDragVisuals();
+
+        if (draggedCard) {
+          var updatedOrder = getCanvasOrder();
+          if (JSON.stringify(updatedOrder) !== JSON.stringify(dragOriginOrder)) {
+            persistCanvasOrder().catch(function (error) {
+              moveCanvasCard(dragOriginOrder);
+              setBuilderReorderStatus(error && error.message ? error.message : 'Block sirasi kaydedilemedi. Onceki sira geri yuklendi.', 'danger');
+            });
+          }
+        }
+
+        draggedCard = null;
+        draggedHandle = null;
+        dragOriginOrder = [];
+      });
+    });
+
+    getCanvasCards().forEach(function (card) {
+      card.addEventListener('dragover', function (event) {
+        if (!isBuilderEditMode || !draggedCard || draggedCard === card) {
+          return;
+        }
+
+        event.preventDefault();
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = 'move';
+        }
+
+        clearDragVisuals();
+        draggedCard.classList.add('opacity-50', 'border-primary', 'border-2');
+        card.classList.add('border-primary', 'border-2');
+
+        var cardRect = card.getBoundingClientRect();
+        var insertAfter = event.clientY > cardRect.top + (cardRect.height / 2);
+
+        if (insertAfter) {
+          if (card.nextSibling !== draggedCard) {
+            card.parentNode.insertBefore(draggedCard, card.nextSibling);
+          }
+        } else if (card.previousSibling !== draggedCard) {
+          card.parentNode.insertBefore(draggedCard, card);
+        }
+
+        refreshCanvasOrderLabels();
+      });
+
+      card.addEventListener('drop', function (event) {
+        if (!isBuilderEditMode || !draggedCard) {
+          return;
+        }
+
+        event.preventDefault();
+      });
+    });
+
+    if (builderCanvasList) {
+      builderCanvasList.addEventListener('dragleave', function (event) {
+        if (!builderCanvasList.contains(event.relatedTarget)) {
+          clearDragVisuals();
+          if (draggedCard) {
+            draggedCard.classList.add('opacity-50', 'border-primary', 'border-2');
+          }
+        }
+      });
+    }
 
     editButtons.forEach(function (button) {
       button.addEventListener('click', function () {

@@ -341,6 +341,17 @@ class PageController extends BaseController
         $pageCode = trim((string) $this->request->getPost('page_code'));
         $blockId = trim((string) $this->request->getPost('block_id'));
         $direction = trim((string) $this->request->getPost('direction'));
+        $orderedBlockIds = $this->request->getPost('ordered_block_ids');
+
+        if ($this->request->isAJAX() && is_array($orderedBlockIds)) {
+            $versionId = trim((string) $this->request->getPost('version_id'));
+            $result = $this->pageBuilderService->reorderBlocks($versionId, $orderedBlockIds);
+            $status = ($result['success'] ?? false) ? 200 : 422;
+
+            return $this->response
+                ->setStatusCode($status)
+                ->setJSON($this->withCsrf($result));
+        }
 
         $result = $this->pageBuilderService->reorderBlock($blockId, $direction);
 
@@ -437,5 +448,15 @@ class PageController extends BaseController
 
         return redirect()->to(site_url('admin/pages/' . $pageCode . '/builder'))
             ->with('success', 'Draft tekrar taslak durumuna alindi.');
+    }
+
+    private function withCsrf(array $payload): array
+    {
+        $payload['csrf'] = [
+            'token' => csrf_token(),
+            'hash' => csrf_hash(),
+        ];
+
+        return $payload;
     }
 }

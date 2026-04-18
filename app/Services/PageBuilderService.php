@@ -414,6 +414,43 @@ class PageBuilderService
         return ['success' => true];
     }
 
+    public function reorderBlocks(string $versionId, array $orderedBlockIds): array
+    {
+        $blocks = $this->blockInstanceModel->findByPageVersion($versionId);
+        if ($blocks === []) {
+            return ['success' => false, 'error' => 'Siralanacak block bulunamadi.'];
+        }
+
+        $currentIds = array_values(array_map(static fn (array $block): string => (string) ($block['id'] ?? ''), $blocks));
+        $orderedIds = array_values(array_filter(array_map(static fn ($id): string => trim((string) $id), $orderedBlockIds)));
+
+        sort($currentIds);
+        $sortedOrderedIds = $orderedIds;
+        sort($sortedOrderedIds);
+
+        if ($currentIds !== $sortedOrderedIds) {
+            return ['success' => false, 'error' => 'Gecerli bir block sirasi gonderilmedi.'];
+        }
+
+        $orderIndexes = array_values(array_map(static fn (array $block): int => (int) ($block['order_index'] ?? 0), $blocks));
+        sort($orderIndexes);
+
+        $db = db_connect();
+        $db->transStart();
+
+        foreach ($orderedIds as $index => $blockId) {
+            $this->blockInstanceModel->update($blockId, ['order_index' => $orderIndexes[$index] ?? $index]);
+        }
+
+        $db->transComplete();
+
+        if (! $db->transStatus()) {
+            return ['success' => false, 'error' => 'Block sirasi guncellenemedi.'];
+        }
+
+        return ['success' => true];
+    }
+
     public function updateDraftMeta(string $versionId, array $input): array
     {
         if (! $this->pageVersionService->tablesReady()) {
