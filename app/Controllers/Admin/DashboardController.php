@@ -24,7 +24,7 @@ class DashboardController extends BaseController
 
     public function index()
     {
-        $activeDashboard = $this->dashboardService->getActiveDashboard($this->actorId());
+        $activeDashboard = $this->dashboardService->getVisibleDashboard($this->actorId(), $this->actorRole());
         $builderBlocks = $this->dashboardBlockService->getBlocksForDashboard((string) ($activeDashboard['id'] ?? ''));
 
         return view('admin/dashboard/index', [
@@ -32,6 +32,7 @@ class DashboardController extends BaseController
             'builderDashboard' => $activeDashboard,
             'builderBlocks' => $this->dashboardDataSourceService->hydrateBlocks($builderBlocks),
             'builderBlockTypes' => $this->dashboardBlockService->getAvailableBlockTypes(),
+            'canManageDashboardBuilder' => $this->actorRole() === 'admin',
         ]);
     }
 
@@ -41,5 +42,12 @@ class DashboardController extends BaseController
         $id = trim((string) ($user['id'] ?? $user['user_id'] ?? ''));
 
         return $id === '' ? null : $id;
+    }
+
+    private function actorRole(): string
+    {
+        $user = session()->get('user') ?? [];
+
+        return strtolower(trim((string) ($user['role'] ?? session('role') ?? '')));
     }
 }

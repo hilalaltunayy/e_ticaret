@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Services\Admin\SettingsPermissionsService;
+use Config\Services;
 use DomainException;
 use Throwable;
 
@@ -18,6 +19,9 @@ class SettingsPermissionsController extends BaseController
     {
         $secretaries = $this->service->listSecretaries();
         $selectedUserId = trim((string) ($this->request->getGet('user_id') ?? ''));
+        if ($selectedUserId === '') {
+            $selectedUserId = trim((string) (session()->getFlashdata('selectedSecretaryId') ?? ''));
+        }
         if ($selectedUserId === '' && $secretaries !== []) {
             $selectedUserId = (string) ($secretaries[0]['id'] ?? '');
         }
@@ -38,7 +42,62 @@ class SettingsPermissionsController extends BaseController
             'selectedUserId' => $selectedUserId,
             'matrix' => $matrix,
             'error' => $error,
+            'validation' => session('validation'),
+            'openSecretaryModal' => (bool) session('openSecretaryModal'),
         ]);
+    }
+
+    public function createSecretary()
+    {
+        $returnUserId = trim((string) $this->request->getPost('return_user_id'));
+        $redirectUrl = site_url('admin/settings/permissions');
+        if ($returnUserId !== '') {
+            $redirectUrl .= '?user_id=' . rawurlencode($returnUserId);
+        }
+
+        $post = [
+            'username' => trim((string) $this->request->getPost('username')),
+            'email' => trim((string) $this->request->getPost('email')),
+            'password' => (string) $this->request->getPost('password'),
+            'password_confirm' => (string) $this->request->getPost('password_confirm'),
+            'status' => trim((string) $this->request->getPost('status')),
+        ];
+
+        $validator = Services::validation();
+        $validator->setRules([
+            'username' => 'required|min_length[3]|max_length[100]',
+            'email' => 'required|valid_email|max_length[100]|is_unique[users.email]',
+            'password' => 'required|min_length[6]|max_length[255]',
+            'password_confirm' => 'required|matches[password]',
+            'status' => 'required|in_list[active,suspended]',
+        ]);
+
+        if (! $validator->run($post)) {
+            return redirect()->to($redirectUrl)
+                ->withInput()
+                ->with('validation', $validator)
+                ->with('error', 'Lutfen form alanlarini kontrol edin.')
+                ->with('openSecretaryModal', true);
+        }
+
+        try {
+            $secretaryId = $this->service->createSecretary($post);
+
+            return redirect()
+                ->to(site_url('admin/settings/permissions') . '?user_id=' . rawurlencode($secretaryId))
+                ->with('success', 'Yeni sekreter basariyla olusturuldu.')
+                ->with('selectedSecretaryId', $secretaryId);
+        } catch (DomainException $e) {
+            return redirect()->to($redirectUrl)
+                ->withInput()
+                ->with('error', $e->getMessage())
+                ->with('openSecretaryModal', true);
+        } catch (Throwable) {
+            return redirect()->to($redirectUrl)
+                ->withInput()
+                ->with('error', 'Sekreter olusturulamadi.')
+                ->with('openSecretaryModal', true);
+        }
     }
 
     public function update()

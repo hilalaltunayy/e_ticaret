@@ -13,7 +13,7 @@ $routes = Services::routes();
 // ----------------------------------------------------
 // ACIK ALAN - HERKES ERISEBILIR
 // ----------------------------------------------------
-$routes->get('/', 'Login::index');
+$routes->get('/', 'StorefrontController::home');
 $routes->get('login', 'Login::index');
 $routes->post('login/auth', 'Login::auth');
 
@@ -71,8 +71,6 @@ $routes->post('products/update', 'ProductController::update');
 // ----------------------------------------------------
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 
-    // Admin Dashboard
-    $routes->get('dashboard', 'Admin\DashboardController::index');
     $routes->get('banners', 'Admin\Banners::index');
     $routes->post('banners/save', 'Admin\Banners::save');
     $routes->post('banners/toggle/(:segment)', 'Admin\Banners::toggle/$1');
@@ -105,16 +103,6 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('dashboard/blocks/store', 'Admin\DashboardBlockController::store');
     $routes->post('dashboard/blocks/update/(:segment)', 'Admin\DashboardBlockController::update/$1');
     $routes->post('dashboard/blocks/delete/(:segment)', 'Admin\DashboardBlockController::delete/$1');
-    $routes->get('stock', 'Admin\Stock::index');
-    $routes->get('shipping', 'Admin\Shipping::index');
-    $routes->get('shipping/tracking-template', 'Admin\Shipping::trackingTemplate');
-    $routes->get('shipping/templates/tracking-upload', 'Admin\Shipping::trackingUploadTemplate');
-    $routes->get('shipping/manifesto/download', 'Admin\Shipping::manifestoDownload');
-    $routes->post('shipping/bulk/labels', 'Admin\Shipping::bulkLabels');
-    $routes->post('shipping/bulk/barcodes', 'Admin\Shipping::bulkBarcodes');
-    $routes->post('shipping/bulk/manifest', 'Admin\Shipping::bulkManifest');
-    $routes->get('shipping/companies/create', 'Admin\ShippingCompanies::create');
-    $routes->post('shipping/companies/store', 'Admin\ShippingCompanies::store');
     $routes->get('marketing', 'Admin\Marketing::index');
     $routes->get('pricing', 'Admin\Pricing::index');
     $routes->get('pricing/rules', 'Admin\Pricing::rules');
@@ -124,41 +112,64 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('pricing/rules/update/(:segment)', 'Admin\Pricing::updateRule/$1');
     $routes->post('pricing/rules/toggle/(:segment)', 'Admin\Pricing::toggleRule/$1');
     $routes->post('pricing/rules/delete/(:segment)', 'Admin\Pricing::deleteRule/$1');
-    $routes->get('customers', 'Admin\Customers::index');
     $routes->get('automation', 'Admin\Automation::index');
+    $routes->get('settings', 'Admin\Settings::index');
+    $routes->get('settings/permissions', 'Admin\SettingsPermissionsController::index');
+    $routes->post('settings/permissions/update', 'Admin\SettingsPermissionsController::update');
+    $routes->post('settings/permissions/secretaries/create', 'Admin\SettingsPermissionsController::createSecretary');
+    // (ileride)
+    // $routes->get('users', 'Admin\Users::index');
+    // $routes->get('roles', 'Admin\Roles::index');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_dashboard'], function ($routes) {
+    $routes->get('dashboard', 'Admin\DashboardController::index');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_stock'], function ($routes) {
+    $routes->get('stock', 'Admin\Stock::index');
+    $routes->get('stock/moves', 'Admin\Stock::moves');
+    $routes->get('stock/move/(:segment)', 'Admin\StockMove::create/$1');
+    $routes->post('stock/move/(:segment)', 'Admin\StockMove::store/$1');
+    $routes->post('stock/deactivate/(:segment)', 'Admin\Stock::deactivate/$1');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_notifications'], function ($routes) {
     $routes->get('notifications', 'Admin\Notifications::index');
     $routes->post('notifications/test-email', 'Admin\Notifications::sendTestEmail');
     $routes->post('notifications/test-sms', 'Admin\Notifications::sendTestSms');
     $routes->post('notifications/templates/save', 'Admin\Notifications::saveTemplate');
     $routes->post('notifications/templates/send-test', 'Admin\Notifications::sendSavedTemplateTest');
-    $routes->get('settings', 'Admin\Settings::index');
-    $routes->get('settings/permissions', 'Admin\SettingsPermissionsController::index');
-    $routes->post('settings/permissions/update', 'Admin\SettingsPermissionsController::update');
-    $routes->get('stock/moves', 'Admin\Stock::moves');
-    $routes->get('stock/move/(:segment)', 'Admin\StockMove::create/$1');
-    $routes->post('stock/move/(:segment)', 'Admin\StockMove::store/$1');
-    $routes->post('stock/deactivate/(:segment)', 'Admin\Stock::deactivate/$1');
+});
 
-    // Products + API (admin only)
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_customers'], function ($routes) {
+    $routes->get('customers', 'Admin\Customers::index');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_products'], function ($routes) {
     $routes->get('products', 'Admin\Products::index');
     $routes->get('api/products', 'Admin\Products::datatables');
     $routes->get('products/create', 'Admin\Products::create');
     $routes->post('products/store', 'Admin\Products::store');
     $routes->get('products/edit/(:segment)', 'Admin\Products::edit/$1');
     $routes->post('products/update/(:segment)', 'Admin\Products::update/$1');
-    $routes->get('api/shipping', 'Admin\Shipping::datatables');
-
-
-    // Authors (admin only)
     $routes->get('authors/create', 'Admin\Products::createAuthor');
     $routes->post('authors/store', 'Admin\Products::storeAuthor');
-    // Categories (admin only)
     $routes->get('categories/create', 'Admin\Products::createCategory');
     $routes->post('categories/store', 'Admin\Products::storeCategory');
+});
 
-    // (ileride)
-    // $routes->get('users', 'Admin\Users::index');
-    // $routes->get('roles', 'Admin\Roles::index');
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_shipping'], function ($routes) {
+    $routes->get('shipping', 'Admin\Shipping::index');
+    $routes->get('shipping/tracking-template', 'Admin\Shipping::trackingTemplate');
+    $routes->get('shipping/templates/tracking-upload', 'Admin\Shipping::trackingUploadTemplate');
+    $routes->get('shipping/manifesto/download', 'Admin\Shipping::manifestoDownload');
+    $routes->post('shipping/bulk/labels', 'Admin\Shipping::bulkLabels');
+    $routes->post('shipping/bulk/barcodes', 'Admin\Shipping::bulkBarcodes');
+    $routes->post('shipping/bulk/manifest', 'Admin\Shipping::bulkManifest');
+    $routes->get('shipping/companies/create', 'Admin\ShippingCompanies::create');
+    $routes->post('shipping/companies/store', 'Admin\ShippingCompanies::store');
+    $routes->get('api/shipping', 'Admin\Shipping::datatables');
 });
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_shipping'], function ($routes) {

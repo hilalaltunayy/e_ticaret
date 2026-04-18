@@ -16,6 +16,10 @@ if (! is_array($permissions)) {
 
 $canManageOrders = ($roleName === 'admin') || in_array('manage_orders', $permissions, true);
 $canManageShipping = ($roleName === 'admin') || in_array('manage_shipping', $permissions, true);
+$canManageDashboard = ($roleName === 'admin') || in_array('manage_dashboard', $permissions, true);
+$canManageStock = ($roleName === 'admin') || in_array('manage_stock', $permissions, true);
+$canManageNotifications = ($roleName === 'admin') || in_array('manage_notifications', $permissions, true);
+$canManageCustomers = ($roleName === 'admin') || in_array('manage_customers', $permissions, true);
 $canManageCampaigns = ($roleName === 'admin')
     || in_array('manage_campaigns', $permissions, true)
     || in_array('manage_campaigns_engine', $permissions, true);
@@ -67,14 +71,16 @@ $canManageAuthz = ($roleName === 'admin');
         <li class="pc-item pc-caption">
           <label>Admin Erişim</label>
         </li>
-        <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
-            <span class="pc-micon">
-              <svg class="pc-icon"><use xlink:href="#custom-status-up"></use></svg>
-            </span>
-            <span class="pc-mtext">Dashboard</span>
-          </a>
-        </li>
+        <?php if ($canManageDashboard): ?>
+          <li class="pc-item">
+            <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+              <span class="pc-micon">
+                <svg class="pc-icon"><use xlink:href="#custom-status-up"></use></svg>
+              </span>
+              <span class="pc-mtext">Dashboard</span>
+            </a>
+          </li>
+        <?php endif; ?>
         <li class="pc-item">
           <a href="<?= site_url('admin/pages') ?>" class="pc-link<?= $isActive('admin/pages') ?>">
             <span class="pc-micon">
@@ -95,14 +101,16 @@ $canManageAuthz = ($roleName === 'admin');
             <span class="pc-mtext">Ürünler</span>
           </a>
         </li>
-        <li class="pc-item">
-          <a href="<?= site_url('admin/stock') ?>" class="pc-link<?= $isActive('admin/stock') ?>">
-            <span class="pc-micon">
-              <svg class="pc-icon"><use xlink:href="#custom-box-1"></use></svg>
-            </span>
-            <span class="pc-mtext">Stok Takip Paneli</span>
-          </a>
-        </li>
+        <?php if ($canManageStock): ?>
+          <li class="pc-item">
+            <a href="<?= site_url('admin/stock') ?>" class="pc-link<?= $isActive('admin/stock') ?>">
+              <span class="pc-micon">
+                <svg class="pc-icon"><use xlink:href="#custom-box-1"></use></svg>
+              </span>
+              <span class="pc-mtext">Stok Takip Paneli</span>
+            </a>
+          </li>
+        <?php endif; ?>
         <?php if ($canManageOrders): ?>
           <li class="pc-item">
             <a href="<?= site_url('admin/orders') ?>" class="pc-link<?= $isActive('admin/orders') ?>">
@@ -149,14 +157,16 @@ $canManageAuthz = ($roleName === 'admin');
             </a>
           </li>
         <?php endif; ?>
-        <li class="pc-item">
-          <a href="<?= site_url('admin/notifications') ?>" class="pc-link<?= $isActive('admin/notifications') ?>">
-            <span class="pc-micon">
-              <i class="ti ti-mail"></i>
-            </span>
-            <span class="pc-mtext">E-posta / Sms Gönderimi</span>
-          </a>
-        </li>
+        <?php if ($canManageNotifications): ?>
+          <li class="pc-item">
+            <a href="<?= site_url('admin/notifications') ?>" class="pc-link<?= $isActive('admin/notifications') ?>">
+              <span class="pc-micon">
+                <i class="ti ti-mail"></i>
+              </span>
+              <span class="pc-mtext">E-posta / Sms Gönderimi</span>
+            </a>
+          </li>
+        <?php endif; ?>
         <li class="pc-item">
           <a href="<?= site_url('admin/banners') ?>" class="pc-link<?= $isActive('admin/banners') ?>">
             <span class="pc-micon">
@@ -189,14 +199,16 @@ $canManageAuthz = ($roleName === 'admin');
         <li class="pc-item pc-caption">
           <label>Müşteri Yönetimi</label>
         </li>
-        <li class="pc-item">
-          <a href="<?= site_url('admin/customers') ?>" class="pc-link<?= $isActive('admin/customers') ?>">
-            <span class="pc-micon">
-              <i class="ti ti-users"></i>
-            </span>
-            <span class="pc-mtext">Müşteriler</span>
-          </a>
-        </li>
+        <?php if ($canManageCustomers): ?>
+          <li class="pc-item">
+            <a href="<?= site_url('admin/customers') ?>" class="pc-link<?= $isActive('admin/customers') ?>">
+              <span class="pc-micon">
+                <i class="ti ti-users"></i>
+              </span>
+              <span class="pc-mtext">Müşteriler</span>
+            </a>
+          </li>
+        <?php endif; ?>
         <li class="pc-item">
           <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
             <span class="pc-micon">
@@ -279,14 +291,16 @@ $canManageAuthz = ($roleName === 'admin');
         <li class="pc-item pc-caption">
           <label>Sistem</label>
         </li>
-        <li class="pc-item">
-          <a href="<?= site_url('admin/notifications') ?>" class="pc-link<?= $isActive('admin/notifications') ?>">
-            <span class="pc-micon">
-              <i class="ti ti-bell"></i>
-            </span>
-            <span class="pc-mtext">Bildirim Yönetimi</span>
-          </a>
-        </li>
+        <?php if ($canManageNotifications): ?>
+          <li class="pc-item">
+            <a href="<?= site_url('admin/notifications') ?>" class="pc-link<?= $isActive('admin/notifications') ?>">
+              <span class="pc-micon">
+                <i class="ti ti-bell"></i>
+              </span>
+              <span class="pc-mtext">Bildirim Yönetimi</span>
+            </a>
+          </li>
+        <?php endif; ?>
         <li class="pc-item">
           <a href="<?= site_url('admin/settings') ?>" class="pc-link<?= $isActive('admin/settings') ?>">
             <span class="pc-micon">

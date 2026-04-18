@@ -12,6 +12,7 @@ $builderBlockEditId = (string) (session('dashboard_block_edit_id') ?? '');
 $builderBlockEditOld = is_array(session('dashboard_block_edit_old') ?? null) ? session('dashboard_block_edit_old') : [];
 $builderBlockTypeCount = count($builderBlockTypes);
 $builderBlockCount = count($builderBlocks);
+$canManageDashboardBuilder = (bool) ($canManageDashboardBuilder ?? false);
 $selectedBlockTypeId = (string) old('block_type_id', '');
 $selectedBlockTypeCode = '';
 $builderCharts = [];
@@ -206,6 +207,7 @@ foreach ($builderBlocks as $builderBlock) {
           </div>
           <div class="d-flex align-items-center gap-2">
             <span class="badge bg-light-primary text-primary"><?= esc($builderBlockTypeCount) ?> blok tipi</span>
+            <?php if ($canManageDashboardBuilder): ?>
             <button
               type="button"
               class="btn btn-outline-primary btn-sm"
@@ -222,6 +224,9 @@ foreach ($builderBlocks as $builderBlock) {
             >
               Yeni Kart Ekle
             </button>
+            <?php else: ?>
+              <span class="badge bg-light-secondary text-secondary">Goruntuleme modu</span>
+            <?php endif; ?>
           </div>
         </div>
         <div class="card-body">
@@ -233,9 +238,13 @@ foreach ($builderBlocks as $builderBlock) {
               <?= !empty($builderDashboard['name']) ? esc($builderDashboard['name']) : 'Dashboard builder kaydı henüz yüklenmedi.' ?>
             </span>
             <span class="text-muted small">Toplam blok: <?= esc($builderBlockCount) ?></span>
+            <?php if ($canManageDashboardBuilder): ?>
             <span class="badge bg-light-warning text-warning" id="dashboardBuilderEditBadge">Düzenleme modu kapalı</span>
+            <?php endif; ?>
           </div>
+          <?php if ($canManageDashboardBuilder): ?>
           <div id="dashboardBuilderReorderStatus" class="dashboard-builder-status small text-muted mb-3"></div>
+          <?php endif; ?>
 
           <?php if (empty($builderBlocks)): ?>
             <div class="border rounded-3 bg-light-subtle p-4 text-center">
@@ -315,6 +324,7 @@ foreach ($builderBlocks as $builderBlock) {
 
                         <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
                           <div class="small text-muted"><?= esc((string) ($render['subtitle'] ?? '')) ?></div>
+                          <?php if ($canManageDashboardBuilder): ?>
                           <div class="d-flex flex-wrap gap-2">
                             <button
                               type="button"
@@ -331,6 +341,7 @@ foreach ($builderBlocks as $builderBlock) {
                             </form>
                             <button type="button" class="btn btn-sm btn-outline-secondary" title="Tasima akisi bir sonraki sprintte acilacak." disabled>Taşı</button>
                           </div>
+                          <?php endif; ?>
                         </div>
 
                         <?php if (!empty($render['message'])): ?>
@@ -352,6 +363,7 @@ foreach ($builderBlocks as $builderBlock) {
                             <span class="badge <?= $isVisible ? 'bg-light-success text-success' : 'bg-light-secondary text-secondary' ?>">
                               <?= $isVisible ? 'Görünür' : 'Gizli' ?>
                             </span>
+                            <?php if ($canManageDashboardBuilder): ?>
                             <div class="d-flex gap-1">
                               <button
                                 type="button"
@@ -368,6 +380,7 @@ foreach ($builderBlocks as $builderBlock) {
                               </form>
                               <button type="button" class="btn btn-sm btn-outline-secondary" title="Tasima akisi bir sonraki sprintte acilacak." disabled>Taşı</button>
                             </div>
+                            <?php endif; ?>
                           </div>
                         </div>
 
@@ -450,6 +463,7 @@ foreach ($builderBlocks as $builderBlock) {
                         <div class="bg-body rounded p-3">
                           <?= nl2br(esc((string) ($render['content'] ?? ''))) ?>
                         </div>
+                        <?php if ($canManageDashboardBuilder): ?>
                         <div class="d-flex flex-wrap gap-2 mt-3">
                           <button
                             type="button"
@@ -466,6 +480,7 @@ foreach ($builderBlocks as $builderBlock) {
                           </form>
                           <button type="button" class="btn btn-sm btn-outline-secondary" title="Tasima akisi bir sonraki sprintte acilacak." disabled>Taşı</button>
                         </div>
+                        <?php endif; ?>
                         <span class="builder-resize-handle" data-resize-handle aria-hidden="true">◢</span>
                       </div>
                     </div>
@@ -485,6 +500,7 @@ foreach ($builderBlocks as $builderBlock) {
     </div>
   </div>
 
+  <?php if ($canManageDashboardBuilder): ?>
   <div class="modal fade" id="builderBlockModal" tabindex="-1" aria-labelledby="builderBlockModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
@@ -629,7 +645,9 @@ foreach ($builderBlocks as $builderBlock) {
       </div>
     </div>
   </div>
+  <?php endif; ?>
 
+  <?php if ($canManageDashboardBuilder): ?>
   <div class="modal fade" id="builderEditModal" tabindex="-1" aria-labelledby="builderEditModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable builder-modal-dialog">
       <div class="modal-content builder-modal-content">
@@ -1027,6 +1045,7 @@ foreach ($builderBlocks as $builderBlock) {
       </div>
     </div>
   </div>
+  <?php endif; ?>
 
   <div class="row g-3">
     <div class="col-12 col-lg-7">
@@ -1095,8 +1114,9 @@ foreach ($builderBlocks as $builderBlock) {
 <script src="<?= base_url('assets/admin/js/widgets/cashflow-bar-chart.js') ?>"></script>
 <script src="<?= base_url('assets/admin/js/widgets/category-donut-chart.js') ?>"></script>
 <script src="<?= base_url('assets/admin/js/widgets/widget-calender.js') ?>"></script>
-<script>
+  <script>
   (function () {
+    var canManageDashboardBuilder = <?= $canManageDashboardBuilder ? 'true' : 'false' ?>;
     var blockTypeSelect = document.getElementById('builderBlockType');
     var builderCharts = <?= json_encode($builderCharts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
     var editModalElement = document.getElementById('builderEditModal');
@@ -1841,18 +1861,18 @@ foreach ($builderBlocks as $builderBlock) {
       });
     }
 
-    if (editModalElement) {
+    if (canManageDashboardBuilder && editModalElement) {
       toggleConfigSections(null, '[data-edit-block-config]', '');
     }
 
-    <?php if (!empty($builderBlockErrors)): ?>
+    <?php if ($canManageDashboardBuilder && !empty($builderBlockErrors)): ?>
     var builderModalElement = document.getElementById('builderBlockModal');
     if (builderModalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
       bootstrap.Modal.getOrCreateInstance(builderModalElement).show();
     }
     <?php endif; ?>
 
-    if (editState.modal === 'edit' && editState.blockId) {
+    if (canManageDashboardBuilder && editState.modal === 'edit' && editState.blockId) {
       var editTrigger = document.querySelector('[data-builder-action="edit"][data-block-id="' + editState.blockId + '"]');
       if (editTrigger) {
         openEditModalFromButton(editTrigger, editState.old || {});
@@ -1860,6 +1880,7 @@ foreach ($builderBlocks as $builderBlock) {
     }
   })();
 </script>
+<?php if ($canManageDashboardBuilder): ?>
 <?= view('admin/dashboard_builder/_reorder_script', [
   'reorderGridId' => 'dashboardBuilderBlocksGrid',
   'reorderStatusId' => 'dashboardBuilderReorderStatus',
@@ -1867,4 +1888,5 @@ foreach ($builderBlocks as $builderBlock) {
   'reorderBadgeId' => 'dashboardBuilderEditBadge',
   'reorderEnabledByDefault' => false,
 ]) ?>
+<?php endif; ?>
 <?= $this->endSection() ?>

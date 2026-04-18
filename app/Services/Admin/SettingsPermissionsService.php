@@ -123,6 +123,37 @@ class SettingsPermissionsService
         $this->userPermissionModel->setOverride($userId, $permCode, $allowed);
     }
 
+    public function createSecretary(array $data): string
+    {
+        $username = trim((string) ($data['username'] ?? ''));
+        $email = trim((string) ($data['email'] ?? ''));
+        $password = (string) ($data['password'] ?? '');
+        $status = $this->normalizeSecretaryStatus((string) ($data['status'] ?? 'active'));
+
+        if ($username === '' || $email === '' || $password === '') {
+            throw new DomainException('Sekreter bilgileri eksik.');
+        }
+
+        $existing = $this->userModel->withDeleted()->where('email', $email)->first();
+        if (is_array($existing)) {
+            throw new DomainException('Bu e-posta adresi zaten kullanimda.');
+        }
+
+        $saved = $this->userModel->insert([
+            'username' => $username,
+            'email' => $email,
+            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'role' => 'secretary',
+            'status' => $status,
+        ]);
+
+        if ($saved === false) {
+            throw new DomainException('Sekreter olusturulamadi.');
+        }
+
+        return (string) $saved;
+    }
+
     private function moduleFromCode(string $code): string
     {
         if (str_starts_with($code, 'manage_')) {
@@ -131,6 +162,13 @@ class SettingsPermissionsService
 
         $parts = explode('_', $code);
         return $parts[0] ?? 'genel';
+    }
+
+    private function normalizeSecretaryStatus(string $status): string
+    {
+        $normalized = strtolower(trim($status));
+
+        return in_array($normalized, ['active', 'suspended'], true) ? $normalized : 'active';
     }
 
     private function isValidUuid(string $value): bool
