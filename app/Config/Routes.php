@@ -63,10 +63,6 @@ $routes->get('products/list/(:any)', 'ProductController::listByType/$1');
 // Digerleri
 $routes->get('products/selection', 'ProductController::selection');
 
-// Edit & Update
-$routes->get('products/edit/(:num)', 'ProductController::edit/$1');
-$routes->post('products/update', 'ProductController::update');
-
 // ----------------------------------------------------
 // ADMIN ALANI - SADECE ADMIN
 // ----------------------------------------------------
