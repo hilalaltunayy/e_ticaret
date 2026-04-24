@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 <?php
 $selectedBlockTypeId = old('block_type_id');
-$draftName = trim((string) ($draft['name'] ?? ('Draft ' . (string) ($draft['version_no'] ?? 1))));
+$draftName = trim((string) ($draft['name'] ?? ('Taslak ' . (string) ($draft['version_no'] ?? 1))));
 $draftStatus = trim((string) ($draft['status'] ?? 'DRAFT'));
 $blockCount = count($blocks);
 $builderPolicy = is_array($builderPolicy ?? null) ? $builderPolicy : ['mode' => 'limited', 'title' => 'Kisitli block kutuphanesi', 'message' => 'Bu sayfa turu icin block kutuphanesi sinirlandirildi.'];
@@ -109,7 +109,6 @@ foreach ($blockTypes as $availableBlockType) {
                             </div>
                             <div>
                                 <h4 class="mb-1"><?= esc($page['name']) ?> Builder</h4>
-                                <p class="text-muted mb-0">Sayfa akisina uygun bloklar ekle, sira duzenle ve draft yerlesimini yonet.</p>
                             </div>
                         </div>
                     </div>
@@ -117,7 +116,7 @@ foreach ($blockTypes as $availableBlockType) {
                         <div class="row g-3">
                             <div class="col-sm-4 col-6">
                                 <div class="border rounded p-3 h-100">
-                                    <div class="text-muted small mb-1">Draft</div>
+                                    <div class="text-muted small mb-1">Taslak</div>
                                     <div class="fw-semibold"><?= esc($draftName) ?></div>
                                 </div>
                             </div>
@@ -145,7 +144,7 @@ foreach ($blockTypes as $availableBlockType) {
                         <i class="ti ti-edit-circle me-1"></i> Taslak Islemleri
                     </button>
                     <a href="<?= site_url('admin/pages/' . $page['code'] . '/drafts') ?>" class="btn btn-outline-primary">
-                        <i class="ti ti-stack-2 me-1"></i> Draftlar
+                        <i class="ti ti-stack-2 me-1"></i> Taslaklar
                     </a>
                 </div>
             </div>
@@ -158,7 +157,6 @@ foreach ($blockTypes as $availableBlockType) {
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                     <div>
                         <h5 class="mb-1">Builder Canvas</h5>
-                        <p class="text-muted mb-0">Bloklar sayfa akisina uygun sirayla burada yer alir.</p>
                     </div>
                     <div class="d-flex flex-wrap align-items-center justify-content-end gap-3">
                         <div class="form-check form-switch mb-0">
@@ -1518,7 +1516,7 @@ foreach ($blockTypes as $availableBlockType) {
 
         <div class="card border shadow-none mb-3">
             <div class="card-body">
-                <div class="text-muted small mb-2">Draft Ozeti</div>
+                <div class="text-muted small mb-2">Taslak Ozeti</div>
                 <div class="row g-3">
                     <div class="col-sm-6">
                         <div class="border rounded p-3 h-100">
@@ -1529,7 +1527,7 @@ foreach ($blockTypes as $availableBlockType) {
                     </div>
                     <div class="col-sm-6">
                         <div class="border rounded p-3 h-100">
-                            <div class="text-muted small mb-1">Draft</div>
+                            <div class="text-muted small mb-1">Taslak</div>
                             <div class="fw-semibold"><?= esc($draftName) ?></div>
                             <div class="small text-muted">Version #<?= esc((string) ($draft['version_no'] ?? 1)) ?></div>
                         </div>
@@ -1564,7 +1562,7 @@ foreach ($blockTypes as $availableBlockType) {
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">Draft Adi</label>
+                        <label class="form-label">Taslak Adi</label>
                         <input type="text" name="draft_name" class="form-control" value="<?= esc(old('draft_name', $draftName)) ?>" placeholder="Orn. Nisan Kampanya Taslagi">
                     </div>
                     <div class="mb-0">
@@ -1621,7 +1619,7 @@ foreach ($blockTypes as $availableBlockType) {
 
             <div class="card border shadow-none mb-0">
                 <div class="card-header">
-                    <h6 class="mb-0">Draft Yasam Dongusu</h6>
+                    <h6 class="mb-0">Taslak Yasam Dongusu</h6>
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
@@ -1629,7 +1627,7 @@ foreach ($blockTypes as $availableBlockType) {
                             <?= csrf_field() ?>
                             <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
                             <button type="submit" class="btn btn-outline-success w-100">
-                                <i class="ti ti-copy-plus me-1"></i> Yeni Draft Olustur
+                                <i class="ti ti-copy-plus me-1"></i> Yeni Taslak Olustur
                             </button>
                         </form>
                         <form action="<?= site_url('admin/pages/drafts/duplicate') ?>" method="post">
@@ -1685,7 +1683,7 @@ foreach ($blockTypes as $availableBlockType) {
             <h5 class="offcanvas-title mb-1" id="blockEditOffcanvasLabel">Block Duzenle</h5>
             <div class="d-flex flex-wrap align-items-center gap-2">
                 <span class="badge bg-light-primary" id="editBlockCodeBadge">-</span>
-                <span class="badge bg-light-secondary">Draft</span>
+                <span class="badge bg-light-secondary">Taslak</span>
             </div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>

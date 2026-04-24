@@ -183,8 +183,7 @@ foreach ($builderBlocks as $builderBlock) {
 <?= $this->section('content') ?>
 <div class="container-fluid py-4">
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <h2 class="mb-0">Analytics & Finance Dashboard</h2>
-    <span class="text-muted small">Able Pro demo blend</span>
+    <h2 class="mb-0">Sitenin Nabzi</h2>
   </div>
 
   <?php if (session()->getFlashdata('success')): ?>
@@ -201,12 +200,8 @@ foreach ($builderBlocks as $builderBlock) {
         <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
           <div>
             <h5 class="mb-1">Dashboard Builder</h5>
-            <p class="text-muted small mb-0">
-              Mevcut dashboard akışını bozmadan, yeni builder altyapısındaki blokları burada önizleyebilirsiniz.
-            </p>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-light-primary text-primary"><?= esc($builderBlockTypeCount) ?> blok tipi</span>
             <?php if ($canManageDashboardBuilder): ?>
             <button
               type="button"
@@ -230,20 +225,8 @@ foreach ($builderBlocks as $builderBlock) {
           </div>
         </div>
         <div class="card-body">
-          <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-            <span class="badge bg-light-success text-success">
-              <?= !empty($builderDashboard) ? 'Aktif Dashboard Hazır' : 'Varsayılan Dashboard Bekleniyor' ?>
-            </span>
-            <span class="text-muted small">
-              <?= !empty($builderDashboard['name']) ? esc($builderDashboard['name']) : 'Dashboard builder kaydı henüz yüklenmedi.' ?>
-            </span>
-            <span class="text-muted small">Toplam blok: <?= esc($builderBlockCount) ?></span>
-            <?php if ($canManageDashboardBuilder): ?>
-            <span class="badge bg-light-warning text-warning" id="dashboardBuilderEditBadge">Düzenleme modu kapalı</span>
-            <?php endif; ?>
-          </div>
           <?php if ($canManageDashboardBuilder): ?>
-          <div id="dashboardBuilderReorderStatus" class="dashboard-builder-status small text-muted mb-3"></div>
+          <div id="dashboardBuilderReorderStatus" class="dashboard-builder-status d-none" aria-hidden="true"></div>
           <?php endif; ?>
 
           <?php if (empty($builderBlocks)): ?>

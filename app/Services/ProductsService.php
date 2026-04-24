@@ -118,6 +118,29 @@ class ProductsService
         return $this->hydrateProductDto($item);
     }
 
+    public function getSimilarProductsByProduct(ProductDTO $product, int $limit = 4): array
+    {
+        $categoryId = $product->category_id ?? null;
+        if ($categoryId === null || trim((string) $categoryId) === '') {
+            return [];
+        }
+
+        $builder = $this->model->builder();
+        $builder
+            ->select('products.*, categories.category_name')
+            ->join('categories', 'categories.id = products.category_id', 'left')
+            ->where('products.is_active', 1)
+            ->where('products.category_id', (string) $categoryId)
+            ->where('products.id !=', (string) ($product->id ?? ''))
+            ->orderBy('CASE WHEN products.type = ' . $this->model->db->escape((string) ($product->type ?? '')) . ' THEN 0 ELSE 1 END', '', false)
+            ->orderBy('products.updated_at', 'DESC')
+            ->limit(max(1, $limit));
+
+        $results = $builder->get()->getResultArray();
+
+        return array_map(fn ($item) => $this->hydrateProductDto($item), $results);
+    }
+
     public function getAdminCategories(): array
     {
         return (new CategoryModel())->getAllForAdmin();

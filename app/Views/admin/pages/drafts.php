@@ -30,7 +30,7 @@
             <form action="<?= site_url('admin/pages/drafts/create') ?>" method="post">
                 <?= csrf_field() ?>
                 <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
-                <button type="submit" class="btn btn-sm btn-success">Yeni Draft</button>
+                <button type="submit" class="btn btn-sm btn-success">Yeni Taslak</button>
             </form>
             <a href="<?= site_url('admin/pages/' . $page['code'] . '/builder') ?>" class="btn btn-sm btn-primary">Builder</a>
             <a href="<?= site_url('admin/pages/' . $page['code']) ?>" class="btn btn-sm btn-outline-secondary">Sayfa Detayi</a>

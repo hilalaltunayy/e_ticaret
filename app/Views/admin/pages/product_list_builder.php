@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 <?php
-$draftName = trim((string) ($draft['name'] ?? ('Draft ' . (string) ($draft['version_no'] ?? 1))));
+$draftName = trim((string) ($draft['name'] ?? ('Taslak ' . (string) ($draft['version_no'] ?? 1))));
 $draftStatus = trim((string) ($draft['status'] ?? 'DRAFT'));
 $config = is_array($productListConfig ?? null) ? $productListConfig : [];
 $sections = is_array($config['sections'] ?? null) ? $config['sections'] : [];
@@ -31,17 +31,11 @@ $scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i',
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
-                    <div class="d-flex flex-wrap gap-2 mb-2">
-                        <span class="badge bg-light-primary"><?= esc($draftStatus) ?></span>
-                        <span class="badge bg-light-secondary"><?= esc($page['code']) ?></span>
-                        <span class="badge bg-light-success">Section Tabanli Yonetim</span>
-                    </div>
                     <h4 class="mb-1">Urun Listeleme Sayfa Sistemi</h4>
-                    <p class="text-muted mb-0"><?= esc((string) ($builderPolicy['message'] ?? 'Bu sayfa generic block builder yerine section tabanli bir sistem ile yonetilir.')) ?></p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
                     <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#draftMetaOffcanvas">Taslak Islemleri</button>
-                    <a href="<?= site_url('admin/pages/' . $page['code'] . '/drafts') ?>" class="btn btn-outline-primary">Draftlar</a>
+                    <a href="<?= site_url('admin/pages/' . $page['code'] . '/drafts') ?>" class="btn btn-outline-primary">Taslaklar</a>
                 </div>
             </div>
         </div>
@@ -52,16 +46,11 @@ $scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i',
     <div class="col-xxl-5">
         <div class="card mb-4">
             <div class="card-header">
-                <h5 class="mb-1">Section Yonetimi</h5>
-                <p class="text-muted mb-0">Bolumleri acip kapatin, siralayin ve iceriklerini duzenleyin.</p>
+                <h5 class="mb-1">Oturum Yonetimi</h5>
             </div>
             <div class="card-body">
                 <?php if (session()->getFlashdata('error')): ?><div class="alert alert-danger"><?= esc(session()->getFlashdata('error')) ?></div><?php endif; ?>
                 <?php if (session()->getFlashdata('success')): ?><div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div><?php endif; ?>
-                <div class="alert alert-light border mb-4">
-                    <div class="fw-semibold mb-1"><?= esc((string) ($builderPolicy['title'] ?? 'Page-specific policy')) ?></div>
-                    <div class="small text-muted mb-0"><?= esc((string) ($builderPolicy['message'] ?? 'Bu sayfa kontrollu section ayarlariyla yonetilir.')) ?></div>
-                </div>
 
                 <form action="<?= site_url('admin/pages/product-list-builder/update') ?>" method="post" id="productListBuilderForm">
                     <?= csrf_field() ?>
@@ -218,7 +207,7 @@ $scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i',
 
     <div class="col-xxl-7">
         <div class="card mb-4">
-            <div class="card-header"><h5 class="mb-1">Mini Sayfa Onizlemesi</h5><p class="text-muted mb-0">Section siralari ve gorunurluk ayarlarinin etkisini inceleyin.</p></div>
+            <div class="card-header"><h5 class="mb-1">Mini Sayfa Onizlemesi</h5></div>
             <div class="card-body">
                 <?= view('admin/pages/partials/product_list_preview', ['productListPreview' => $productListPreview ?? []]) ?>
             </div>
@@ -240,9 +229,9 @@ $scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i',
             <?= csrf_field() ?>
             <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
             <input type="hidden" name="version_id" value="<?= esc($draft['id']) ?>">
-            <div class="card border shadow-none mb-3"><div class="card-header"><h6 class="mb-0">Temel Ayarlar</h6></div><div class="card-body"><div class="mb-3"><label class="form-label">Draft Adi</label><input type="text" name="draft_name" class="form-control" value="<?= esc(old('draft_name', $draftName)) ?>"></div><div class="mb-0"><label class="form-label">Kisa Not</label><textarea name="draft_notes" rows="4" class="form-control"><?= esc(old('draft_notes', (string) ($draft['notes'] ?? ''))) ?></textarea></div></div></div>
+            <div class="card border shadow-none mb-3"><div class="card-header"><h6 class="mb-0">Temel Ayarlar</h6></div><div class="card-body"><div class="mb-3"><label class="form-label">Taslak Adi</label><input type="text" name="draft_name" class="form-control" value="<?= esc(old('draft_name', $draftName)) ?>"></div><div class="mb-0"><label class="form-label">Kisa Not</label><textarea name="draft_notes" rows="4" class="form-control"><?= esc(old('draft_notes', (string) ($draft['notes'] ?? ''))) ?></textarea></div></div></div>
             <div class="card border shadow-none mb-3"><div class="card-header"><h6 class="mb-0">Canliya Al ve Schedule</h6></div><div class="card-body"><div class="d-grid gap-2 mb-3"><button type="submit" class="btn btn-success" form="draftMetaForm" formaction="<?= site_url('admin/pages/builder/draft/publish') ?>" <?= $draftStatus === 'PUBLISHED' ? 'disabled' : '' ?>><?= $draftStatus === 'PUBLISHED' ? 'Canlida' : 'Canliya Al' ?></button></div><label class="form-label">Planlanan Tarih</label><input type="datetime-local" name="scheduled_publish_at" class="form-control mb-3" value="<?= esc(old('scheduled_publish_at', $scheduledPublishInputValue)) ?>"><div class="d-flex flex-wrap gap-2"><button type="submit" class="btn btn-primary" form="draftMetaForm" formaction="<?= site_url('admin/pages/builder/draft/schedule') ?>" <?= $draftStatus === 'PUBLISHED' ? 'disabled' : '' ?>>Schedule Et</button><?php if ($draftStatus === 'SCHEDULED'): ?><button type="submit" class="btn btn-outline-warning" form="draftMetaForm" formaction="<?= site_url('admin/pages/builder/draft/unschedule') ?>">Planlamayi Kaldir</button><?php endif; ?></div></div></div>
-            <div class="card border shadow-none mb-0"><div class="card-header"><h6 class="mb-0">Draft Yasam Dongusu</h6></div><div class="card-body"><div class="d-grid gap-2"><form action="<?= site_url('admin/pages/drafts/create') ?>" method="post"><?= csrf_field() ?><input type="hidden" name="page_code" value="<?= esc($page['code']) ?>"><button type="submit" class="btn btn-outline-success w-100">Yeni Draft Olustur</button></form><form action="<?= site_url('admin/pages/drafts/duplicate') ?>" method="post"><?= csrf_field() ?><input type="hidden" name="page_code" value="<?= esc($page['code']) ?>"><input type="hidden" name="version_id" value="<?= esc($draft['id']) ?>"><button type="submit" class="btn btn-outline-info w-100" <?= $draftStatus === 'ARCHIVED' ? 'disabled' : '' ?>>Taslagi Kopyala</button></form></div></div></div>
+            <div class="card border shadow-none mb-0"><div class="card-header"><h6 class="mb-0">Taslak Yasam Dongusu</h6></div><div class="card-body"><div class="d-grid gap-2"><form action="<?= site_url('admin/pages/drafts/create') ?>" method="post"><?= csrf_field() ?><input type="hidden" name="page_code" value="<?= esc($page['code']) ?>"><button type="submit" class="btn btn-outline-success w-100">Yeni Taslak Olustur</button></form><form action="<?= site_url('admin/pages/drafts/duplicate') ?>" method="post"><?= csrf_field() ?><input type="hidden" name="page_code" value="<?= esc($page['code']) ?>"><input type="hidden" name="version_id" value="<?= esc($draft['id']) ?>"><button type="submit" class="btn btn-outline-info w-100" <?= $draftStatus === 'ARCHIVED' ? 'disabled' : '' ?>>Taslagi Kopyala</button></form></div></div></div>
         </form>
     </div>
     <div class="offcanvas-footer border-top p-3"><div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">Kapat</button><button type="submit" class="btn btn-primary" form="draftMetaForm">Kaydet</button></div></div>

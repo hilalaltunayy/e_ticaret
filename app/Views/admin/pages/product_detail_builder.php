@@ -2,9 +2,12 @@
 
 <?= $this->section('content') ?>
 <?php
+$draftName = trim((string) ($draft['name'] ?? ('Taslak ' . (string) ($draft['version_no'] ?? 1))));
 $draftStatus = trim((string) ($draft['status'] ?? 'DRAFT'));
 $config = is_array($productDetailConfig ?? null) ? $productDetailConfig : [];
 $sections = is_array($config['sections'] ?? null) ? $config['sections'] : [];
+$scheduledPublishValue = trim((string) ($draft['scheduled_publish_at'] ?? ''));
+$scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i', strtotime($scheduledPublishValue)) : '';
 ?>
 
 <div class="page-header">
@@ -21,11 +24,12 @@ $sections = is_array($config['sections'] ?? null) ? $config['sections'] : [];
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
-                    <div class="d-flex flex-wrap gap-2 mb-2"><span class="badge bg-light-primary"><?= esc($draftStatus) ?></span><span class="badge bg-light-secondary"><?= esc($page['code']) ?></span><span class="badge bg-light-success">Kontrollu Product Detail Sablonu</span></div>
-                    <h4 class="mb-1">Product Detail Sayfa Sistemi</h4>
-                    <p class="text-muted mb-0"><?= esc((string) ($builderPolicy['message'] ?? 'Product detail sayfasi kontrollu section mantigiyla yonetilir.')) ?></p>
+                    <h4 class="mb-1">Urun Detay Sayfasi</h4>
                 </div>
-                <a href="<?= site_url('admin/pages/' . $page['code'] . '/drafts') ?>" class="btn btn-outline-primary">Draftlar</a>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#draftMetaOffcanvas">Taslak Islemleri</button>
+                    <a href="<?= site_url('admin/pages/' . $page['code'] . '/drafts') ?>" class="btn btn-outline-primary">Taslaklar</a>
+                </div>
             </div>
         </div>
     </div>
@@ -34,11 +38,10 @@ $sections = is_array($config['sections'] ?? null) ? $config['sections'] : [];
 <div class="row">
     <div class="col-xxl-5">
         <div class="card mb-4">
-            <div class="card-header"><h5 class="mb-1">Section Yonetimi</h5><p class="text-muted mb-0">Urun detay is mantigina dokunmadan metinleri, gorunurlugu ve sirayi yonetin.</p></div>
+            <div class="card-header"><h5 class="mb-1">Oturum Yonetimi</h5></div>
             <div class="card-body">
                 <?php if (session()->getFlashdata('error')): ?><div class="alert alert-danger"><?= esc(session()->getFlashdata('error')) ?></div><?php endif; ?>
                 <?php if (session()->getFlashdata('success')): ?><div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div><?php endif; ?>
-                <div class="alert alert-light border mb-4"><div class="fw-semibold mb-1"><?= esc((string) ($builderPolicy['title'] ?? 'Product detail policy')) ?></div><div class="small text-muted mb-0"><?= esc((string) ($builderPolicy['message'] ?? 'Bu sayfa kontrollu section ayarlariyla yonetilir.')) ?></div></div>
 
                 <form action="<?= site_url('admin/pages/product-detail-builder/update') ?>" method="post">
                     <?= csrf_field() ?>
@@ -73,6 +76,162 @@ $sections = is_array($config['sections'] ?? null) ? $config['sections'] : [];
             <div class="card-body">
                 <?= view('admin/pages/partials/product_detail_preview', ['productDetailPreview' => $productDetailPreview ?? []]) ?>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end w-50" tabindex="-1" id="draftMetaOffcanvas" aria-labelledby="draftMetaOffcanvasLabel">
+    <div class="offcanvas-header border-bottom">
+        <div>
+            <h5 class="offcanvas-title mb-1" id="draftMetaOffcanvasLabel">Taslak Islemleri</h5>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="badge bg-light-primary"><?= esc($draftStatus) ?></span>
+                <span class="badge bg-light-secondary"><?= esc($page['code']) ?></span>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <?php if (session()->getFlashdata('draft_error')): ?>
+            <div class="alert alert-danger" role="alert">
+                <div class="d-flex align-items-start gap-2">
+                    <i class="ti ti-alert-circle mt-1"></i>
+                    <div><?= esc(session()->getFlashdata('draft_error')) ?></div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('success')): ?>
+            <div class="alert alert-success" role="alert">
+                <div class="d-flex align-items-start gap-2">
+                    <i class="ti ti-circle-check mt-1"></i>
+                    <div><?= esc(session()->getFlashdata('success')) ?></div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <form action="<?= site_url('admin/pages/builder/draft/update') ?>" method="post" id="draftMetaForm">
+            <?= csrf_field() ?>
+            <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+            <input type="hidden" name="version_id" value="<?= esc($draft['id']) ?>">
+
+            <div class="card border shadow-none mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Temel Ayarlar</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Taslak Adi</label>
+                        <input type="text" name="draft_name" class="form-control" value="<?= esc(old('draft_name', $draftName)) ?>" placeholder="Orn. Urun detay taslagi">
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Kisa Not</label>
+                        <textarea name="draft_notes" rows="4" class="form-control" placeholder="Orn. Aciklama ve CTA metinleri guncellenecek"><?= esc(old('draft_notes', (string) ($draft['notes'] ?? ''))) ?></textarea>
+                        <div class="form-text">Bu not yalnizca admin tarafinda taslak takibi icin kullanilir.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border shadow-none mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Canliya Al</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-light border mb-3">
+                        <div class="small text-muted mb-0">Bu draft canliya alindiginda ayni sayfadaki mevcut published version otomatik olarak arsivlenir.</div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success" form="draftMetaForm" formaction="<?= site_url('admin/pages/builder/draft/publish') ?>" <?= $draftStatus === 'PUBLISHED' ? 'disabled' : '' ?>>
+                            <i class="ti ti-broadcast me-1"></i> <?= $draftStatus === 'PUBLISHED' ? 'Canlida' : 'Canliya Al' ?>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border shadow-none mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Schedule</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Planlanan Tarih</label>
+                        <input type="datetime-local" name="scheduled_publish_at" class="form-control" value="<?= esc(old('scheduled_publish_at', $scheduledPublishInputValue)) ?>">
+                    </div>
+                    <div class="alert alert-light border mb-3">
+                        <div class="small text-muted mb-0">Planlama yapildiginda version `SCHEDULED` durumuna gecer. Otomatik zaman gelince publish motoru sonraki sprintte tamamlanacak.</div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-primary" form="draftMetaForm" formaction="<?= site_url('admin/pages/builder/draft/schedule') ?>" <?= $draftStatus === 'PUBLISHED' ? 'disabled' : '' ?>>
+                            <i class="ti ti-calendar-event me-1"></i> Schedule Et
+                        </button>
+                        <?php if ($draftStatus === 'SCHEDULED'): ?>
+                            <button type="submit" class="btn btn-outline-warning" form="draftMetaForm" formaction="<?= site_url('admin/pages/builder/draft/unschedule') ?>">
+                                <i class="ti ti-calendar-off me-1"></i> Planlamayi Kaldir
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($scheduledPublishValue !== ''): ?>
+                        <div class="small text-muted mt-3">Mevcut plan: <?= esc($scheduledPublishValue) ?></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="card border shadow-none mb-0">
+                <div class="card-header">
+                    <h6 class="mb-0">Taslak Yasam Dongusu</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <form action="<?= site_url('admin/pages/drafts/create') ?>" method="post">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                            <button type="submit" class="btn btn-outline-success w-100">
+                                <i class="ti ti-copy-plus me-1"></i> Yeni Taslak Olustur
+                            </button>
+                        </form>
+                        <form action="<?= site_url('admin/pages/drafts/duplicate') ?>" method="post">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                            <input type="hidden" name="version_id" value="<?= esc($draft['id']) ?>">
+                            <button type="submit" class="btn btn-outline-info w-100" <?= $draftStatus === 'ARCHIVED' ? 'disabled' : '' ?>>
+                                <i class="ti ti-copy me-1"></i> Taslagi Kopyala
+                            </button>
+                        </form>
+                        <form action="<?= site_url('admin/pages/drafts/archive') ?>" method="post">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                            <input type="hidden" name="version_id" value="<?= esc($draft['id']) ?>">
+                            <button type="submit" class="btn btn-outline-warning w-100" <?= ! in_array($draftStatus, ['DRAFT', 'SCHEDULED'], true) ? 'disabled' : '' ?>>
+                                <i class="ti ti-archive me-1"></i> Taslagi Arsivle
+                            </button>
+                        </form>
+                        <?php if (is_array($publishedVersion ?? null) && ! empty($publishedVersion['id'])): ?>
+                            <form action="<?= site_url('admin/pages/drafts/unpublish') ?>" method="post">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="page_code" value="<?= esc($page['code']) ?>">
+                                <input type="hidden" name="version_id" value="<?= esc($publishedVersion['id']) ?>">
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="ti ti-plug-connected-x me-1"></i> Canli Surumu Geri Cek
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                        <button type="button" class="btn btn-outline-danger" disabled>
+                            <i class="ti ti-trash me-1"></i> Guvenli Silme (Yakinda)
+                        </button>
+                    </div>
+                    <div class="alert alert-light border mt-3 mb-0">
+                        <div class="small text-muted mb-0">Silme aksiyonu bu sprintte bilerek pasif tutuldu. Riskli hard delete acilmadi.</div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="offcanvas-footer border-top p-3">
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">Kapat</button>
+            <button type="submit" class="btn btn-primary" form="draftMetaForm">
+                <i class="ti ti-device-floppy me-1"></i> Kaydet
+            </button>
         </div>
     </div>
 </div>

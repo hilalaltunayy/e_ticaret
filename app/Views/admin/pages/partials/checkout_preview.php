@@ -6,18 +6,6 @@ $hasVisibleSections = ! empty($preview['hasVisibleSections']);
 $visibleSectionCount = (int) ($preview['visibleSectionCount'] ?? 0);
 ?>
 
-<div class="card border shadow-none bg-light mb-3">
-    <div class="card-body">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <div>
-                <div class="fw-semibold mb-1">Checkout Mini Preview</div>
-                <div class="small text-muted">Form akisi, odeme guveni ve siparis ozeti icin sade yonetici gorunumu.</div>
-            </div>
-            <span class="badge bg-light-primary"><?= esc((string) $visibleSectionCount) ?> aktif bolum</span>
-        </div>
-    </div>
-</div>
-
 <?php if (! $hasVisibleSections): ?>
     <div class="alert alert-light border mb-3">
         <div class="fw-semibold mb-1">Preview hazir</div>
@@ -26,7 +14,7 @@ $visibleSectionCount = (int) ($preview['visibleSectionCount'] ?? 0);
 <?php endif; ?>
 
 <?php if (! empty($config['breadcrumb_goster']) && ! empty($config['sections']['sayfa_ust_alani']['active'])): ?>
-    <div class="small text-muted mb-3">Sepet / Checkout / <?= esc((string) ($config['sayfa_basligi'] ?? 'Guvenli Checkout')) ?></div>
+    <div class="small text-muted mb-3">Sepet / Odeme / <?= esc((string) ($config['sayfa_basligi'] ?? 'Guvenli Odeme')) ?></div>
 <?php endif; ?>
 
 <?php foreach ($sections as $section): ?>
@@ -34,7 +22,7 @@ $visibleSectionCount = (int) ($preview['visibleSectionCount'] ?? 0);
         continue;
     } ?>
     <?php if (($section['key'] ?? '') === 'sayfa_ust_alani'): ?>
-        <div class="card border shadow-none mb-3"><div class="card-body"><div class="d-flex flex-wrap justify-content-between gap-3"><div><span class="badge bg-light-primary mb-2"><?= esc((string) ($section['title'] ?? 'Sayfa Ust Alani')) ?></span><h4 class="mb-1"><?= esc((string) ($config['sayfa_basligi'] ?? 'Guvenli Checkout')) ?></h4><p class="text-muted mb-2"><?= esc((string) ($config['sayfa_alt_basligi'] ?? 'Teslimat ve odeme adimlarini tamamlayarak siparisinizi olusturun.')) ?></p><div class="small text-success"><?= esc((string) ($config['guven_kisa_notu'] ?? 'SSL korumasi aktif, bilgileriniz guvende islenir.')) ?></div></div><span class="badge bg-light-secondary">Sira <?= esc((string) ($section['order'] ?? 1)) ?></span></div></div></div>
+        <div class="card border shadow-none mb-3"><div class="card-body"><div class="d-flex flex-wrap justify-content-between gap-3"><div><span class="badge bg-light-primary mb-2"><?= esc((string) ($section['title'] ?? 'Sayfa Ust Alani')) ?></span><h4 class="mb-1"><?= esc((string) ($config['sayfa_basligi'] ?? 'Guvenli Odeme')) ?></h4><p class="text-muted mb-2"><?= esc((string) ($config['sayfa_alt_basligi'] ?? 'Teslimat ve odeme adimlarini tamamlayarak siparisinizi olusturun.')) ?></p><div class="small text-success"><?= esc((string) ($config['guven_kisa_notu'] ?? 'SSL korumasi aktif, bilgileriniz guvende islenir.')) ?></div></div><span class="badge bg-light-secondary">Sira <?= esc((string) ($section['order'] ?? 1)) ?></span></div></div></div>
     <?php elseif (($section['key'] ?? '') === 'adim_cubugu' && ! empty($config['adim_cubugu_gorunur'])): ?>
         <div class="card border shadow-none mb-3"><div class="card-body"><div class="d-flex flex-wrap align-items-center gap-2 mb-3"><span class="badge bg-light-primary">1 Teslimat</span><span class="badge bg-light-secondary">2 Odeme</span><span class="badge bg-light-secondary">3 Onay</span></div><div class="small text-muted"><?= esc((string) ($config['adim_cubugu_aciklama'] ?? 'Teslimat, odeme ve onay adimlarini sirasiyla tamamlayin.')) ?></div></div></div>
     <?php elseif (($section['key'] ?? '') === 'teslimat_fatura_alani'): ?>

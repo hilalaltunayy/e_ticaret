@@ -47,6 +47,7 @@ class ProductController extends BaseController
 
         return view('site/products/product_detail', array_merge($this->storefrontViewData(), [
             'product' => $product,
+            'similarProducts' => $this->productsService->getSimilarProductsByProduct($product, 4),
         ]));
     }
 

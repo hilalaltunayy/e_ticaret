@@ -9,22 +9,6 @@ $pricingDeltaCount = (int) ($preview['pricingDeltaCount'] ?? 0);
 $stockWarningCount = (int) ($preview['stockWarningCount'] ?? 0);
 ?>
 
-<div class="card border shadow-none bg-light mb-3">
-    <div class="card-body">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <div>
-                <div class="fw-semibold mb-1">Cart Mini Preview</div>
-                <div class="small text-muted">Sepet urunleri, fiyat farki, stok uyari ve CTA alanlari icin sade yonetici gorunumu.</div>
-            </div>
-            <div class="d-flex flex-wrap gap-2">
-                <span class="badge bg-light-primary"><?= esc((string) $visibleSectionCount) ?> aktif bolum</span>
-                <span class="badge bg-light-warning"><?= esc((string) $pricingDeltaCount) ?> fiyat farki</span>
-                <span class="badge bg-light-danger"><?= esc((string) $stockWarningCount) ?> stok uyari</span>
-            </div>
-        </div>
-    </div>
-</div>
-
 <?php if (! $hasVisibleSections): ?>
     <div class="alert alert-light border mb-3">
         <div class="fw-semibold mb-1">Preview hazir</div>

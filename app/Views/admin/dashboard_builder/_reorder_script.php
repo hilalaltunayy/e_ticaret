@@ -78,7 +78,15 @@ $reorderEnabledByDefault = (bool) ($reorderEnabledByDefault ?? false);
         return;
       }
 
+      if (!message) {
+        statusBox.className = 'dashboard-builder-status d-none';
+        statusBox.setAttribute('aria-hidden', 'true');
+        statusBox.textContent = '';
+        return;
+      }
+
       statusBox.className = 'builder-status small mt-3';
+      statusBox.removeAttribute('aria-hidden');
       if (tone === 'success') {
         statusBox.classList.add('text-success');
       } else if (tone === 'error') {
@@ -270,7 +278,7 @@ $reorderEnabledByDefault = (bool) ($reorderEnabledByDefault ?? false);
 
       if (!enabled) {
         clearDragState();
-        setStatus('Düzenleme modu kapalı. Dashboard normal görünümde.', 'muted');
+        setStatus('', 'muted');
         return;
       }
 
@@ -385,7 +393,7 @@ $reorderEnabledByDefault = (bool) ($reorderEnabledByDefault ?? false);
 
     if (items().length < 2) {
       setToggleState();
-      setStatus(enabled ? 'Siralama icin en az iki blok gerekli.' : 'Düzenleme modu kapalı. Dashboard normal görünümde.', 'muted');
+      setStatus(enabled ? 'Siralama icin en az iki blok gerekli.' : '', 'muted');
       items().forEach(function (item) {
         item.setAttribute('draggable', 'false');
       });

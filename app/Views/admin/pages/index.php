@@ -22,7 +22,6 @@
     <div class="card-header d-flex justify-content-between align-items-center">
         <div>
             <h5 class="mb-1">Sayfa Yonetimi</h5>
-            <p class="text-muted mb-0">Sprint 1 kapsaminda sayfa omurgasi ve draft listeleme ekranlari.</p>
         </div>
     </div>
     <div class="card-body">
@@ -42,7 +41,7 @@
                             <th>Sayfa</th>
                             <th>Kod</th>
                             <th>Durum</th>
-                            <th>Draft</th>
+                            <th>Taslak</th>
                             <th>Published Version</th>
                             <th>Islem</th>
                         </tr>

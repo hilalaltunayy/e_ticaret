@@ -44,7 +44,7 @@
                         <?php else: ?>
                         <a href="<?= site_url('admin/pages/' . $version['page_code'] . '/builder') ?>" class="btn btn-sm btn-primary">Builder</a>
                         <?php endif; ?>
-                        <a href="<?= site_url('admin/pages/' . $version['page_code'] . '/drafts') ?>" class="btn btn-sm btn-outline-secondary">Draft Listesine Don</a>
+                        <a href="<?= site_url('admin/pages/' . $version['page_code'] . '/drafts') ?>" class="btn btn-sm btn-outline-secondary">Taslak Listesine Don</a>
                     </div>
                 <?php endif; ?>
             </div>
