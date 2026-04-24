@@ -1,0 +1,625 @@
+# Domain KB manifest
+# Purpose: map repository paths to Domain KB files for documentation updates, drift checks, Oracle MCP guidance, and GitNexus planning.
+
+version: 2
+language: en
+kb_root: ai/domain-kb
+source_inventory: ai/domain-cube/00_repo_inventory.md
+
+global_kb_files:
+  - path: ai/domain-kb/00_repo_inventory.md
+    role: repository_inventory
+  - path: ai/domain-kb/01_domain_index.md
+    role: domain_index
+  - path: ai/domain-kb/02_route_permission_matrix.md
+    role: route_permission_matrix
+  - path: ai/domain-kb/03_security_filter_audit.md
+    role: security_filter_audit
+  - path: ai/domain-kb/04_kb_quality_audit.md
+    role: kb_quality_audit
+  - path: ai/domain-kb/05_kb_manifest_and_schema_plan.md
+    role: manifest_schema_plan
+  - path: ai/domain-kb/06_route_baseline.md
+    role: route_baseline
+  - path: ai/domain-kb/07_kb_normalization_report.md
+    role: normalization_report
+  - path: ai/domain-kb/08_post_normalization_validation.md
+    role: post_normalization_validation
+  - path: ai/domain-kb/09_claim_id_registry.md
+    role: claim_id_registry
+  - path: ai/domain-kb/10_schema_model_matrix.md
+    role: schema_model_matrix
+  - path: ai/domain-kb/11_blocker_resolution_report.md
+    role: blocker_resolution_report
+  - path: ai/domain-kb/12_final_kb_readiness_check.md
+    role: final_kb_readiness_check
+  - path: ai/domain-kb/kb-manifest.yaml
+    role: kb_manifest
+
+domains:
+  auth:
+    name: Auth
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+    watched_paths:
+      exact:
+        - app/Controllers/Login.php
+        - app/Controllers/Register.php
+        - app/Controllers/Logout.php
+        - app/Services/AuthService.php
+        - app/Models/UserModel.php
+        - app/DTO/UserDTO.php
+        - app/Filters/AuthFilter.php
+        - app/Config/Routes.php
+        - app/Config/Filters.php
+        - app/Config/Session.php
+      globs:
+        - app/Views/auth/**
+      broad_review: []
+    route_patterns:
+      - /login
+      - /login/auth
+      - /register
+      - /register/save
+      - /logout
+      - /dashboard_anasayfa
+    permissions: []
+
+  user_role_permission:
+    name: User / Role / Permission
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+      - ai/domain-kb/10_schema_model_matrix.md
+    watched_paths:
+      exact:
+        - app/Models/UserModel.php
+        - app/Models/RoleModel.php
+        - app/Models/RoleModels.php
+        - app/Models/PermissionModel.php
+        - app/Models/RolePermissionModel.php
+        - app/Models/UserPermissionModel.php
+        - app/Filters/RoleFilter.php
+        - app/Filters/PermissionFilter.php
+        - app/Filters/CampaignAccessFilter.php
+        - app/Controllers/Admin/SettingsPermissionsController.php
+        - app/Services/Admin/SettingsPermissionsService.php
+        - app/Views/admin/settings/permissions.php
+        - app/Database/Seeds/InitialAuthSeeder.php
+        - app/Config/Routes.php
+        - app/Config/Filters.php
+      globs:
+        - app/Database/Migrations/*Permission*.php
+      broad_review: []
+    route_patterns:
+      - /admin/settings/permissions
+      - /admin/settings/permissions/update
+      - /admin/settings/permissions/secretaries/create
+    permissions:
+      - manage_dashboard
+      - manage_stock
+      - manage_notifications
+      - manage_customers
+      - manage_products
+      - manage_shipping
+      - manage_orders
+      - manage_campaigns
+      - manage_campaigns_engine
+
+  admin_panel:
+    name: Admin Panel
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+    watched_paths:
+      exact:
+        - app/Controllers/Admin/DashboardController.php
+        - app/Controllers/Admin/Settings.php
+        - app/Controllers/Admin/Marketing.php
+        - app/Controllers/Admin/Automation.php
+        - app/Controllers/Admin/Customers.php
+        - app/Services/Admin/DashboardService.php
+        - app/Views/admin/layouts/main.php
+        - app/Config/Routes.php
+      globs:
+        - app/Views/admin/partials/**
+        - app/DTO/Admin/**
+      broad_review:
+        - app/Controllers/Admin/**
+        - app/Views/admin/**
+    route_patterns:
+      - /admin/dashboard
+      - /admin/settings
+      - /admin/marketing
+      - /admin/automation
+      - /admin/customers
+    permissions:
+      - manage_dashboard
+      - manage_customers
+
+  secretary_access:
+    name: Secretary Access
+    kb_files:
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+    watched_paths:
+      exact:
+        - app/Controllers/Login.php
+        - app/Controllers/Admin/SettingsPermissionsController.php
+        - app/Services/Admin/SettingsPermissionsService.php
+        - app/Models/UserPermissionModel.php
+        - app/Filters/RoleFilter.php
+        - app/Views/admin/settings/permissions.php
+        - app/Database/Migrations/2026-04-17-120000_EnsureSecretaryOperationPermissions.php
+        - app/Config/Routes.php
+      globs: []
+      broad_review: []
+    route_patterns:
+      - /admin/dashboard
+      - /admin/stock*
+      - /admin/notifications*
+      - /admin/customers
+      - /admin/products*
+      - /admin/shipping*
+      - /admin/orders*
+    permissions:
+      - manage_dashboard
+      - manage_stock
+      - manage_notifications
+      - manage_customers
+      - manage_products
+      - manage_shipping
+      - manage_orders
+
+  product_catalog:
+    name: Product / Catalog
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/10_schema_model_matrix.md
+    watched_paths:
+      exact:
+        - app/Controllers/ProductController.php
+        - app/Controllers/Admin/Products.php
+        - app/Controllers/Admin/Stock.php
+        - app/Controllers/Admin/StockMove.php
+        - app/Controllers/Admin/Pricing.php
+        - app/Services/ProductsService.php
+        - app/Services/PriceService.php
+        - app/Models/ProductsModel.php
+        - app/Models/AuthorModel.php
+        - app/Models/TypeModel.php
+        - app/Models/PriceRuleModel.php
+        - app/DTO/ProductDTO.php
+        - app/Config/Routes.php
+      globs:
+        - app/Views/site/products/**
+        - app/Views/admin/products/**
+        - app/Views/admin/stock/**
+        - app/Views/admin/pricing/**
+      broad_review: []
+    route_patterns:
+      - /products
+      - /products/detail/*
+      - /products/list/*
+      - /products/selection
+      - /admin/products*
+      - /admin/stock*
+      - /admin/pricing*
+    permissions:
+      - manage_products
+      - manage_stock
+
+  category:
+    name: Category
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/10_schema_model_matrix.md
+    watched_paths:
+      exact:
+        - app/Models/CategoryModel.php
+        - app/Controllers/Admin/Products.php
+        - app/Services/ProductsService.php
+        - app/Services/CampaignService.php
+        - app/Services/CouponService.php
+        - app/Views/admin/categories/create.php
+        - app/Database/Seeds/CategorySeeder.php
+        - app/Config/Routes.php
+      globs: []
+      broad_review: []
+    route_patterns:
+      - /admin/categories/create
+      - /admin/categories/store
+    permissions:
+      - manage_products
+
+  order:
+    name: Order
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+      - ai/domain-kb/10_schema_model_matrix.md
+    watched_paths:
+      exact:
+        - app/Controllers/OrderController.php
+        - app/Controllers/Admin/Orders.php
+        - app/Controllers/Admin/OrderStatuses.php
+        - app/Controllers/Admin/Traits/OrderPackingActions.php
+        - app/Services/OrdersService.php
+        - app/Services/OrderCreationService.php
+        - app/Services/OrderShippingService.php
+        - app/Services/OrderNoteService.php
+        - app/Services/OrdersReportingService.php
+        - app/Services/PackingService.php
+        - app/Services/InvoiceService.php
+        - app/Models/OrderModel.php
+        - app/Models/OrderItemModel.php
+        - app/Models/OrderLogModel.php
+        - app/Models/PackingSessionModel.php
+        - app/Models/InvoiceModel.php
+        - app/Config/Routes.php
+      globs:
+        - app/Views/admin/orders/**
+        - app/Database/Migrations/*Order*.php
+        - app/Database/Migrations/*Invoices*.php
+        - app/Database/Migrations/*Packing*.php
+      broad_review: []
+    route_patterns:
+      - /orders
+      - /orders/create
+      - /admin/orders*
+      - /admin/api/orders*
+    permissions:
+      - manage_orders
+
+  cart:
+    name: Cart
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+      - ai/domain-kb/10_schema_model_matrix.md
+    watched_paths:
+      exact:
+        - app/Services/CartPageBuilderService.php
+        - app/Services/CartPreviewRenderer.php
+        - app/Services/CheckoutPageBuilderService.php
+        - app/Services/CheckoutPreviewRenderer.php
+        - app/Services/CouponService.php
+        - app/Models/CouponModel.php
+        - app/Models/CouponTargetModel.php
+        - app/Models/CouponRedemptionModel.php
+        - app/Views/admin/pages/cart_builder.php
+        - app/Views/admin/pages/checkout_builder.php
+        - app/Views/admin/pages/partials/cart_preview.php
+        - app/Views/admin/pages/partials/checkout_preview.php
+        - app/Config/Routes.php
+      globs: []
+      broad_review: []
+    route_patterns:
+      - /admin/pages/cart-builder/update
+      - /admin/pages/checkout-builder/update
+    permissions:
+      - admin_role_only
+
+  favorites_wishlist:
+    name: Favorites / Wishlist
+    kb_files:
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+    watched_paths:
+      exact:
+        - app/Config/Routes.php
+        - app/Views/site/products/product_detail.php
+      globs:
+        - app/Controllers/**/*Favorite*.php
+        - app/Controllers/**/*Wishlist*.php
+        - app/Models/**/*Favorite*.php
+        - app/Models/**/*Wishlist*.php
+        - app/Services/**/*Favorite*.php
+        - app/Services/**/*Wishlist*.php
+        - app/Database/Migrations/**/*Favorite*.php
+        - app/Database/Migrations/**/*Wishlist*.php
+      broad_review:
+        - app/Views/site/**
+    route_patterns: []
+    permissions: []
+
+  review:
+    name: Review
+    kb_files:
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+    watched_paths:
+      exact:
+        - app/Config/Routes.php
+        - app/Views/site/products/product_detail.php
+      globs:
+        - app/Controllers/**/*Review*.php
+        - app/Controllers/**/*Rating*.php
+        - app/Models/**/*Review*.php
+        - app/Models/**/*Rating*.php
+        - app/Services/**/*Review*.php
+        - app/Services/**/*Rating*.php
+        - app/Database/Migrations/**/*Review*.php
+        - app/Database/Migrations/**/*Rating*.php
+      broad_review:
+        - app/Views/site/**
+    route_patterns: []
+    permissions: []
+
+  page_builder:
+    name: Page Builder
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/10_schema_model_matrix.md
+    watched_paths:
+      exact:
+        - app/Controllers/Admin/PageController.php
+        - app/Services/PageService.php
+        - app/Services/PageVersionService.php
+        - app/Services/PageBuilderService.php
+        - app/Services/ProductDetailPageBuilderService.php
+        - app/Services/ProductListPreviewRenderer.php
+        - app/Services/ProductDetailPreviewRenderer.php
+        - app/Services/CartPageBuilderService.php
+        - app/Services/CartPreviewRenderer.php
+        - app/Services/CheckoutPageBuilderService.php
+        - app/Services/CheckoutPreviewRenderer.php
+        - app/Models/PageModel.php
+        - app/Models/PageVersionModel.php
+        - app/Models/BlockTypeModel.php
+        - app/Models/BlockInstanceModel.php
+        - app/Database/Seeds/PageManagementSeeder.php
+        - app/Config/Routes.php
+      globs:
+        - app/DTO/PageManagement/**
+        - app/Views/admin/pages/**
+        - app/Database/Migrations/*Page*.php
+        - app/Database/Migrations/*Block*.php
+      broad_review: []
+    route_patterns:
+      - /admin/pages*
+      - /admin/page-versions/*
+    permissions:
+      - admin_role_only
+
+  dashboard_builder:
+    name: Dashboard Builder
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/10_schema_model_matrix.md
+    watched_paths:
+      exact:
+        - app/Controllers/Admin/DashboardController.php
+        - app/Controllers/Admin/DashboardBuilder.php
+        - app/Controllers/Admin/DashboardBlockController.php
+        - app/Services/DashboardService.php
+        - app/Services/DashboardBuilderService.php
+        - app/Services/DashboardBlockService.php
+        - app/Services/DashboardDataSourceService.php
+        - app/Services/Admin/DashboardService.php
+        - app/Models/DashboardModel.php
+        - app/Models/DashboardBlockTypeModel.php
+        - app/Models/DashboardBlockModel.php
+        - app/Models/DashboardBlockInstanceModel.php
+        - app/Database/Seeds/DashboardBuilderSeeder.php
+        - app/Config/Routes.php
+      globs:
+        - app/Views/admin/dashboard/**
+        - app/Views/admin/dashboard_builder/**
+        - app/Helpers/dashboard_*_helper.php
+        - app/Database/Migrations/*Dashboard*.php
+      broad_review: []
+    route_patterns:
+      - /admin/dashboard
+      - /admin/dashboard-builder*
+      - /admin/dashboard/blocks*
+    permissions:
+      - manage_dashboard
+      - admin_role_only
+
+  theme_media:
+    name: Theme / Media
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/10_schema_model_matrix.md
+    watched_paths:
+      exact:
+        - app/Controllers/Admin/Banners.php
+        - app/Services/BannerService.php
+        - app/Models/BannerModel.php
+        - app/Helpers/product_media_helper.php
+        - app/Config/Routes.php
+      globs:
+        - app/Views/admin/banners/**
+        - app/Views/admin/theme/**
+        - app/Views/admin/layouts/**
+        - app/Views/site/layouts/**
+        - app/Views/site/partials/**
+        - app/Database/Migrations/*Banner*.php
+      broad_review:
+        - public/uploads/**
+    route_patterns:
+      - /admin/banners*
+    permissions:
+      - admin_role_only
+
+  frontend_storefront:
+    name: Frontend Storefront
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+    watched_paths:
+      exact:
+        - app/Controllers/StorefrontController.php
+        - app/Controllers/ProductController.php
+        - app/Controllers/Home.php
+        - app/Services/StorefrontHomeService.php
+        - app/Services/ProductsService.php
+        - app/Models/ProductsModel.php
+        - app/Models/CategoryModel.php
+        - app/Models/AuthorModel.php
+        - app/Models/PageModel.php
+        - app/Models/PageVersionModel.php
+        - app/Models/BlockInstanceModel.php
+        - app/Config/Routes.php
+      globs:
+        - app/Views/site/storefront/**
+        - app/Views/site/products/**
+        - app/Views/site/home/**
+        - app/Views/site/layouts/**
+        - app/Views/site/partials/**
+      broad_review:
+        - app/Views/site/**
+    route_patterns:
+      - /
+      - /yardim/*
+      - /products/detail/*
+      - /products/list/*
+      - /products/selection
+      - /dashboard_anasayfa
+    permissions:
+      - login_required_for_dashboard
+
+  campaign_coupon:
+    name: Campaign / Coupon
+    kb_files:
+      - ai/domain-kb/00_repo_inventory.md
+      - ai/domain-kb/01_domain_index.md
+      - ai/domain-kb/02_route_permission_matrix.md
+      - ai/domain-kb/03_security_filter_audit.md
+      - ai/domain-kb/06_route_baseline.md
+      - ai/domain-kb/09_claim_id_registry.md
+      - ai/domain-kb/10_schema_model_matrix.md
+    watched_paths:
+      exact:
+        - app/Controllers/Admin/Campaigns.php
+        - app/Controllers/Admin/Coupons.php
+        - app/Services/CampaignService.php
+        - app/Services/CouponService.php
+        - app/Models/CampaignModel.php
+        - app/Models/CampaignTargetModel.php
+        - app/Models/CouponModel.php
+        - app/Models/CouponTargetModel.php
+        - app/Models/CouponRedemptionModel.php
+        - app/Filters/CampaignAccessFilter.php
+        - app/Config/Routes.php
+      globs:
+        - app/Views/admin/campaigns/**
+        - app/Views/admin/coupons/**
+      broad_review: []
+    route_patterns:
+      - /admin/campaigns*
+      - /admin/coupons*
+    permissions:
+      - manage_campaigns
+      - manage_campaigns_engine
+
+needs_review:
+  - path: app/Models/RoleModels.php
+    reason: Appears to overlap with RoleModel.php and may declare the same role model intent.
+    related_domains:
+      - user_role_permission
+  - path: app/Controllers/Admin/Dashboard.php
+    reason: No active route link is visible in Routes.php; may be legacy.
+    related_domains:
+      - admin_panel
+      - dashboard_builder
+  - path: app/Controllers/Admin/OrderController.php
+    reason: No active route link is visible in Routes.php; Admin/Orders.php appears to be the primary admin order controller.
+    related_domains:
+      - order
+      - admin_panel
+  - path: app/Controllers/Admin/ShippingAutomation.php
+    reason: Active routes point to ShippingAutomationController.php.
+    related_domains:
+      - admin_panel
+      - order
+  - path: app/Views/site/products/product_selection.php
+    reason: File exists, but products/selection delegates to ProductController::index in the current route flow.
+    related_domains:
+      - product_catalog
+      - frontend_storefront
+  - path: app/Views/admin/orders/stock_management_view.php
+    reason: Active controller-to-view link was not confirmed during static review.
+    related_domains:
+      - order
+      - product_catalog
+  - path: app/Views/admin/theme/**
+    reason: Alternative admin theme/layout set; active usage is unclear.
+    related_domains:
+      - theme_media
+      - admin_panel
+  - path: app/Views/layouts/**
+    reason: Legacy/general layout set coexists with newer admin and site layouts.
+    related_domains:
+      - admin_panel
+      - frontend_storefront
+  - path: app/Models/VisitModel.php
+    reason: Allowed fields appear narrower than the visits migration fields.
+    related_domains:
+      - admin_panel
+  - path: app/Services/ShippingAutomationRuleRepository.php
+    reason: Static review did not confirm a clear usage point.
+    related_domains:
+      - order
+      - admin_panel
+  - path: app/Views/site/products/product_detail.php
+    reason: Contains favorite/rating UI fragments, but matching backend runtime routes and models are not visible.
+    related_domains:
+      - favorites_wishlist
+      - review
+
+assumptions:
+  - "Assumption: Cart and checkout are currently represented mainly by admin page builder preview/configuration files, not by a clear runtime commerce flow."
+  - "Assumption: Favorites / Wishlist and Review are not implemented as backend route/model/service flows in the reviewed repository state."
+  - "Assumption: Campaign / Coupon should be tracked as a separate automation domain even though earlier KB files describe it partly through Cart and Admin Panel."
+  - "Assumption: Public page rendering for all page builder page types still needs a dedicated runtime render matrix."

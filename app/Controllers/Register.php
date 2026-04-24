@@ -11,7 +11,7 @@ class Register extends BaseController
     // KayÄ±t sayfasÄ±nÄ± (View) ekrana getiren fonksiyon
     public function index()
     {
-        return view('register'); // Birazdan bu View dosyasÄ±nÄ± oluÅŸturacaÄŸÄ±z
+        return view('auth/register'); // Birazdan bu View dosyasÄ±nÄ± oluÅŸturacaÄŸÄ±z
     }
 
     // KayÄ±t iÅŸlemini gerÃ§ekleÅŸtiren fonksiyon
