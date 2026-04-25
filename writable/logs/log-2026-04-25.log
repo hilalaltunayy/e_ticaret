@@ -6,3 +6,60 @@ DEBUG - 2026-04-25 09:47:40 --> Session: Class initialized using 'CodeIgniter\Se
 DEBUG - 2026-04-25 09:47:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2026-04-25 09:47:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2026-04-25 09:47:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-04-25 11:23:54 --> Error connecting to the database: mysqli_sql_exception: Hedef makine etkin olarak reddettiğinden bağlantı kurulamadı in C:\code\e_ticaret\system\Database\MySQLi\Connection.php:201
+Stack trace:
+#0 C:\code\e_ticaret\system\Database\MySQLi\Connection.php(201): mysqli->real_connect('localhost', 'root', Object(SensitiveParameterValue), 'eticaret_proje_...', 3306, '', 0)
+#1 C:\code\e_ticaret\system\Database\BaseConnection.php(419): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\code\e_ticaret\system\Database\BaseConnection.php(614): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\code\e_ticaret\system\Database\BaseConnection.php(1525): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FRO...')
+#4 C:\code\e_ticaret\system\Database\BaseConnection.php(1545): CodeIgniter\Database\BaseConnection->listTables()
+#5 C:\code\e_ticaret\app\Services\PageService.php(59): CodeIgniter\Database\BaseConnection->tableExists('pages')
+#6 C:\code\e_ticaret\app\Services\PageService.php(48): App\Services\PageService->tablesReady()
+#7 C:\code\e_ticaret\app\Services\StorefrontHomeService.php(46): App\Services\PageService->findPageByCode('home')
+#8 C:\code\e_ticaret\app\Controllers\StorefrontController.php(41): App\Services\StorefrontHomeService->getHomePageData('')
+#9 C:\code\e_ticaret\system\CodeIgniter.php(933): App\Controllers\StorefrontController->home()
+#10 C:\code\e_ticaret\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\StorefrontController))
+#11 C:\code\e_ticaret\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#12 C:\code\e_ticaret\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#13 C:\code\e_ticaret\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#14 C:\code\e_ticaret\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#15 C:\code\e_ticaret\system\rewrite.php(44): require_once('C:\\code\\e_ticar...')
+#16 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Hedef makine etkin olarak reddettiğinden bağlantı kurulamadı in C:\code\e_ticaret\system\Database\MySQLi\Connection.php:246
+Stack trace:
+#0 C:\code\e_ticaret\system\Database\BaseConnection.php(419): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\code\e_ticaret\system\Database\BaseConnection.php(614): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\code\e_ticaret\system\Database\BaseConnection.php(1525): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FRO...')
+#3 C:\code\e_ticaret\system\Database\BaseConnection.php(1545): CodeIgniter\Database\BaseConnection->listTables()
+#4 C:\code\e_ticaret\app\Services\PageService.php(59): CodeIgniter\Database\BaseConnection->tableExists('pages')
+#5 C:\code\e_ticaret\app\Services\PageService.php(48): App\Services\PageService->tablesReady()
+#6 C:\code\e_ticaret\app\Services\StorefrontHomeService.php(46): App\Services\PageService->findPageByCode('home')
+#7 C:\code\e_ticaret\app\Controllers\StorefrontController.php(41): App\Services\StorefrontHomeService->getHomePageData('')
+#8 C:\code\e_ticaret\system\CodeIgniter.php(933): App\Controllers\StorefrontController->home()
+#9 C:\code\e_ticaret\system\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\StorefrontController))
+#10 C:\code\e_ticaret\system\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#11 C:\code\e_ticaret\system\Boot.php(363): CodeIgniter\CodeIgniter->run()
+#12 C:\code\e_ticaret\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#13 C:\code\e_ticaret\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#14 C:\code\e_ticaret\system\rewrite.php(44): require_once('C:\\code\\e_ticar...')
+#15 {main}
+CRITICAL - 2026-04-25 11:23:54 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Hedef makine etkin olarak reddettiğinden bağlantı kurulamadı
+[Method: GET, Route: /]
+in SYSTEMPATH\Database\BaseConnection.php on line 465.
+ 1 SYSTEMPATH\Database\BaseConnection.php(614): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseConnection.php(1525): CodeIgniter\Database\BaseConnection->query('SHOW TABLES FROM `eticaret_proje_clean1`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(1545): CodeIgniter\Database\BaseConnection->listTables()
+ 4 APPPATH\Services\PageService.php(59): CodeIgniter\Database\BaseConnection->tableExists('pages')
+ 5 APPPATH\Services\PageService.php(48): App\Services\PageService->tablesReady()
+ 6 APPPATH\Services\StorefrontHomeService.php(46): App\Services\PageService->findPageByCode('home')
+ 7 APPPATH\Controllers\StorefrontController.php(41): App\Services\StorefrontHomeService->getHomePageData('')
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\StorefrontController->home()
+ 9 SYSTEMPATH\CodeIgniter.php(507): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\StorefrontController))
+10 SYSTEMPATH\CodeIgniter.php(354): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(363): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+14 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
+DEBUG - 2026-04-25 11:24:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
