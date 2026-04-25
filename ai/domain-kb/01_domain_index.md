@@ -120,6 +120,7 @@ This file is the domain-oriented working guide. Route, table, permission, and fi
 - Missing: A standalone product selection view exists, but `products/selection` delegates to the product index.
 - Risks: Stock move routing and `PriceService` usage points should be tracked.
 - KB update triggers: Product controller/service/model, product views, stock/pricing routes, or product migrations.
+- Controlled update note: REAL-TEST-001 marks `app/Models/ProductsModel.php` as high impact for Product / Catalog and `app/Views/site/products/list.php` as medium impact for Product / Catalog through the optimized manifest. Needs Review: no application diff was provided, so schema, validation, or behavior changes are not confirmed.
 
 ## Domain: Category
 
@@ -132,6 +133,7 @@ This file is the domain-oriented working guide. Route, table, permission, and fi
 - Missing: Independent category index/edit/delete flow is not visible.
 - Risks: Category is embedded under Product / Catalog; ownership boundary is weak.
 - KB update triggers: Category model, product admin category methods, category seeder, or campaign/coupon target usage changes.
+- Controlled update note: REAL-TEST-001 marks `app/Models/ProductsModel.php` as medium impact for Category because product-category relations may be affected by product model changes. Needs Review: no category behavior change is confirmed without an application diff.
 
 ## Domain: Order
 
@@ -255,6 +257,7 @@ This file is the domain-oriented working guide. Route, table, permission, and fi
 - Missing: Account pages, favorites, reviews, and cart/checkout runtime flows are not visible.
 - Risks: `site/products/product_selection.php` is not linked by the active selection route. Page builder public render scope must be mapped separately.
 - KB update triggers: Storefront/Product/Home controller, storefront service, site views, page builder public rendering, or public route changes.
+- Controlled update note: REAL-TEST-001 marks `app/Views/site/products/list.php` as high impact for Frontend Storefront and `app/Models/ProductsModel.php` as low impact for Frontend Storefront. With the available input, this is treated as a storefront view impact only; backend-flow impact is not confirmed. Needs Review if the view change adds form actions, route targets, cart/favorite/review behavior, or other runtime backend implications.
 
 ## Assumptions
 

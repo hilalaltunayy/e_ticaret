@@ -42,6 +42,10 @@ Recommended prefixes:
 | `ROUTE-CLAIM-006` | Route Baseline | Route baseline is partly manual and needs future automated extraction. | `ai/domain-kb/06_route_baseline.md` | `app/Config/Routes.php` | High | Verified |
 | `MODEL-CLAIM-001` | Schema / Models | Schema/model matrix is missing from older KB files but now has an initial baseline in `10_schema_model_matrix.md`. | `ai/domain-kb/10_schema_model_matrix.md` | `app/Models/**`, `app/Database/Migrations/**` | High | Partially Resolved |
 | `DOMAIN-CLAIM-002` | KB System | Stable claim IDs are not yet applied to every historical claim. | `ai/domain-kb/08_post_normalization_validation.md` | `ai/domain-kb/*.md` | High | Partially Resolved |
+| `MODEL-CLAIM-002` | Product / Catalog | `ProductsModel.php` is the high-impact model owner for Product / Catalog in the optimized manifest. | `ai/domain-kb/01_domain_index.md`, `ai/domain-kb/10_schema_model_matrix.md`, `ai/domain-kb/kb-manifest.yaml` | `app/Models/ProductsModel.php` | High | Verified |
+| `DOMAIN-CLAIM-003` | Frontend Storefront / Product / Catalog | Product site list view changes are high impact for Frontend Storefront and medium impact for Product / Catalog; backend-flow impact requires review when no diff is provided. | `ai/domain-kb/01_domain_index.md`, `ai/domain-kb/kb-manifest.yaml` | `app/Views/site/products/list.php` | Medium | Needs Review |
+| `SECURITY-CLAIM-003` | Auth / User / Role / Permission / Secretary Access | `Filters.php` changes are high impact for Auth and User / Role / Permission, and medium impact for Secretary Access in the optimized manifest. | `ai/domain-kb/02_route_permission_matrix.md`, `ai/domain-kb/03_security_filter_audit.md`, `ai/domain-kb/kb-manifest.yaml` | `app/Config/Filters.php` | High | Verified |
+| `ROUTE-CLAIM-007` | Auth / Admin Panel / Frontend Storefront / Page Builder / Dashboard Builder | `Routes.php` changes are classified by optimized manifest impact levels instead of triggering equal full-domain updates. | `ai/domain-kb/02_route_permission_matrix.md`, `ai/domain-kb/06_route_baseline.md`, `ai/domain-kb/kb-manifest.yaml` | `app/Config/Routes.php` | High | Verified |
 
 ## Usage Rules
 

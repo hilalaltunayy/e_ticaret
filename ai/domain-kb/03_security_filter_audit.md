@@ -367,6 +367,18 @@ Risk:
 - Role-only admin routes may be acceptable policy, but they are less granular than the secretary permission model.
 - Missing runtime routes for cart, checkout, account, favorites, and review prevent complete user-flow security assessment.
 
+## Controlled Update Notes
+
+- REAL-TEST-002 impact analysis:
+  - Source: `ai/domain-kb/kb-manifest.yaml`
+  - Changed path: `app/Config/Filters.php`
+  - High impact domains: Auth; User / Role / Permission
+  - Medium impact domain: Secretary Access
+  - Low-impact domains require review only if the actual filter diff changes their route access.
+- Needs Review: no application diff was provided for `app/Config/Filters.php`, so no specific filter behavior change is confirmed.
+- Route baseline was not updated because `app/Config/Routes.php` was not part of the changed paths.
+- Schema/model matrix was not updated because no model, migration, or seeder path was part of the changed paths.
+
 ## Summary
 
 - Secure areas:

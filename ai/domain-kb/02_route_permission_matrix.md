@@ -265,6 +265,26 @@ Status values:
 - CSRF and secure header behavior cannot be fully judged from route mappings alone.
 - Missing runtime user routes can hide product expectations that are not represented in `Routes.php`.
 
+## Controlled Update Notes
+
+- REAL-TEST-002 impact analysis:
+  - Source: `ai/domain-kb/kb-manifest.yaml`
+  - Changed path: `app/Config/Filters.php`
+  - High impact domains: Auth; User / Role / Permission
+  - Medium impact domain: Secretary Access
+- This matrix requires review when filter aliases, filter arguments, RBAC behavior, or secretary permission enforcement changes.
+- Needs Review: no application diff was provided, so no specific route row is changed by this test.
+- Route baseline was not updated because route definitions did not change.
+- REAL-TEST-003 impact analysis:
+  - Source: `ai/domain-kb/kb-manifest.yaml`
+  - Changed path: `app/Config/Routes.php`
+  - High impact domains: Auth; Admin Panel; Frontend Storefront
+  - Medium impact domains: Page Builder; Dashboard Builder
+  - Low impact domains: Product / Catalog; Category
+  - Review-required domains: Order; Cart; Favorites / Wishlist; Review; Campaign / Coupon; Theme / Media
+- Needs Review: no application diff was provided for `Routes.php`, so no concrete route matrix row was changed by this controlled test.
+- Review-required domains were not directly updated; they require exact route diff evidence before domain KB updates.
+
 ## Result
 
 - Clearly protected routes:

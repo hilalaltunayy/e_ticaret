@@ -47,7 +47,7 @@ This is a baseline, not a full field-level schema diff. It documents model-to-ta
 | `PageVersionModel.php` | `page_versions` | `app/Models/PageVersionModel.php`, `2026-04-04-100100_CreatePageVersionsTable.php` | Verified | Page Builder. |
 | `PermissionModel.php` | `permissions` | `app/Models/PermissionModel.php`, `2026-02-07-104831_CreateInitialSchemaUuid.php` | Verified | RBAC. |
 | `PriceRuleModel.php` | `price_rules` | `app/Models/PriceRuleModel.php`, `2026-03-31-100000_CreatePriceRulesTable.php` | Verified | Product / Catalog / Pricing. |
-| `ProductsModel.php` | `products` | `app/Models/ProductsModel.php`, `2026-02-07-104831_CreateInitialSchemaUuid.php` | Verified | Product / Catalog. |
+| `ProductsModel.php` | `products` | `app/Models/ProductsModel.php`, `2026-02-07-104831_CreateInitialSchemaUuid.php` | Verified | Product / Catalog. REAL-TEST-001 confirms this path as high-impact for schema/model KB review when changed. |
 | `RoleModel.php` | `roles` | `app/Models/RoleModel.php`, `2026-02-07-104831_CreateInitialSchemaUuid.php` | Verified | RBAC. |
 | `RoleModels.php` | `roles` | `app/Models/RoleModels.php`, `2026-02-07-104831_CreateInitialSchemaUuid.php` | Needs Review | Duplicate/conflicting role model file risk remains. |
 | `RolePermissionModel.php` | `role_permissions` | `app/Models/RolePermissionModel.php`, `2026-02-07-104831_CreateInitialSchemaUuid.php` | Verified | RBAC pivot. |
@@ -128,6 +128,7 @@ This is a baseline, not a full field-level schema diff. It documents model-to-ta
 - Model allowed fields were not exhaustively compared against every migration field.
 - Runtime database state was not inspected.
 - Soft-delete, timestamp, and custom data access behavior require a later detailed audit.
+- REAL-TEST-001 changed-path input included `app/Models/ProductsModel.php`, but no application diff was provided. Needs Review: field-level schema/model impact cannot be confirmed without an actual diff or extractor output.
 
 ## Assumptions
 

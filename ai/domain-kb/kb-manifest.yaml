@@ -6,6 +6,93 @@ language: en
 kb_root: ai/domain-kb
 source_inventory: ai/domain-cube/00_repo_inventory.md
 
+impact_rules:
+  high_impact:
+    meaning: "A changed path is expected to directly affect route behavior, security posture, primary domain behavior, or user-visible runtime flow."
+    kb_update: "Required unless the change is explicitly proven to be documentation-only or formatting-only."
+    automation_action: "Open the affected domain KB files and produce a KB update or a recorded skip reason."
+  medium_impact:
+    meaning: "A changed path may affect domain behavior, admin tooling, builder configuration, or secondary route/view bindings."
+    kb_update: "Required when behavior, route binding, permission behavior, schema mapping, or domain ownership changed."
+    automation_action: "Review affected KB files and mark update completed or skipped with a reason."
+  low_impact:
+    meaning: "A changed path has an indirect or secondary relationship to the domain."
+    kb_update: "Optional when the change is clearly local and does not alter domain behavior, routes, schema, security, or user flow."
+    automation_action: "Record low-impact match; update only if the review finds domain-facing drift."
+  review_required:
+    meaning: "A changed path is too broad, ambiguous, legacy, or weakly owned for automatic domain updates."
+    kb_update: "Do not auto-update. Manual review is required before selecting affected KB files."
+    automation_action: "Create a review item and keep update status pending or skipped with a manual-review reason."
+
+impact_mappings:
+  app/Config/Routes.php:
+    match_type: exact
+    high_impact:
+      - auth
+      - admin_panel
+      - frontend_storefront
+    medium_impact:
+      - page_builder
+      - dashboard_builder
+    low_impact:
+      - product_catalog
+      - category
+    review_required:
+      - secretary_access
+      - order
+      - cart
+      - favorites_wishlist
+      - review
+      - theme_media
+      - campaign_coupon
+      - user_role_permission
+    notes: "Routes.php is intentionally no longer treated as an equal full-domain trigger for every domain; exact route extraction is still needed for final automation precision."
+  app/Config/Filters.php:
+    match_type: exact
+    high_impact:
+      - auth
+      - user_role_permission
+    medium_impact:
+      - secretary_access
+    low_impact:
+      - admin_panel
+      - order
+      - cart
+      - page_builder
+      - dashboard_builder
+      - frontend_storefront
+      - campaign_coupon
+    review_required:
+      - product_catalog
+      - category
+      - favorites_wishlist
+      - review
+      - theme_media
+    notes: "Filter config changes prioritize authentication and RBAC first; other domains are reviewed only when their route access is affected."
+  app/Models/ProductsModel.php:
+    match_type: exact
+    high_impact:
+      - product_catalog
+    medium_impact:
+      - category
+    low_impact:
+      - frontend_storefront
+    review_required: []
+    notes: "Product model changes primarily affect Product / Catalog; storefront impact is secondary unless runtime product rendering changes."
+  app/Views/site/products/**:
+    match_type: glob
+    high_impact:
+      - frontend_storefront
+    medium_impact:
+      - product_catalog
+    low_impact:
+      - favorites_wishlist
+      - review
+    review_required:
+      - cart
+      - campaign_coupon
+    notes: "Product site views prioritize storefront impact; backend flow implications still require review when forms, route targets, cart, campaign, wishlist, or review UI behavior changes."
+
 global_kb_files:
   - path: ai/domain-kb/00_repo_inventory.md
     role: repository_inventory
@@ -33,6 +120,18 @@ global_kb_files:
     role: blocker_resolution_report
   - path: ai/domain-kb/12_final_kb_readiness_check.md
     role: final_kb_readiness_check
+  - path: ai/domain-kb/13_gitnexus_metadata_baseline.md
+    role: gitnexus_metadata_baseline
+  - path: ai/domain-kb/20_kb_update_system_test_summary.md
+    role: kb_update_system_test_summary
+  - path: ai/domain-kb/21_gitnexus_system_design.md
+    role: gitnexus_system_design
+  - path: ai/domain-kb/22_gitnexus_design_validation.md
+    role: gitnexus_design_validation
+  - path: ai/domain-kb/23_gitnexus_workflow_policy.md
+    role: gitnexus_workflow_policy
+  - path: ai/domain-kb/24_gitnexus_workflow_policy_validation.md
+    role: gitnexus_workflow_policy_validation
   - path: ai/domain-kb/kb-manifest.yaml
     role: kb_manifest
 
@@ -138,8 +237,10 @@ domains:
         - app/Views/admin/partials/**
         - app/DTO/Admin/**
       broad_review:
-        - app/Controllers/Admin/**
-        - app/Views/admin/**
+        - app/Controllers/Admin/Dashboard.php
+        - app/Controllers/Admin/OrderController.php
+        - app/Controllers/Admin/ShippingAutomation.php
+        - app/Views/admin/theme/**
     route_patterns:
       - /admin/dashboard
       - /admin/settings
@@ -351,7 +452,7 @@ domains:
         - app/Database/Migrations/**/*Favorite*.php
         - app/Database/Migrations/**/*Wishlist*.php
       broad_review:
-        - app/Views/site/**
+        - app/Views/site/products/product_detail.php
     route_patterns: []
     permissions: []
 
@@ -376,7 +477,7 @@ domains:
         - app/Database/Migrations/**/*Review*.php
         - app/Database/Migrations/**/*Rating*.php
       broad_review:
-        - app/Views/site/**
+        - app/Views/site/products/product_detail.php
     route_patterns: []
     permissions: []
 
@@ -518,7 +619,7 @@ domains:
         - app/Views/site/layouts/**
         - app/Views/site/partials/**
       broad_review:
-        - app/Views/site/**
+        - app/Views/site/products/product_selection.php
     route_patterns:
       - /
       - /yardim/*

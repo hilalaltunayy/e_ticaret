@@ -270,6 +270,20 @@ Missing or unclear runtime routes:
   - `ai/domain-kb/01_domain_index.md`
   - `ai/domain-kb/06_route_baseline.md`
 
+## Controlled Update Notes
+
+- REAL-TEST-003 impact analysis:
+  - Source: `ai/domain-kb/kb-manifest.yaml`
+  - Changed path: `app/Config/Routes.php`
+  - High impact domains: Auth; Admin Panel; Frontend Storefront
+  - Medium impact domains: Page Builder; Dashboard Builder
+  - Low impact domains: Product / Catalog; Category
+  - Review-required domains: Order; Cart; Favorites / Wishlist; Review; Campaign / Coupon; Theme / Media
+- Needs Review: no application diff was provided for `Routes.php`, so no exact route baseline row was added, removed, or changed.
+- Review-required domains must not be auto-updated until route extraction or manual diff review confirms a concrete route change.
+- `03_security_filter_audit.md` was not updated in this controlled test because no explicit route security boundary change was provided.
+- `10_schema_model_matrix.md` was not updated because route changes do not imply schema/model changes by themselves.
+
 ## Assumptions
 
 - Assumption: Route names are not listed because named route aliases are not visible in the reviewed `Routes.php`.
