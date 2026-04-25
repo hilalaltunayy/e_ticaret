@@ -63,3 +63,5 @@ in SYSTEMPATH\Database\BaseConnection.php on line 465.
 13 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
 14 SYSTEMPATH\rewrite.php(44): require_once('C:\\code\\e_ticaret\\public\\index.php')
 DEBUG - 2026-04-25 11:24:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-25 12:45:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2026-04-25 13:26:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

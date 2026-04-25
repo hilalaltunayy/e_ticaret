@@ -1,0 +1,9 @@
+# Local environment secrets
+.env
+.env.*
+!.env.example
+
+# CodeIgniter runtime data
+writable/logs/*
+writable/session/*
+writable/debugbar/*
