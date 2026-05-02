@@ -1,0 +1,13 @@
+services:
+  oracle-mcp-runtime:
+    container_name: oracle-mcp-runtime
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../../..:/workspace:ro
+      - ./output:/workspace/ai/oracle/runtime/output:rw
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
