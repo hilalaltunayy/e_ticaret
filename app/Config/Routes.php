@@ -122,6 +122,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_dashboard'], function ($routes) {
     $routes->get('dashboard', 'Admin\DashboardController::index');
+    $routes->get('traffic-analysis', 'Admin\TrafficAnalysis::index');
+    $routes->get('log-records', 'Admin\LogRecords::index');
 });
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_stock'], function ($routes) {
@@ -142,10 +144,13 @@ $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_notificat
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_customers'], function ($routes) {
     $routes->get('customers', 'Admin\Customers::index');
+    $routes->get('customer-messages', 'Admin\CustomerMessages::index');
+    $routes->get('complaints', 'Admin\Complaints::index');
 });
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_products'], function ($routes) {
     $routes->get('products', 'Admin\Products::index');
+    $routes->get('reviews', 'Admin\Reviews::index');
     $routes->get('api/products', 'Admin\Products::datatables');
     $routes->get('products/create', 'Admin\Products::create');
     $routes->post('products/store', 'Admin\Products::store');

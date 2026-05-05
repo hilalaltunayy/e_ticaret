@@ -1,5 +1,9 @@
 <?= $this->extend('admin/layouts/main') ?>
 
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="<?= base_url('assets/admin/css/plugins/dataTables.bootstrap5.min.css') ?>">
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 <?php
 $report = is_array($report ?? null) ? $report : [];
@@ -119,9 +123,9 @@ $statusText = static function (string $status): string {
     <h5 class="mb-0">Son Sipari&#351; &Ouml;deme &Ouml;zeti</h5>
     <a href="<?= site_url('admin/orders') ?>" class="btn btn-sm btn-outline-primary">Sipari&#351;lere Git</a>
   </div>
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
+  <div class="card-body">
+    <div class="dt-responsive table-responsive">
+      <table id="paymentReportsTable" class="table table-hover table-striped align-middle mb-0 w-100">
         <thead>
           <tr>
             <th>Sipari&#351;</th>
@@ -133,11 +137,6 @@ $statusText = static function (string $status): string {
           </tr>
         </thead>
         <tbody>
-          <?php if ($recentOrders === []): ?>
-            <tr>
-              <td colspan="6" class="text-center text-muted py-4">Raporlanacak siparis bulunamadi.</td>
-            </tr>
-          <?php endif; ?>
           <?php foreach ($recentOrders as $order): ?>
             <?php
             $orderId = (string) ($order['id'] ?? '');
@@ -159,4 +158,34 @@ $statusText = static function (string $status): string {
     </div>
   </div>
 </div>
+<?= $this->endSection() ?>
+
+<?= $this->section('pageScripts') ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.bootstrap5.min.js') ?>"></script>
+<script>
+  (function () {
+    $('#paymentReportsTable').DataTable({
+      pageLength: 10,
+      lengthMenu: [10, 25, 50, 100],
+      order: [[5, 'desc']],
+      dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+      language: {
+        lengthMenu: '_MENU_ kayit goster',
+        search: 'Ara:',
+        zeroRecords: 'Raporlanacak siparis bulunamadi',
+        info: '_TOTAL_ kayittan _START_ - _END_ arasi gosteriliyor',
+        infoEmpty: '0 kayittan 0 - 0 arasi gosteriliyor',
+        infoFiltered: '(_MAX_ kayit icinden filtrelendi)',
+        paginate: {
+          first: 'Ilk',
+          last: 'Son',
+          next: 'Sonraki',
+          previous: 'Onceki'
+        }
+      }
+    });
+  })();
+</script>
 <?= $this->endSection() ?>

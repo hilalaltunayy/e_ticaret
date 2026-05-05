@@ -8,6 +8,7 @@ use App\Models\OrderModel;
 use App\Models\UserPermissionModel;
 use App\Presenters\OrderDatatablePresenter;
 use App\Services\InvoiceService;
+use App\Services\AuditLogger;
 use App\Services\OrderCreationService;
 use App\Services\OrderNoteService;
 use App\Services\OrderShippingService;
@@ -26,7 +27,8 @@ class Orders extends BaseController
         private ?PackingService $packingService = null,
         private ?OrderNoteService $orderNoteService = null,
         private ?OrderCreationService $orderCreationService = null,
-        private ?OrderShippingService $orderShippingService = null
+        private ?OrderShippingService $orderShippingService = null,
+        private ?AuditLogger $auditLogger = null
     ) {
         $this->ordersService = $this->ordersService ?? new OrdersService();
         $this->ordersReportingService = $this->ordersReportingService ?? new OrdersReportingService();
@@ -35,6 +37,7 @@ class Orders extends BaseController
         $this->orderNoteService = $this->orderNoteService ?? new OrderNoteService();
         $this->orderCreationService = $this->orderCreationService ?? new OrderCreationService();
         $this->orderShippingService = $this->orderShippingService ?? new OrderShippingService();
+        $this->auditLogger = $this->auditLogger ?? new AuditLogger();
     }
 
     public function index()
@@ -159,6 +162,7 @@ class Orders extends BaseController
         }
 
         $actor = $this->getActor();
+        $beforeOrder = (new OrderModel())->findByIdOrOrderNo($orderId);
         $result = $this->ordersService->applyInlineStatusUpdate($orderId, $field, $value, $actor);
         if (! (bool) ($result['success'] ?? false)) {
             return $this->jsonErrorResponse(
@@ -166,6 +170,18 @@ class Orders extends BaseController
                 (string) ($result['message'] ?? "Gecersiz istek.")
             );
         }
+
+        $this->auditLogger->log(
+            $field === 'payment_status' ? 'order.payment_update' : 'order.status_update',
+            'order',
+            (string) ($beforeOrder['id'] ?? $orderId),
+            [
+                'order_no' => (string) ($beforeOrder['order_no'] ?? ''),
+                'field' => $field,
+                'before' => [$field => (string) ($beforeOrder[$field] ?? '')],
+                'after' => [$field => $value],
+            ]
+        );
 
         return $this->response->setJSON($this->withCsrf([
             'success' => true,
@@ -428,6 +444,22 @@ class Orders extends BaseController
             return redirect()->back()->withInput()->with('error', 'Durum guncellenemedi.');
         }
 
+        $order = (array) ($result['order'] ?? []);
+        $after = ['order_status' => (string) $this->request->getPost('order_status')];
+        $paymentStatus = trim((string) ($this->request->getPost('payment_status') ?? ''));
+        if ($paymentStatus !== '') {
+            $after['payment_status'] = $paymentStatus;
+        }
+
+        $this->auditLogger->log('order.status_update', 'order', (string) ($order['id'] ?? $identifier), [
+            'order_no' => (string) ($order['order_no'] ?? ''),
+            'before' => [
+                'order_status' => (string) ($order['order_status'] ?? ''),
+                'payment_status' => (string) ($order['payment_status'] ?? ''),
+            ],
+            'after' => $after,
+        ]);
+
         return redirect()->back()->with('success', 'Durum guncellendi.');
     }
     public function updateShipping(string $identifier)
@@ -458,6 +490,19 @@ class Orders extends BaseController
         $shippingCompany = (string) ($result['shipping_company'] ?? '');
         $trackingNumber = (string) ($result['tracking_number'] ?? '');
         $shippingStatus = (string) ($result['shipping_status'] ?? '');
+        $this->auditLogger->log('order.shipping_update', 'order', (string) ($order['id'] ?? $identifier), [
+            'order_no' => (string) ($order['order_no'] ?? ''),
+            'before' => [
+                'shipping_company' => (string) ($order['shipping_company'] ?? ''),
+                'tracking_number' => (string) ($order['tracking_number'] ?? ''),
+                'shipping_status' => (string) ($order['shipping_status'] ?? ''),
+            ],
+            'after' => [
+                'shipping_company' => $shippingCompany,
+                'tracking_number' => $trackingNumber !== '' ? '[set]' : '',
+                'shipping_status' => $shippingStatus,
+            ],
+        ]);
         $this->logOrderAction(
             (string) $order['id'],
             $actor['id'],

@@ -81,14 +81,14 @@ $canManageAuthz = ($roleName === 'admin');
             </a>
           </li>
         <?php endif; ?>
-        <li class="pc-item">
+          <li class="pc-item">
           <a href="<?= site_url('admin/pages') ?>" class="pc-link<?= $isActive('admin/pages') ?>">
             <span class="pc-micon">
               <i class="ti ti-layout-grid"></i>
             </span>
             <span class="pc-mtext">Sayfa Yönetimi</span>
           </a>
-        </li>
+          </li>
 
         <li class="pc-item pc-caption">
           <label>Ürün Yönetimi</label>
@@ -210,7 +210,7 @@ $canManageAuthz = ($roleName === 'admin');
           </li>
         <?php endif; ?>
         <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+          <a href="<?= site_url('admin/customer-messages') ?>" class="pc-link<?= $isActive('admin/customer-messages') ?>">
             <span class="pc-micon">
               <i class="ti ti-message-circle"></i>
             </span>
@@ -222,7 +222,7 @@ $canManageAuthz = ($roleName === 'admin');
           <label>Yorum / Değerlendirme</label>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+          <a href="<?= site_url('admin/reviews') ?>" class="pc-link<?= $isActive('admin/reviews') ?>">
             <span class="pc-micon">
               <i class="ti ti-star"></i>
             </span>
@@ -230,7 +230,7 @@ $canManageAuthz = ($roleName === 'admin');
           </a>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+          <a href="<?= site_url('admin/complaints') ?>" class="pc-link<?= $isActive('admin/complaints') ?>">
             <span class="pc-micon">
               <i class="ti ti-alert-circle"></i>
             </span>
@@ -250,7 +250,7 @@ $canManageAuthz = ($roleName === 'admin');
           </a>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+          <a href="<?= site_url('admin/traffic-analysis') ?>" class="pc-link<?= $isActive('admin/traffic-analysis') ?>">
             <span class="pc-micon">
               <i class="ti ti-activity"></i>
             </span>
@@ -272,7 +272,7 @@ $canManageAuthz = ($roleName === 'admin');
           </li>
         <?php endif; ?>
         <li class="pc-item">
-          <a href="<?= site_url('admin/dashboard') ?>" class="pc-link<?= $isActive('admin/dashboard') ?>">
+          <a href="<?= site_url('admin/log-records') ?>" class="pc-link<?= $isActive('admin/log-records') ?>">
             <span class="pc-micon">
               <i class="ti ti-file-text"></i>
             </span>

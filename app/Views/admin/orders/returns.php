@@ -1,5 +1,9 @@
 <?= $this->extend('admin/layouts/main') ?>
 
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="<?= base_url('assets/admin/css/plugins/dataTables.bootstrap5.min.css') ?>">
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 <?php
 $returnsReport = is_array($returnsReport ?? null) ? $returnsReport : [];
@@ -81,9 +85,9 @@ $statusText = static function (string $status): string {
     </div>
     <a href="<?= site_url('admin/orders') ?>" class="btn btn-sm btn-outline-primary">Sipari&#351; Listesi</a>
   </div>
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
+  <div class="card-body">
+    <div class="dt-responsive table-responsive">
+      <table id="returnsTable" class="table table-hover table-striped align-middle mb-0 w-100">
         <thead>
           <tr>
             <th>Sipari&#351;</th>
@@ -95,14 +99,6 @@ $statusText = static function (string $status): string {
           </tr>
         </thead>
         <tbody>
-          <?php if ($orders === []): ?>
-            <tr>
-              <td colspan="6" class="text-center py-5">
-                <div class="mb-1 fw-semibold">&#304;ade kayd&#305; bulunamad&#305;.</div>
-                <div class="text-muted">&#304;ade mod&uuml;l&uuml;, sipari&#351; durumlar&#305; iade s&uuml;recine girdi&#287;inde burada listeleyecek.</div>
-              </td>
-            </tr>
-          <?php endif; ?>
           <?php foreach ($orders as $order): ?>
             <?php
             $orderId = (string) ($order['id'] ?? '');
@@ -126,4 +122,34 @@ $statusText = static function (string $status): string {
     </div>
   </div>
 </div>
+<?= $this->endSection() ?>
+
+<?= $this->section('pageScripts') ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/admin/js/plugins/dataTables.bootstrap5.min.js') ?>"></script>
+<script>
+  (function () {
+    $('#returnsTable').DataTable({
+      pageLength: 10,
+      lengthMenu: [10, 25, 50, 100],
+      order: [[5, 'desc']],
+      dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+      language: {
+        lengthMenu: '_MENU_ kayit goster',
+        search: 'Ara:',
+        zeroRecords: 'Iade kaydi bulunamadi',
+        info: '_TOTAL_ kayittan _START_ - _END_ arasi gosteriliyor',
+        infoEmpty: '0 kayittan 0 - 0 arasi gosteriliyor',
+        infoFiltered: '(_MAX_ kayit icinden filtrelendi)',
+        paginate: {
+          first: 'Ilk',
+          last: 'Son',
+          next: 'Sonraki',
+          previous: 'Onceki'
+        }
+      }
+    });
+  })();
+</script>
 <?= $this->endSection() ?>
