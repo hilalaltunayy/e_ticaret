@@ -25,121 +25,313 @@ class ShippingSimulationService
             ? (array) call_user_func($this->companiesResolver)
             : $this->getCompaniesById();
 
-        $eligible = [];
-
-        foreach ($rules as $rule) {
-            $check = $this->isRuleEligible($rule, $request);
-            if (! $check['eligible']) {
-                continue;
-            }
-
-            $score = $this->scoreRule($rule, $request);
-            $companyId = (string) ($rule['primary_company_id'] ?? '');
-
-            $eligible[] = [
-                'rule' => $rule,
-                'company_id' => $companyId,
-                'company_name' => $companies[$companyId]['name'] ?? ($companyId !== '' ? $companyId : '-'),
-                'checks' => $check,
-                'score' => $score,
-            ];
+        if ($rules === []) {
+            return $this->buildEmptyResponse(
+                $request,
+                'Aktif otomasyon kurali bulunamadi. Saglikli bir oneri icin sehir, desi, kapida odeme ve SLA kurallari tanimlanmalidir.',
+                [],
+                ['city kurali', 'desi kurali', 'cod kurali', 'sla kurali']
+            );
         }
 
-        usort($eligible, function (array $a, array $b): int {
-            if ($a['score']['cost'] !== $b['score']['cost']) {
-                return $a['score']['cost'] <=> $b['score']['cost'];
+        $candidateIds = $this->collectCandidateIds($rules, $companies);
+        $candidates = [];
+
+        foreach ($candidateIds as $companyId) {
+            $candidate = $this->analyzeCandidate($companyId, $companies, $rules, $request);
+            if ($candidate['matched_rule_count'] === 0) {
+                continue;
+            }
+            $candidates[] = $candidate;
+        }
+
+        if ($candidates === []) {
+            return $this->buildEmptyResponse(
+                $request,
+                'Girilen kriterlere tam veya kismi uyum saglayan aktif kural bulunamadi. Sehir, desi, kapida odeme veya SLA kurallari genisletilmelidir.',
+                [],
+                $this->buildNeedsDataList($rules)
+            );
+        }
+
+        $candidates = $this->applyCostScores($candidates);
+        foreach ($candidates as &$candidate) {
+            $candidate['total_score'] = $this->calculateTotalScore($candidate, $request->mode);
+        }
+        unset($candidate);
+
+        usort($candidates, function (array $left, array $right): int {
+            if ($left['total_score'] !== $right['total_score']) {
+                return $right['total_score'] <=> $left['total_score'];
             }
 
-            if ($a['score']['sla'] !== $b['score']['sla']) {
-                return $a['score']['sla'] <=> $b['score']['sla'];
+            if ($left['matched_rule_count'] !== $right['matched_rule_count']) {
+                return $right['matched_rule_count'] <=> $left['matched_rule_count'];
             }
 
-            return $b['score']['priority'] <=> $a['score']['priority'];
+            if ($left['priority'] !== $right['priority']) {
+                return $right['priority'] <=> $left['priority'];
+            }
+
+            return strcmp((string) $left['company_name'], (string) $right['company_name']);
         });
 
-        $selected = $eligible[0] ?? null;
+        $selected = $candidates[0];
+        $topCandidates = array_slice($candidates, 0, 3);
 
         return [
-            'ok' => true,
             'request' => [
                 'city' => $request->city,
                 'city_slug' => $request->citySlug,
                 'sla_days' => $request->slaDays,
                 'cod' => $request->cod,
                 'desi' => $request->desi,
+                'mode' => $request->mode,
             ],
-            'selected' => $selected ? [
+            'selected' => [
                 'company_id' => $selected['company_id'],
                 'company_name' => $selected['company_name'],
-                'rule_id' => $selected['rule']['id'] ?? null,
+                'summary' => $this->buildSummary($selected, $request),
+                'reason_lines' => $selected['reason_lines'],
+                'price_label' => $selected['price_label'],
+                'score' => $selected['total_score'],
+                'matched_rule_types' => $selected['matched_rule_types'],
                 'reason' => [
-                    'city_match' => $selected['checks']['city'],
-                    'sla_match' => $selected['checks']['sla'],
-                    'cod_match' => $selected['checks']['cod'],
-                    'desi_match' => $selected['checks']['desi'],
-                    'cost' => $selected['score']['cost'],
-                    'sla' => $selected['score']['sla'],
-                    'priority' => $selected['score']['priority'],
+                    'city_match' => in_array('city', $selected['matched_rule_types'], true),
+                    'sla_match' => in_array('sla', $selected['matched_rule_types'], true),
+                    'cod_match' => ! $request->cod || in_array('cod', $selected['matched_rule_types'], true),
+                    'desi_match' => in_array('desi', $selected['matched_rule_types'], true),
+                    'cost' => $selected['price_label'],
+                    'sla' => $selected['sla_display'],
+                    'priority' => $selected['priority'],
                 ],
-            ] : null,
-            'top_candidates' => array_map(function (array $row): array {
+            ],
+            'top_candidates' => array_map(function (array $candidate): array {
                 return [
-                    'company_name' => $row['company_name'],
-                    'rule_id' => $row['rule']['id'] ?? null,
-                    'cost' => $row['score']['cost'],
-                    'sla' => $row['score']['sla'],
-                    'priority' => $row['score']['priority'],
+                    'company_name' => $candidate['company_name'],
+                    'score' => $candidate['total_score'],
+                    'price_label' => $candidate['price_label'],
+                    'matched_rule_count' => $candidate['matched_rule_count'],
+                    'matched_rule_types' => $candidate['matched_rule_types'],
+                    'cost' => $candidate['price_label'],
+                    'sla' => $candidate['sla_display'],
+                    'priority' => $candidate['priority'],
                 ];
-            }, array_slice($eligible, 0, 3)),
+            }, $topCandidates),
+            'fallback_message' => null,
+            'needs_data' => $this->buildNeedsDataList($rules),
         ];
     }
 
-    public function normalizeCity(string $city): string
-    {
-        return ShippingSimulationRequestDTO::normalizeCity($city);
-    }
+    private function analyzeCandidate(
+        string $companyId,
+        array $companies,
+        array $rules,
+        ShippingSimulationRequestDTO $request
+    ): array {
+        $company = $companies[$companyId] ?? ['id' => $companyId, 'name' => $companyId];
+        $cityRule = $this->findBestRuleMatch($rules, 'city', $companyId, function (array $rule) use ($request): bool {
+            return $this->matchesCity($rule, $request);
+        });
+        $desiRule = $this->findBestRuleMatch($rules, 'desi', $companyId, function (array $rule) use ($request): bool {
+            return $this->matchesDesi($rule, $request->desi);
+        });
+        $slaRule = $this->findBestRuleMatch($rules, 'sla', $companyId, function (array $rule) use ($request): bool {
+            return $this->matchesSla($rule, $request);
+        });
+        $codRule = $request->cod
+            ? $this->findBestRuleMatch($rules, 'cod', $companyId, static fn (array $rule): bool => (int) ($rule['supports_cod'] ?? 0) === 1)
+            : null;
 
-    public function isRuleEligible(array $rule, ShippingSimulationRequestDTO $request): array
-    {
-        $ruleCity = trim((string) ($rule['city'] ?? ''));
-        $ruleCitySlug = trim((string) ($rule['city_slug'] ?? ''));
-        if ($ruleCitySlug === '' && $ruleCity !== '') {
-            $ruleCitySlug = $this->normalizeCity($ruleCity);
+        $reasonLines = [];
+        $matchedRuleTypes = [];
+        $matchedRuleCount = 0;
+
+        $cityScore = 0.0;
+        if ($cityRule !== null) {
+            $cityScore = $cityRule['role'] === 'primary' ? 1.0 : 0.65;
+            $matchedRuleTypes[] = 'city';
+            $matchedRuleCount++;
+            $reasonLines[] = 'Sehir kurali eslesmesi bulundu.';
         }
 
-        $cityPass = ($ruleCitySlug === '' || $ruleCitySlug === $request->citySlug);
+        $desiScore = 0.0;
+        if ($desiRule !== null) {
+            $desiScore = $desiRule['role'] === 'primary' ? 1.0 : 0.65;
+            $matchedRuleTypes[] = 'desi';
+            $matchedRuleCount++;
+            $reasonLines[] = 'Desi araligi kurali ile uyumlu.';
+        }
 
-        $maxSla = $this->resolveSla($rule);
-        $slaPass = ($request->slaDays <= $maxSla);
+        $slaScore = 0.0;
+        if ($slaRule !== null) {
+            $ruleSla = max(1, (int) ($slaRule['rule']['sla_max_days'] ?? $slaRule['rule']['sla_days'] ?? $request->slaDays));
+            $gap = max(0, $ruleSla - $request->slaDays);
+            $slaScore = max(0.2, 1 - ($gap * 0.25));
+            if ($ruleSla <= $request->slaDays) {
+                $slaScore = min(1.0, $slaScore + 0.15);
+            }
+            $matchedRuleTypes[] = 'sla';
+            $matchedRuleCount++;
+            $reasonLines[] = 'SLA hedefi ile uyumlu kural bulundu.';
+        }
 
-        $supportsCod = $this->resolveSupportsCod($rule);
-        $codPass = ($supportsCod === $request->cod);
+        $codScore = $request->cod ? 0.0 : 0.5;
+        if ($request->cod && $codRule !== null) {
+            $codScore = $codRule['role'] === 'primary' ? 1.0 : 0.65;
+            $matchedRuleTypes[] = 'cod';
+            $matchedRuleCount++;
+            $reasonLines[] = 'Kapida odeme destegi bulunan kural eslesti.';
+        }
 
-        $desiPass = $this->isDesiInRange($rule, $request->desi);
+        $priority = max(
+            $this->resolvePriority($cityRule['rule'] ?? []),
+            $this->resolvePriority($desiRule['rule'] ?? []),
+            $this->resolvePriority($slaRule['rule'] ?? []),
+            $this->resolvePriority($codRule['rule'] ?? [])
+        );
+
+        $estimatedPrice = $this->pickBestEstimatedPrice([
+            $cityRule['rule'] ?? null,
+            $desiRule['rule'] ?? null,
+            $slaRule['rule'] ?? null,
+            $codRule['rule'] ?? null,
+        ], $request->desi);
+
+        if ($estimatedPrice === null) {
+            $reasonLines[] = 'Fiyat verisi olmadigi icin maliyet karsilastirmasi sinirli yapildi.';
+        } else {
+            $reasonLines[] = 'Tahmini fiyat verisi mevcut.';
+        }
 
         return [
-            'eligible' => $cityPass && $slaPass && $codPass && $desiPass,
-            'city' => $cityPass,
-            'sla' => $slaPass,
-            'cod' => $codPass,
-            'desi' => $desiPass,
-        ];
-    }
-
-    public function scoreRule(array $rule, ShippingSimulationRequestDTO $request): array
-    {
-        $cost = $this->resolveCost($rule, $request->desi);
-        $sla = $this->resolveSla($rule);
-        $priority = $this->resolvePriority($rule);
-
-        return [
-            'cost' => $cost,
-            'sla' => $sla,
+            'company_id' => $companyId,
+            'company_name' => (string) ($company['name'] ?? $companyId),
+            'matched_rule_count' => $matchedRuleCount,
+            'matched_rule_types' => array_values(array_unique($matchedRuleTypes)),
+            'reason_lines' => $reasonLines,
+            'city_score' => $cityScore,
+            'desi_score' => $desiScore,
+            'sla_score' => $slaScore,
+            'cod_score' => $codScore,
+            'cost_score' => 0.0,
+            'priority_score' => $priority > 0 ? min(1.0, $priority / 100) : 0.0,
             'priority' => $priority,
+            'estimated_price' => $estimatedPrice,
+            'sla_display' => $slaRule !== null
+                ? (string) ((int) ($slaRule['rule']['sla_max_days'] ?? $slaRule['rule']['sla_days'] ?? 0))
+                : 'Kural yok',
+            'price_label' => $estimatedPrice === null
+                ? 'Fiyat verisi yok'
+                : number_format($estimatedPrice, 2, ',', '.') . ' TL (tahmini)',
         ];
     }
 
-    private function isDesiInRange(array $rule, float $desi): bool
+    private function calculateTotalScore(array $candidate, string $mode): int
+    {
+        $weights = match ($mode) {
+            'hizli' => ['sla' => 40, 'city' => 20, 'desi' => 10, 'cod' => 10, 'priority' => 10, 'cost' => 10],
+            'ekonomik' => ['sla' => 10, 'city' => 10, 'desi' => 15, 'cod' => 10, 'priority' => 20, 'cost' => 35],
+            default => ['sla' => 25, 'city' => 20, 'desi' => 15, 'cod' => 10, 'priority' => 10, 'cost' => 20],
+        };
+
+        $score = 0.0;
+        $score += $candidate['sla_score'] * $weights['sla'];
+        $score += $candidate['city_score'] * $weights['city'];
+        $score += $candidate['desi_score'] * $weights['desi'];
+        $score += $candidate['cod_score'] * $weights['cod'];
+        $score += $candidate['priority_score'] * $weights['priority'];
+        $score += $candidate['cost_score'] * $weights['cost'];
+
+        return (int) round($score);
+    }
+
+    private function applyCostScores(array $candidates): array
+    {
+        $prices = array_values(array_filter(array_map(
+            static fn (array $candidate): ?float => $candidate['estimated_price'],
+            $candidates
+        ), static fn (?float $price): bool => $price !== null));
+
+        if ($prices === []) {
+            return $candidates;
+        }
+
+        $min = min($prices);
+        $max = max($prices);
+
+        foreach ($candidates as &$candidate) {
+            if ($candidate['estimated_price'] === null) {
+                $candidate['cost_score'] = 0.0;
+                continue;
+            }
+
+            if ($max === $min) {
+                $candidate['cost_score'] = 1.0;
+                continue;
+            }
+
+            $candidate['cost_score'] = ($max - $candidate['estimated_price']) / ($max - $min);
+        }
+        unset($candidate);
+
+        return $candidates;
+    }
+
+    private function findBestRuleMatch(array $rules, string $type, string $companyId, callable $matcher): ?array
+    {
+        $matches = [];
+
+        foreach ($rules as $rule) {
+            if (($rule['rule_type'] ?? '') !== $type) {
+                continue;
+            }
+            if (! $matcher($rule)) {
+                continue;
+            }
+
+            $primaryId = trim((string) ($rule['primary_company_id'] ?? ''));
+            $secondaryId = trim((string) ($rule['secondary_company_id'] ?? ''));
+            if ($primaryId === $companyId) {
+                $matches[] = ['rule' => $rule, 'role' => 'primary'];
+            } elseif ($secondaryId === $companyId) {
+                $matches[] = ['rule' => $rule, 'role' => 'secondary'];
+            }
+        }
+
+        if ($matches === []) {
+            return null;
+        }
+
+        usort($matches, function (array $left, array $right): int {
+            $leftPriority = $this->resolvePriority($left['rule']);
+            $rightPriority = $this->resolvePriority($right['rule']);
+            if ($leftPriority !== $rightPriority) {
+                return $rightPriority <=> $leftPriority;
+            }
+
+            if ($left['role'] !== $right['role']) {
+                return $left['role'] === 'primary' ? -1 : 1;
+            }
+
+            return strcmp((string) ($left['rule']['id'] ?? ''), (string) ($right['rule']['id'] ?? ''));
+        });
+
+        return $matches[0];
+    }
+
+    private function matchesCity(array $rule, ShippingSimulationRequestDTO $request): bool
+    {
+        $citySlug = trim((string) ($rule['city_slug'] ?? ''));
+        if ($citySlug === '') {
+            $city = trim((string) ($rule['city'] ?? ''));
+            $citySlug = $city !== '' ? ShippingSimulationRequestDTO::normalizeCity($city) : '';
+        }
+
+        return $citySlug !== '' && $citySlug === $request->citySlug;
+    }
+
+    private function matchesDesi(array $rule, float $desi): bool
     {
         $min = $this->toFloatOrNull($rule['desi_min'] ?? null);
         $max = $this->toFloatOrNull($rule['desi_max'] ?? null);
@@ -152,59 +344,45 @@ class ShippingSimulationService
             return false;
         }
 
-        return true;
+        return $min !== null || $max !== null;
     }
 
-    private function resolveSupportsCod(array $rule): bool
+    private function matchesSla(array $rule, ShippingSimulationRequestDTO $request): bool
     {
-        if (array_key_exists('supports_cod', $rule)) {
-            return (int) $rule['supports_cod'] === 1;
+        $ruleSla = (int) ($rule['sla_max_days'] ?? $rule['sla_days'] ?? 0);
+        if ($ruleSla <= 0) {
+            return false;
         }
 
-        $type = strtolower(trim((string) ($rule['rule_type'] ?? '')));
-        if ($type === 'cod') {
-            return true;
+        $city = trim((string) ($rule['city'] ?? ''));
+        if ($city === '' && trim((string) ($rule['city_slug'] ?? '')) === '') {
+            return $ruleSla <= $request->slaDays;
         }
 
-        $config = $this->readConfig($rule);
-        if (array_key_exists('supports_cod', $config)) {
-            return filter_var($config['supports_cod'], FILTER_VALIDATE_BOOLEAN);
-        }
-
-        return false;
+        return $this->matchesCity($rule, $request) && $ruleSla <= $request->slaDays;
     }
 
-    private function resolveSla(array $rule): int
+    private function pickBestEstimatedPrice(array $rules, float $desi): ?float
     {
-        foreach (['sla_max_days', 'sla_days'] as $field) {
-            if (! array_key_exists($field, $rule)) {
+        $prices = [];
+        foreach ($rules as $rule) {
+            if (! is_array($rule)) {
                 continue;
             }
-            $value = $rule[$field];
-            if ($value === null || $value === '') {
-                continue;
-            }
-            $intValue = (int) $value;
-            if ($intValue > 0) {
-                return $intValue;
+            $price = $this->resolveCost($rule, $desi);
+            if ($price !== null) {
+                $prices[] = $price;
             }
         }
 
-        $config = $this->readConfig($rule);
-        if (isset($config['sla_max_days']) && is_numeric((string) $config['sla_max_days'])) {
-            $intValue = (int) $config['sla_max_days'];
-            if ($intValue > 0) {
-                return $intValue;
-            }
-        }
-
-        return 7;
+        return $prices === [] ? null : min($prices);
     }
 
     private function resolvePriority(array $rule): int
     {
-        if (isset($rule['priority']) && is_numeric((string) $rule['priority'])) {
-            return (int) $rule['priority'];
+        $priority = $rule['priority'] ?? null;
+        if ($priority !== null && is_numeric((string) $priority)) {
+            return (int) $priority;
         }
 
         $config = $this->readConfig($rule);
@@ -215,21 +393,24 @@ class ShippingSimulationService
         return 0;
     }
 
-    private function resolveCost(array $rule, float $desi): int
+    private function resolveCost(array $rule, float $desi): ?float
     {
         if (isset($rule['estimated_cost']) && is_numeric((string) $rule['estimated_cost'])) {
-            return (int) round((float) $rule['estimated_cost']);
+            return round((float) $rule['estimated_cost'], 2);
         }
 
         $config = $this->readConfig($rule);
-        $baseCost = (isset($config['base_cost']) && is_numeric((string) $config['base_cost']))
-            ? (float) $config['base_cost']
-            : 60.0;
-        $costPerDesi = (isset($config['cost_per_desi']) && is_numeric((string) $config['cost_per_desi']))
-            ? (float) $config['cost_per_desi']
-            : 12.0;
+        $hasBase = isset($config['base_cost']) && is_numeric((string) $config['base_cost']);
+        $hasPerDesi = isset($config['cost_per_desi']) && is_numeric((string) $config['cost_per_desi']);
 
-        return (int) round($baseCost + ($desi * $costPerDesi));
+        if (! $hasBase && ! $hasPerDesi) {
+            return null;
+        }
+
+        $base = $hasBase ? (float) $config['base_cost'] : 0.0;
+        $perDesi = $hasPerDesi ? (float) $config['cost_per_desi'] : 0.0;
+
+        return round($base + ($desi * $perDesi), 2);
     }
 
     private function readConfig(array $rule): array
@@ -240,6 +421,7 @@ class ShippingSimulationService
         }
 
         $decoded = json_decode($raw, true);
+
         return is_array($decoded) ? $decoded : [];
     }
 
@@ -253,6 +435,93 @@ class ShippingSimulationService
         }
 
         return (float) $value;
+    }
+
+    private function collectCandidateIds(array $rules, array $companies): array
+    {
+        $ids = [];
+
+        foreach ($rules as $rule) {
+            foreach (['primary_company_id', 'secondary_company_id'] as $field) {
+                $id = trim((string) ($rule[$field] ?? ''));
+                if ($id !== '') {
+                    $ids[$id] = true;
+                }
+            }
+        }
+
+        foreach ($companies as $id => $company) {
+            $candidateId = trim((string) ($company['id'] ?? $id));
+            if ($candidateId !== '') {
+                $ids[$candidateId] = true;
+            }
+        }
+
+        return array_keys($ids);
+    }
+
+    private function buildSummary(array $selected, ShippingSimulationRequestDTO $request): string
+    {
+        $parts = [];
+        if (in_array('city', $selected['matched_rule_types'], true)) {
+            $parts[] = 'sehir';
+        }
+        if (in_array('desi', $selected['matched_rule_types'], true)) {
+            $parts[] = 'desi';
+        }
+        if (in_array('sla', $selected['matched_rule_types'], true)) {
+            $parts[] = 'SLA';
+        }
+        if ($request->cod && in_array('cod', $selected['matched_rule_types'], true)) {
+            $parts[] = 'kapida odeme';
+        }
+
+        $criteria = $parts === [] ? 'mevcut kurallara' : implode(', ', $parts) . ' kriterlerine';
+
+        return $selected['company_name'] . ' secilen ' . $criteria . ' gore en uygun secenektir.';
+    }
+
+    private function buildNeedsDataList(array $rules): array
+    {
+        $types = [];
+        foreach ($rules as $rule) {
+            $type = trim((string) ($rule['rule_type'] ?? ''));
+            if ($type !== '') {
+                $types[$type] = true;
+            }
+        }
+
+        $needs = [];
+        foreach (['city', 'desi', 'cod', 'sla'] as $type) {
+            if (! isset($types[$type])) {
+                $needs[] = $type . ' kurali';
+            }
+        }
+
+        return $needs;
+    }
+
+    private function buildEmptyResponse(
+        ShippingSimulationRequestDTO $request,
+        string $message,
+        array $candidates,
+        array $needsData
+    ): array
+    {
+        return [
+            'request' => [
+                'city' => $request->city,
+                'city_slug' => $request->citySlug,
+                'sla_days' => $request->slaDays,
+                'cod' => $request->cod,
+                'desi' => $request->desi,
+                'mode' => $request->mode,
+            ],
+            'selected' => null,
+            'top_candidates' => $candidates,
+            'fallback_message' => $message,
+            'needs_data' => $needsData,
+        ];
     }
 
     private function getCompaniesById(): array
@@ -300,10 +569,10 @@ class ShippingSimulationService
     private function fallbackCompanies(): array
     {
         return [
-            'yurtici' => ['id' => 'yurtici', 'name' => 'Yurtiçi Kargo'],
+            'yurtici' => ['id' => 'yurtici', 'name' => 'Yurtici Kargo'],
             'aras' => ['id' => 'aras', 'name' => 'Aras Kargo'],
             'mng' => ['id' => 'mng', 'name' => 'MNG Kargo'],
-            'surat' => ['id' => 'surat', 'name' => 'Sürat Kargo'],
+            'surat' => ['id' => 'surat', 'name' => 'Surat Kargo'],
             'ptt' => ['id' => 'ptt', 'name' => 'PTT Kargo'],
             'ups' => ['id' => 'ups', 'name' => 'UPS'],
         ];

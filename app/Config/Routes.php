@@ -68,12 +68,25 @@ $routes->get('products/selection', 'ProductController::selection');
 // ----------------------------------------------------
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 
-    $routes->get('banners', 'Admin\Banners::index');
-    $routes->post('banners/save', 'Admin\Banners::save');
-    $routes->post('banners/toggle/(:segment)', 'Admin\Banners::toggle/$1');
     $routes->get('dashboard-builder', 'Admin\DashboardBuilder::index');
     $routes->post('dashboard-builder/reorder', 'Admin\DashboardBuilder::reorder');
     $routes->post('dashboard-builder/resize', 'Admin\DashboardBuilder::resize');
+    $routes->get('dashboard/blocks/fetch/(:segment)', 'Admin\DashboardBlockController::fetch/$1');
+    $routes->get('dashboard/blocks/detail', 'Admin\DashboardBlockController::detail');
+    $routes->post('dashboard/blocks/store', 'Admin\DashboardBlockController::store');
+    $routes->post('dashboard/blocks/update/(:segment)', 'Admin\DashboardBlockController::update/$1');
+    $routes->post('dashboard/blocks/delete/(:segment)', 'Admin\DashboardBlockController::delete/$1');
+    $routes->get('settings', 'Admin\Settings::index');
+    $routes->post('settings', 'Admin\Settings::update');
+    $routes->get('settings/permissions', 'Admin\SettingsPermissionsController::index');
+    $routes->post('settings/permissions/update', 'Admin\SettingsPermissionsController::update');
+    $routes->post('settings/permissions/secretaries/create', 'Admin\SettingsPermissionsController::createSecretary');
+    // (ileride)
+    // $routes->get('users', 'Admin\Users::index');
+    // $routes->get('roles', 'Admin\Roles::index');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_pages'], function ($routes) {
     $routes->get('pages', 'Admin\PageController::index');
     $routes->get('pages/(:segment)/builder', 'Admin\PageController::builder/$1');
     $routes->post('pages/product-list-builder/update', 'Admin\PageController::updateProductListBuilder');
@@ -96,11 +109,15 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('pages/(:segment)/drafts', 'Admin\PageController::drafts/$1');
     $routes->get('pages/(:segment)', 'Admin\PageController::show/$1');
     $routes->get('page-versions/(:segment)', 'Admin\PageController::show/$1');
-    $routes->get('dashboard/blocks/fetch/(:segment)', 'Admin\DashboardBlockController::fetch/$1');
-    $routes->get('dashboard/blocks/detail', 'Admin\DashboardBlockController::detail');
-    $routes->post('dashboard/blocks/store', 'Admin\DashboardBlockController::store');
-    $routes->post('dashboard/blocks/update/(:segment)', 'Admin\DashboardBlockController::update/$1');
-    $routes->post('dashboard/blocks/delete/(:segment)', 'Admin\DashboardBlockController::delete/$1');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_banners'], function ($routes) {
+    $routes->get('banners', 'Admin\Banners::index');
+    $routes->post('banners/save', 'Admin\Banners::save');
+    $routes->post('banners/toggle/(:segment)', 'Admin\Banners::toggle/$1');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_marketing'], function ($routes) {
     $routes->get('marketing', 'Admin\Marketing::index');
     $routes->get('pricing', 'Admin\Pricing::index');
     $routes->get('pricing/rules', 'Admin\Pricing::rules');
@@ -111,19 +128,10 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('pricing/rules/toggle/(:segment)', 'Admin\Pricing::toggleRule/$1');
     $routes->post('pricing/rules/delete/(:segment)', 'Admin\Pricing::deleteRule/$1');
     $routes->get('automation', 'Admin\Automation::index');
-    $routes->get('settings', 'Admin\Settings::index');
-    $routes->get('settings/permissions', 'Admin\SettingsPermissionsController::index');
-    $routes->post('settings/permissions/update', 'Admin\SettingsPermissionsController::update');
-    $routes->post('settings/permissions/secretaries/create', 'Admin\SettingsPermissionsController::createSecretary');
-    // (ileride)
-    // $routes->get('users', 'Admin\Users::index');
-    // $routes->get('roles', 'Admin\Roles::index');
 });
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_dashboard'], function ($routes) {
     $routes->get('dashboard', 'Admin\DashboardController::index');
-    $routes->get('traffic-analysis', 'Admin\TrafficAnalysis::index');
-    $routes->get('log-records', 'Admin\LogRecords::index');
 });
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_stock'], function ($routes) {
@@ -140,17 +148,16 @@ $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_notificat
     $routes->post('notifications/test-sms', 'Admin\Notifications::sendTestSms');
     $routes->post('notifications/templates/save', 'Admin\Notifications::saveTemplate');
     $routes->post('notifications/templates/send-test', 'Admin\Notifications::sendSavedTemplateTest');
+    $routes->get('notifications-management', 'Admin\NotificationsManagement::index');
+    $routes->post('notifications-management', 'Admin\NotificationsManagement::update');
 });
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_customers'], function ($routes) {
     $routes->get('customers', 'Admin\Customers::index');
-    $routes->get('customer-messages', 'Admin\CustomerMessages::index');
-    $routes->get('complaints', 'Admin\Complaints::index');
 });
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_products'], function ($routes) {
     $routes->get('products', 'Admin\Products::index');
-    $routes->get('reviews', 'Admin\Reviews::index');
     $routes->get('api/products', 'Admin\Products::datatables');
     $routes->get('products/create', 'Admin\Products::create');
     $routes->post('products/store', 'Admin\Products::store');
@@ -160,6 +167,26 @@ $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_products'
     $routes->post('authors/store', 'Admin\Products::storeAuthor');
     $routes->get('categories/create', 'Admin\Products::createCategory');
     $routes->post('categories/store', 'Admin\Products::storeCategory');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_reviews'], function ($routes) {
+    $routes->get('reviews', 'Admin\Reviews::index');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_complaints'], function ($routes) {
+    $routes->get('complaints', 'Admin\Complaints::index');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_traffic'], function ($routes) {
+    $routes->get('traffic-analysis', 'Admin\TrafficAnalysis::index');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_logs'], function ($routes) {
+    $routes->get('log-records', 'Admin\LogRecords::index');
+});
+
+$routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_customer_messages'], function ($routes) {
+    $routes->get('customer-messages', 'Admin\CustomerMessages::index');
 });
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_shipping'], function ($routes) {

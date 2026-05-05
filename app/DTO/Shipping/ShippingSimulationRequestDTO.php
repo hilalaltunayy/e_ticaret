@@ -12,36 +12,42 @@ class ShippingSimulationRequestDTO
         public bool $cod,
         public float $desi,
         public string $citySlug,
+        public string $mode,
     ) {
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data, array $defaults = []): self
     {
         $city = trim((string) ($data['city'] ?? ''));
-        $slaDaysRaw = (string) ($data['slaDays'] ?? $data['sla_days'] ?? '');
-        $desiRaw = (string) ($data['desi'] ?? '');
+        $slaDaysRaw = trim((string) ($data['slaDays'] ?? $data['sla_days'] ?? ($defaults['sla_days'] ?? '')));
+        $desiRaw = trim((string) ($data['desi'] ?? ($defaults['desi'] ?? '')));
         $codRaw = $data['cod'] ?? false;
+        $mode = trim(strtolower((string) ($data['mode'] ?? ($defaults['mode'] ?? 'dengeli'))));
 
         if ($city === '' || mb_strlen($city) < 2 || mb_strlen($city) > 100) {
-            throw new DomainException('Şehir alanı 2-100 karakter aralığında zorunludur.');
+            throw new DomainException('Sehir alani 2-100 karakter araliginda zorunludur.');
         }
 
         if ($slaDaysRaw === '' || ! ctype_digit($slaDaysRaw)) {
-            throw new DomainException('SLA gün bilgisi zorunludur ve tam sayı olmalıdır.');
+            throw new DomainException('SLA gun bilgisi zorunludur ve tam sayi olmalidir.');
         }
 
         $slaDays = (int) $slaDaysRaw;
-        if ($slaDays < 0 || $slaDays > 30) {
-            throw new DomainException('SLA gün değeri 0-30 arasında olmalıdır.');
+        if ($slaDays < 1 || $slaDays > 30) {
+            throw new DomainException('SLA gun degeri 1-30 arasinda olmalidir.');
         }
 
         if ($desiRaw === '' || ! is_numeric($desiRaw)) {
-            throw new DomainException('Desi alanı zorunludur ve sayısal olmalıdır.');
+            throw new DomainException('Desi alani zorunludur ve sayisal olmalidir.');
         }
 
         $desi = (float) $desiRaw;
         if ($desi < 0 || $desi > 999) {
-            throw new DomainException('Desi değeri 0-999 arasında olmalıdır.');
+            throw new DomainException('Desi degeri 0-999 arasinda olmalidir.');
+        }
+
+        if (! in_array($mode, ['hizli', 'ekonomik', 'dengeli'], true)) {
+            throw new DomainException('Optimizasyon modu gecersiz.');
         }
 
         return new self(
@@ -50,6 +56,7 @@ class ShippingSimulationRequestDTO
             cod: filter_var($codRaw, FILTER_VALIDATE_BOOLEAN),
             desi: $desi,
             citySlug: self::normalizeCity($city),
+            mode: $mode,
         );
     }
 
@@ -58,6 +65,12 @@ class ShippingSimulationRequestDTO
         $city = trim(mb_strtolower($city, 'UTF-8'));
 
         $map = [
+            'c' => 'c',
+            'g' => 'g',
+            'i' => 'i',
+            'o' => 'o',
+            's' => 's',
+            'u' => 'u',
             'ç' => 'c',
             'ğ' => 'g',
             'ı' => 'i',

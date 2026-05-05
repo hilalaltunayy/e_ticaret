@@ -6,6 +6,10 @@
 $companies = is_array($companies ?? null) ? $companies : [];
 $initialType = (string) ($initialType ?? 'city');
 $kpi = is_array($kpi ?? null) ? $kpi : [];
+$simulationDefaults = is_array($simulationDefaults ?? null) ? $simulationDefaults : [];
+$defaultSlaDays = (string) ($simulationDefaults['sla_days'] ?? '2');
+$defaultDesi = (string) ($simulationDefaults['desi'] ?? '30');
+$defaultMode = (string) ($simulationDefaults['mode'] ?? 'dengeli');
 ?>
 <div class="page-header">
   <div class="page-block">
@@ -167,7 +171,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
     <h5 class="mb-0">Simülasyon Motoru</h5>
   </div>
   <div class="card-body">
-    <form id="simulationForm" class="row g-3">
+    <form id="simulationForm" class="row g-3" method="post" action="<?= site_url('admin/shipping/automation/simulate') ?>">
       <?= csrf_field() ?>
       <div class="col-md-3">
         <label for="sim_city" class="form-label">Şehir</label>
@@ -175,11 +179,19 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
       </div>
       <div class="col-md-2">
         <label for="sim_sla_days" class="form-label">SLA (Gün)</label>
-        <input type="number" class="form-control" id="sim_sla_days" name="sla_days" min="0" max="30" required>
+        <input type="number" class="form-control" id="sim_sla_days" name="sla_days" min="1" max="30" value="<?= esc($defaultSlaDays) ?>">
       </div>
       <div class="col-md-2">
         <label for="sim_desi" class="form-label">Desi</label>
-        <input type="number" class="form-control" id="sim_desi" name="desi" step="0.01" min="0" max="999" required>
+        <input type="number" class="form-control" id="sim_desi" name="desi" step="0.01" min="0" max="999" value="<?= esc($defaultDesi) ?>">
+      </div>
+      <div class="col-md-2">
+        <label for="sim_mode" class="form-label">Optimizasyon Modu</label>
+        <select class="form-select" id="sim_mode" name="mode">
+          <option value="hizli"<?= $defaultMode === 'hizli' ? ' selected' : '' ?>>Hizli</option>
+          <option value="ekonomik"<?= $defaultMode === 'ekonomik' ? ' selected' : '' ?>>Ekonomik</option>
+          <option value="dengeli"<?= $defaultMode === 'dengeli' ? ' selected' : '' ?>>Dengeli</option>
+        </select>
       </div>
       <div class="col-md-3 d-flex align-items-end">
         <div class="form-check">
@@ -188,9 +200,13 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
         </div>
       </div>
       <div class="col-md-2 d-flex align-items-end">
-        <button type="button" class="btn btn-primary w-100 js-simulate" id="simulateBtn" data-action="simulate">Simüle Et</button>
+        <button type="submit" class="btn btn-primary w-100 js-simulate" id="simulateBtn" data-action="simulate">Simülasyonu Çalıştır</button>
       </div>
     </form>
+
+    <div class="small text-muted mt-2">
+      SLA, desi ve mod alanlari bos gonderilirse admin ayarlarindaki varsayilanlar kullanilir.
+    </div>
 
     <div id="simulationAlert" class="alert alert-danger d-none mt-3" role="alert"></div>
 
@@ -199,15 +215,18 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
         <div class="card-body">
           <h6 class="mb-2">Seçilen Firma</h6>
           <h4 class="mb-3" id="simSelectedCompany">-</h4>
+          <p class="text-muted mb-3" id="simSummaryText">-</p>
           <ul class="mb-3" id="simReasonList"></ul>
-          <h6 class="mb-2">Uygun Adaylar (Top 3)</h6>
+          <div id="simFallbackText" class="alert alert-warning d-none mb-3"></div>
+          <div class="small text-muted mb-3" id="simNeedsData"></div>
+          <h6 class="mb-2">Alternatif Firmalar</h6>
           <div class="table-responsive">
             <table class="table table-sm table-striped mb-0">
               <thead>
                 <tr>
                   <th>Firma</th>
-                  <th>Maliyet</th>
-                  <th>SLA</th>
+                  <th>Skor</th>
+                  <th>Fiyat</th>
                   <th>Öncelik</th>
                 </tr>
               </thead>
@@ -368,7 +387,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
     if (!simulateBtn && simulationForm) {
       var btnCol = document.createElement('div');
       btnCol.className = 'col-md-2 d-flex align-items-end';
-      btnCol.innerHTML = '<button type="button" class="btn btn-primary w-100 js-simulate" id="simulateBtn" data-action="simulate">Simüle Et</button>';
+      btnCol.innerHTML = '<button type="submit" class="btn btn-primary w-100 js-simulate" id="simulateBtn" data-action="simulate">Simülasyonu Çalıştır</button>';
       simulationForm.appendChild(btnCol);
       simulateBtn = document.getElementById('simulateBtn');
     }
@@ -380,6 +399,12 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
         simulateBtn.style.visibility = 'visible';
         simulateBtn.style.opacity = '1';
       }
+    }
+
+    function setSimulationLoading(isLoading) {
+      if (!simulateBtn) return;
+      simulateBtn.disabled = isLoading;
+      simulateBtn.textContent = isLoading ? 'Hesaplaniyor...' : 'Simülasyonu Çalıştır';
     }
 
     function esc(value) {
@@ -432,16 +457,22 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
       var selected = payload && payload.selected ? payload.selected : null;
       var candidates = payload && payload.top_candidates ? payload.top_candidates : [];
       var selectedCompany = document.getElementById('simSelectedCompany');
+      var summaryText = document.getElementById('simSummaryText');
       var reasonList = document.getElementById('simReasonList');
+      var fallbackText = document.getElementById('simFallbackText');
+      var needsData = document.getElementById('simNeedsData');
       var candidatesBody = document.getElementById('simCandidatesBody');
 
-      if (!resultBox || !selectedCompany || !reasonList || !candidatesBody) return;
+      if (!resultBox || !selectedCompany || !summaryText || !reasonList || !fallbackText || !needsData || !candidatesBody) return;
 
       if (!selected) {
+        summaryText.textContent = 'Sistem mevcut kurallarla kesin bir oneride bulunamadi.';
         selectedCompany.textContent = 'Uygun firma bulunamadı.';
         reasonList.innerHTML = '<li>Girilen kriterlere uygun aktif kural bulunmadı.</li>';
       } else {
         selectedCompany.textContent = selected.company_name || '-';
+        summaryText.textContent = selected.summary || '';
+        var lines = selected.reason_lines || [];
         var reason = selected.reason || {};
         reasonList.innerHTML =
           '<li>Şehir uyumu: ' + (reason.city_match ? 'Evet' : 'Hayır') + '</li>' +
@@ -452,6 +483,18 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
           '<li>SLA: ' + esc(reason.sla || '-') + '</li>' +
           '<li>Öncelik: ' + esc(reason.priority ?? 0) + '</li>';
       }
+
+      var fallbackMessage = payload && payload.fallback_message ? payload.fallback_message : '';
+      if (fallbackMessage) {
+        fallbackText.classList.remove('d-none');
+        fallbackText.textContent = fallbackMessage;
+      } else {
+        fallbackText.classList.add('d-none');
+        fallbackText.textContent = '';
+      }
+
+      var neededRules = payload && payload.needs_data ? payload.needs_data : [];
+      needsData.textContent = neededRules.length ? ('Eksik veri alanlari: ' + neededRules.join(', ')) : '';
 
       if (!candidates.length) {
         candidatesBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Sonuç yok.</td></tr>';
@@ -710,6 +753,7 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
       simulationForm.addEventListener('submit', function (event) {
         event.preventDefault();
         showSimulationAlert('');
+        setSimulationLoading(true);
 
         var formData = new FormData(simulationForm);
         if (!document.getElementById('sim_cod').checked) {
@@ -730,17 +774,16 @@ $kpi = is_array($kpi ?? null) ? $kpi : [];
           })
           .catch(function (err) {
             showSimulationAlert(err.message || 'Simülasyon hesaplanamadı.');
+            renderSimulationResult({
+              selected: null,
+              top_candidates: [],
+              fallback_message: err.message || 'Simülasyon hesaplanamadı.',
+              needs_data: []
+            });
+          })
+          .finally(function () {
+            setSimulationLoading(false);
           });
-      });
-    }
-
-    if (simulateBtn && simulationForm) {
-      simulateBtn.addEventListener('click', function () {
-        if (typeof simulationForm.requestSubmit === 'function') {
-          simulationForm.requestSubmit();
-          return;
-        }
-        simulationForm.dispatchEvent(new Event('submit', { cancelable: true }));
       });
     }
 

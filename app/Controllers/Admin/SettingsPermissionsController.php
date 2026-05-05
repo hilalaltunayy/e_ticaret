@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Services\AuditLogger;
 use App\Services\Admin\SettingsPermissionsService;
 use Config\Services;
 use DomainException;
@@ -10,9 +11,12 @@ use Throwable;
 
 class SettingsPermissionsController extends BaseController
 {
-    public function __construct(private ?SettingsPermissionsService $service = null)
-    {
+    public function __construct(
+        private ?SettingsPermissionsService $service = null,
+        private ?AuditLogger $auditLogger = null
+    ) {
         $this->service = $this->service ?? new SettingsPermissionsService();
+        $this->auditLogger = $this->auditLogger ?? new AuditLogger();
     }
 
     public function index()
@@ -108,13 +112,23 @@ class SettingsPermissionsController extends BaseController
         $allowed = in_array((string) $allowedRaw, ['1', 'true', 'on'], true);
 
         try {
+            $beforePermission = $this->permissionState($userId, $permCode);
             $this->service->setOverride($userId, $permCode, $allowed);
+            $afterPermission = $this->permissionState($userId, $permCode);
 
             $currentUser = session()->get('user');
             $currentUserId = is_array($currentUser) ? (string) ($currentUser['id'] ?? ($currentUser['user_id'] ?? '')) : '';
             if ($currentUserId !== '' && $currentUserId === $userId) {
                 session()->remove('permissions');
             }
+
+            $this->auditLogger->log('permission.update', 'permission', $userId, [
+                'target_user_id' => $userId,
+                'target_role' => $this->targetRole($userId),
+                'permission_code' => $permCode,
+                'before' => $beforePermission,
+                'after' => $afterPermission,
+            ]);
 
             return $this->response->setJSON([
                 'ok' => true,
@@ -131,5 +145,44 @@ class SettingsPermissionsController extends BaseController
                 'message' => 'Yetki güncellenemedi.',
             ]);
         }
+    }
+
+    private function permissionState(string $userId, string $permCode): array
+    {
+        $state = [
+            'effective' => null,
+            'override' => null,
+            'override_allowed' => null,
+        ];
+
+        try {
+            foreach ($this->service->getMatrix($userId) as $row) {
+                if ((string) ($row['code'] ?? '') !== $permCode) {
+                    continue;
+                }
+
+                return [
+                    'effective' => (bool) ($row['effective'] ?? false),
+                    'override' => (bool) ($row['override'] ?? false),
+                    'override_allowed' => array_key_exists('override_allowed', $row) && $row['override_allowed'] !== null
+                        ? (bool) $row['override_allowed']
+                        : null,
+                ];
+            }
+        } catch (DomainException) {
+        }
+
+        return $state;
+    }
+
+    private function targetRole(string $userId): ?string
+    {
+        foreach ($this->service->listSecretaries() as $secretary) {
+            if ((string) ($secretary['id'] ?? '') === $userId) {
+                return (string) ($secretary['role'] ?? 'secretary');
+            }
+        }
+
+        return null;
     }
 }

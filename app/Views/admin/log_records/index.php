@@ -26,7 +26,7 @@ $hasAuditTable = (bool) ($hasAuditTable ?? false);
         </div>
       </div>
       <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
-        <span class="badge bg-light-secondary text-secondary">Son 6 ay filtresine haz&#305;r</span>
+        <span class="badge bg-light-secondary text-secondary">Son 6 ay</span>
       </div>
     </div>
   </div>
@@ -59,35 +59,9 @@ $hasAuditTable = (bool) ($hasAuditTable ?? false);
   </div>
 </div>
 
-<div class="card mb-3">
-  <div class="card-header">
-    <h5 class="mb-0">Filtre Haz&#305;rl&#305;&#287;&#305;</h5>
-  </div>
-  <div class="card-body">
-    <div class="row g-3">
-      <div class="col-12 col-md-3">
-        <label class="form-label">Tarih Aral&#305;&#287;&#305;</label>
-        <input type="text" class="form-control" value="Son 6 ay" disabled>
-      </div>
-      <div class="col-12 col-md-3">
-        <label class="form-label">Akt&ouml;r</label>
-        <input type="text" class="form-control" value="Hen&uuml;z aktif de&#287;il" disabled>
-      </div>
-      <div class="col-12 col-md-3">
-        <label class="form-label">Aksiyon</label>
-        <input type="text" class="form-control" value="Hen&uuml;z aktif de&#287;il" disabled>
-      </div>
-      <div class="col-12 col-md-3">
-        <label class="form-label">Mod&uuml;l</label>
-        <input type="text" class="form-control" value="Hen&uuml;z aktif de&#287;il" disabled>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="card">
   <div class="card-header">
-    <h5 class="mb-0">Log Listesi</h5>
+    <h5 class="mb-0">Log Listesi - Son 6 ay</h5>
   </div>
   <div class="card-body">
     <?php if (! $hasAuditTable): ?>
@@ -101,16 +75,23 @@ $hasAuditTable = (bool) ($hasAuditTable ?? false);
             <th>Aksiyon</th>
             <th>Mod&uuml;l</th>
             <th>Varl&#305;k</th>
+            <th>Detay</th>
             <th>Olu&#351;turma Tarihi</th>
           </tr>
         </thead>
         <tbody>
           <?php foreach ($items as $item): ?>
+            <?php
+              $meta = json_decode((string) ($item['meta_json'] ?? ''), true);
+              $detail = trim((string) ($item['detail_text'] ?? ''));
+              $actorIdentifier = is_array($meta) ? (string) ($meta['actor_identifier'] ?? '') : '';
+            ?>
             <tr>
-              <td><?= esc((string) ($item['actor_name'] ?? $item['actor_role'] ?? '-')) ?></td>
+              <td><?= esc((string) ($item['actor_name'] ?? $item['actor_email'] ?? ($actorIdentifier !== '' ? $actorIdentifier : ($item['actor_role'] ?? '-')))) ?></td>
               <td><?= esc((string) ($item['action'] ?? '-')) ?></td>
               <td><?= esc((string) ($item['entity_type'] ?? '-')) ?></td>
               <td><?= esc((string) ($item['entity_id'] ?? '-')) ?></td>
+              <td><span class="text-muted"><?= esc($detail !== '' ? $detail : 'Detay bulunamadi') ?></span></td>
               <td><?= esc((string) ($item['created_at'] ?? '-')) ?></td>
             </tr>
           <?php endforeach; ?>
@@ -130,7 +111,7 @@ $hasAuditTable = (bool) ($hasAuditTable ?? false);
     $('#logRecordsTable').DataTable({
       pageLength: 10,
       lengthMenu: [10, 25, 50, 100],
-      order: [[4, 'desc']],
+      order: [[5, 'desc']],
       dom: '<"row align-items-center mb-3"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row align-items-center mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
       language: {
         lengthMenu: '_MENU_ kayit goster',

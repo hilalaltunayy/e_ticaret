@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\DTO\Shipping\ShippingSimulationRequestDTO;
+use App\Models\AdminSettingModel;
 use App\Services\ShippingAutomationService;
 use App\Services\ShippingSimulationService;
 use DomainException;
@@ -21,10 +22,13 @@ class ShippingAutomationController extends BaseController
 
     public function index()
     {
+        $defaults = $this->getSimulationDefaults();
+
         return view('admin/shipping/automation', [
-            'title' => 'Kargo Otomasyon Kuralları',
+            'title' => 'Kargo Otomasyon Kurallari',
             'companies' => $this->automationService->getCompanies(),
             'initialType' => 'city',
+            'simulationDefaults' => $defaults,
             'kpi' => [
                 'active_rule' => $this->automationService->countActiveRules(),
                 'auto_assignment_7d' => $this->automationService->countAutoAssignmentsLast7Days(),
@@ -42,7 +46,8 @@ class ShippingAutomationController extends BaseController
                 'slaDays' => $this->request->getPost('sla_days'),
                 'desi' => $this->request->getPost('desi'),
                 'cod' => $this->request->getPost('cod'),
-            ]);
+                'mode' => $this->request->getPost('mode'),
+            ], $this->getSimulationDefaults());
 
             $result = $this->simulationService->simulate($dto);
 
@@ -58,7 +63,7 @@ class ShippingAutomationController extends BaseController
         } catch (Throwable) {
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'Simülasyon hesaplanamadı.',
+                'message' => 'Simulasyon hesaplanamadi.',
             ]);
         }
     }
@@ -80,7 +85,7 @@ class ShippingAutomationController extends BaseController
         } catch (Throwable) {
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'Kurallar alınamadı.',
+                'message' => 'Kurallar alinamadi.',
             ]);
         }
     }
@@ -100,7 +105,7 @@ class ShippingAutomationController extends BaseController
         } catch (Throwable) {
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'Kural alınamadı.',
+                'message' => 'Kural alinamadi.',
             ]);
         }
     }
@@ -164,8 +169,24 @@ class ShippingAutomationController extends BaseController
         } catch (Throwable) {
             return $this->response->setStatusCode(500)->setJSON([
                 'ok' => false,
-                'message' => 'Kural güncellenemedi.',
+                'message' => 'Kural guncellenemedi.',
             ]);
         }
+    }
+
+    private function getSimulationDefaults(): array
+    {
+        $settingsModel = new AdminSettingModel();
+        $saved = $settingsModel->getMapByKeys([
+            'shipping.default_sla_days',
+            'shipping.default_desi_limit',
+            'shipping.default_mode',
+        ]);
+
+        return [
+            'sla_days' => (string) ($saved['shipping.default_sla_days'] ?? '2'),
+            'desi' => (string) ($saved['shipping.default_desi_limit'] ?? '30'),
+            'mode' => (string) ($saved['shipping.default_mode'] ?? 'dengeli'),
+        ];
     }
 }

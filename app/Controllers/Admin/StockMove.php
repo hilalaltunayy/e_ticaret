@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Services\AuditLogger;
 use App\Services\ProductsService;
 
 class StockMove extends BaseController
@@ -19,10 +20,13 @@ class StockMove extends BaseController
         'hediye_gonderimi',
         'sayim_duzeltme',
     ];
-public function __construct(
-        private ?ProductsService $productsService = null
+
+    public function __construct(
+        private ?ProductsService $productsService = null,
+        private ?AuditLogger $auditLogger = null
     ) {
         $this->productsService = $this->productsService ?? new ProductsService();
+        $this->auditLogger = $this->auditLogger ?? new AuditLogger();
     }
 
     public function create(string $productId)
@@ -91,6 +95,21 @@ public function __construct(
         if (! $saved) {
             return redirect()->back()->withInput()->with('error', 'Stok hareketi kaydedilemedi.');
         }
+
+        $this->auditLogger->log('stock.update', 'stock', $productId, [
+            'product_name' => (string) ($snapshot['product_name'] ?? ''),
+            'reason' => $reason,
+            'direction' => $direction,
+            'quantity' => $quantity,
+            'before' => [
+                'stock_count' => $stockCount,
+                'reserved_count' => (int) ($snapshot['reserved_count'] ?? 0),
+                'sellable' => $sellable,
+            ],
+            'after' => [
+                'stock_count' => $stockCount + $delta,
+            ],
+        ], $user);
 
         return redirect()->to(site_url('admin/stock/moves') . '?product_id=' . urlencode($productId) . '#stock-detail')
             ->with('success', 'Stok hareketi basariyla kaydedildi.');
