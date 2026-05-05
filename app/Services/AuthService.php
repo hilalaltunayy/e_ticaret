@@ -27,10 +27,17 @@ class AuthService
     {
         $user = $this->userModel->findByEmail((string) $email);
 
-        if ($user && password_verify($password, $user['password'])) {
+        if ($user && password_verify($password, $user['password']) && $this->canLogin($user)) {
             return $user;
         }
 
         return false;
+    }
+
+    private function canLogin(array $user): bool
+    {
+        $status = strtolower(trim((string) ($user['status'] ?? '')));
+
+        return in_array($status, ['active', 'enabled'], true);
     }
 }

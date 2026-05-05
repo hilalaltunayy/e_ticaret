@@ -6,16 +6,10 @@ namespace Config;
 
 use CodeIgniter\Config\Filters as BaseFilters;
 use CodeIgniter\Filters\Cors;
-use CodeIgniter\Filters\CSRF;
 use CodeIgniter\Filters\DebugToolbar;
 use CodeIgniter\Filters\ForceHTTPS;
-use CodeIgniter\Filters\Honeypot;
-use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
-use CodeIgniter\Filters\SecureHeaders;
-use CodeIgniter\Config\Services;
-use CodeIgniter\Roter\RouteCollection;
 
 class Filters extends BaseFilters
 {
@@ -29,9 +23,6 @@ class Filters extends BaseFilters
      * or [filter_name => [classname1, classname2, ...]]
      */
     public array $aliases = [
-       
-        
-            'auth' => \App\Filters\AuthFilter::class,
             'role' => \App\Filters\RoleFilter::class,
             'perm' => \App\Filters\PermissionFilter::class,
             'campaign_access' => \App\Filters\CampaignAccessFilter::class,

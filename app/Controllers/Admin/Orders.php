@@ -5,6 +5,7 @@ use App\Controllers\BaseController;
 use App\Controllers\Admin\Traits\OrderPackingActions;
 use App\Models\OrderLogModel;
 use App\Models\OrderModel;
+use App\Models\UserPermissionModel;
 use App\Presenters\OrderDatatablePresenter;
 use App\Services\InvoiceService;
 use App\Services\OrderCreationService;
@@ -566,7 +567,20 @@ class Orders extends BaseController
     {
         $user = session()->get('user') ?? [];
         $role = strtolower((string) ($user['role'] ?? ''));
-        return in_array($role, ['admin', 'secretary'], true);
+        if ($role === 'admin') {
+            return true;
+        }
+
+        if ($role !== 'secretary') {
+            return false;
+        }
+
+        $userId = trim((string) ($user['id'] ?? ($user['user_id'] ?? '')));
+        if ($userId === '') {
+            return false;
+        }
+
+        return (new UserPermissionModel())->isAllowed($userId, 'manage_orders', $role);
     }
 
     private function unauthorizedJsonResponse()
