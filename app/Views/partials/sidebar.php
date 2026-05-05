@@ -96,7 +96,7 @@ $canManageAuthz = ($roleName === 'admin');
         <li class="pc-item">
           <a href="<?= site_url('admin/products') ?>" class="pc-link<?= $isActive('admin/products') ?>">
             <span class="pc-micon">
-              <svg class="pc-icon"><use xlink:href="#custom-shopping-bag"></use></svg>
+              <i class="ti ti-package"></i>
             </span>
             <span class="pc-mtext">Ürünler</span>
           </a>
@@ -105,7 +105,7 @@ $canManageAuthz = ($roleName === 'admin');
           <li class="pc-item">
             <a href="<?= site_url('admin/stock') ?>" class="pc-link<?= $isActive('admin/stock') ?>">
               <span class="pc-micon">
-                <svg class="pc-icon"><use xlink:href="#custom-box-1"></use></svg>
+                <i class="ti ti-box"></i>
               </span>
               <span class="pc-mtext">Stok Takip Paneli</span>
             </a>
@@ -115,7 +115,7 @@ $canManageAuthz = ($roleName === 'admin');
           <li class="pc-item">
             <a href="<?= site_url('admin/orders') ?>" class="pc-link<?= $isActive('admin/orders') ?>">
               <span class="pc-micon">
-                <svg class="pc-icon"><use xlink:href="#custom-bill"></use></svg>
+                <i class="ti ti-file-invoice"></i>
               </span>
               <span class="pc-mtext">Siparişler</span>
             </a>
@@ -188,7 +188,7 @@ $canManageAuthz = ($roleName === 'admin');
           </a>
         </li>
         <li class="pc-item">
-          <a href="<?= site_url('admin/orders') ?>" class="pc-link<?= $isActive('admin/orders') ?>">
+          <a href="<?= site_url('admin/orders/returns') ?>" class="pc-link<?= $isActive('admin/orders/returns') ?>">
             <span class="pc-micon">
               <i class="ti ti-receipt-refund"></i>
             </span>
@@ -247,14 +247,6 @@ $canManageAuthz = ($roleName === 'admin');
               <i class="ti ti-chart-bar"></i>
             </span>
             <span class="pc-mtext">Satış Raporları</span>
-          </a>
-        </li>
-        <li class="pc-item">
-          <a href="<?= site_url('admin/products') ?>" class="pc-link<?= $isActive('admin/products') ?>">
-            <span class="pc-micon">
-              <i class="ti ti-chart-histogram"></i>
-            </span>
-            <span class="pc-mtext">Ürün Performansı</span>
           </a>
         </li>
         <li class="pc-item">

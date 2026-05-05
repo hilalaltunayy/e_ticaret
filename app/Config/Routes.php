@@ -206,6 +206,7 @@ $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_orders'],
     $routes->get('api/orders/analytics', 'Admin\Orders::analytics');
     $routes->get('api/orders/status-distribution', 'Admin\Orders::statusDistribution');
     $routes->get('orders/summary', 'Admin\Orders::summary');
+    $routes->get('orders/returns', 'Admin\Orders::returns');
     $routes->get('orders/statuses', 'Admin\OrderStatuses::index');
     $routes->get('orders/(:segment)/packing/label', 'Admin\Orders::packingLabel/$1');
     $routes->get('orders/(:segment)/packing/verify', 'Admin\Orders::packingVerify/$1');

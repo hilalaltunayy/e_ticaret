@@ -193,6 +193,37 @@ class OrdersReportingService
         ];
     }
 
+    public function buildPaymentReportsPageData(): array
+    {
+        $summary = $this->getSummaryCounts();
+
+        return [
+            'summary' => $summary,
+            'amountColumn' => $this->amountColumn(),
+            'totalAmount' => $this->sumOrderAmount(),
+            'paidAmount' => $this->sumOrderAmount(null, ['paid', 'completed']),
+            'returnedAmount' => $this->sumOrderAmount(['returned', 'return_in_progress', 'return_done']),
+            'cancelledAmount' => $this->sumOrderAmount(['cancelled']),
+            'paymentProviderActive' => false,
+            'recentOrders' => $this->latestOrders(null, 8),
+        ];
+    }
+
+    public function buildReturnsPageData(): array
+    {
+        $returnStatuses = ['returned', 'return_in_progress', 'return_done'];
+
+        return [
+            'summary' => [
+                'total' => $this->countOrdersByStatuses($returnStatuses),
+                'inProgress' => $this->countOrdersByStatuses(['return_in_progress']),
+                'completed' => $this->countOrdersByStatuses(['returned', 'return_done']),
+                'amount' => $this->sumOrderAmount($returnStatuses),
+            ],
+            'orders' => $this->latestOrders($returnStatuses, 25),
+        ];
+    }
+
     private function countByOrderStatuses(array $statuses): int
     {
         return (int) $this->orderModel
@@ -202,5 +233,148 @@ class OrdersReportingService
             ->orWhereIn('status', $statuses)
             ->groupEnd()
             ->countAllResults();
+    }
+
+    private function countOrdersByStatuses(array $statuses): int
+    {
+        $builder = $this->baseOrdersBuilder();
+        $this->applyStatusFilter($builder, $statuses);
+
+        return (int) $builder->countAllResults();
+    }
+
+    private function sumOrderAmount(?array $statuses = null, ?array $paymentStatuses = null): float
+    {
+        $amountColumn = $this->amountColumn();
+        if ($amountColumn === null) {
+            return 0.0;
+        }
+
+        $builder = $this->baseOrdersBuilder()
+            ->select('COALESCE(SUM(' . $amountColumn . '), 0) AS total_amount', false);
+
+        if ($statuses !== null) {
+            $this->applyStatusFilter($builder, $statuses);
+        }
+
+        if ($paymentStatuses !== null && $this->orderHasField('payment_status')) {
+            $builder->whereIn('payment_status', $paymentStatuses);
+        }
+
+        $row = $builder->get()->getRowArray() ?? [];
+
+        return round((float) ($row['total_amount'] ?? 0), 2);
+    }
+
+    private function latestOrders(?array $statuses, int $limit): array
+    {
+        $fields = $this->orderFields();
+        $select = [];
+
+        foreach ([
+            'id',
+            'order_no',
+            'customer_name',
+            'total_amount',
+            'total_price',
+            'payment_method',
+            'payment_status',
+            'status',
+            'order_status',
+            'shipping_status',
+            'created_at',
+            'order_date',
+            'returned_at',
+            'return_started_at',
+            'return_completed_at',
+        ] as $field) {
+            if (in_array($field, $fields, true)) {
+                $select[] = $field;
+            }
+        }
+
+        $builder = $this->baseOrdersBuilder()
+            ->select($select !== [] ? implode(', ', $select) : '*');
+
+        if ($statuses !== null) {
+            $this->applyStatusFilter($builder, $statuses);
+        }
+
+        $dateField = in_array('created_at', $fields, true) ? 'created_at' : 'id';
+
+        return $builder
+            ->orderBy($dateField, 'DESC')
+            ->limit(max(1, $limit))
+            ->get()
+            ->getResultArray();
+    }
+
+    private function applyStatusFilter($builder, array $statuses): void
+    {
+        $statusFields = array_values(array_filter(
+            ['order_status', 'status', 'shipping_status'],
+            fn (string $field): bool => $this->orderHasField($field)
+        ));
+
+        if ($statusFields === []) {
+            return;
+        }
+
+        $builder->groupStart();
+        foreach ($statusFields as $index => $field) {
+            if ($index === 0) {
+                $builder->whereIn($field, $statuses);
+                continue;
+            }
+
+            $builder->orWhereIn($field, $statuses);
+        }
+        $builder->groupEnd();
+    }
+
+    private function baseOrdersBuilder()
+    {
+        $builder = db_connect()->table('orders');
+        if ($this->orderHasField('deleted_at')) {
+            $builder->where('deleted_at', null);
+        }
+
+        return $builder;
+    }
+
+    private function amountColumn(): ?string
+    {
+        if ($this->orderHasField('total_amount')) {
+            return 'total_amount';
+        }
+
+        if ($this->orderHasField('total_price')) {
+            return 'total_price';
+        }
+
+        return null;
+    }
+
+    private function orderHasField(string $field): bool
+    {
+        return in_array($field, $this->orderFields(), true);
+    }
+
+    private function orderFields(): array
+    {
+        static $fields = null;
+        if ($fields !== null) {
+            return $fields;
+        }
+
+        $db = db_connect();
+        if (! $db->tableExists('orders')) {
+            $fields = [];
+            return $fields;
+        }
+
+        $fields = $db->getFieldNames('orders');
+
+        return $fields;
     }
 }

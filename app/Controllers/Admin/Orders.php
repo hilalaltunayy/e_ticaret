@@ -52,13 +52,44 @@ class Orders extends BaseController
     public function summary()
     {
         if (! $this->canManageOrders()) {
-            return $this->unauthorizedJsonResponse();
+            if ($this->request->isAJAX()) {
+                return $this->unauthorizedJsonResponse();
+            }
+
+            return redirect()->to(site_url('admin/dashboard'))->with('error', 'Yetkisiz istek.');
+        }
+
+        if (! $this->request->isAJAX()) {
+            $user = session()->get('user') ?? [];
+
+            return view('admin/orders/payment_reports', [
+                'title' => 'Odeme Raporlari',
+                'userName' => $user['name'] ?? ($user['email'] ?? 'Admin'),
+                'userRole' => $user['role'] ?? '',
+                'report' => $this->ordersReportingService->buildPaymentReportsPageData(),
+            ]);
         }
 
         return $this->response->setJSON($this->withCsrf([
             'success' => true,
             'summary' => $this->getSummaryCounts(),
         ]));
+    }
+
+    public function returns()
+    {
+        if (! $this->canManageOrders()) {
+            return redirect()->to(site_url('admin/dashboard'))->with('error', 'Yetkisiz istek.');
+        }
+
+        $user = session()->get('user') ?? [];
+
+        return view('admin/orders/returns', [
+            'title' => 'Iadeler',
+            'userName' => $user['name'] ?? ($user['email'] ?? 'Admin'),
+            'userRole' => $user['role'] ?? '',
+            'returnsReport' => $this->ordersReportingService->buildReturnsPageData(),
+        ]);
     }
 
     public function analytics()
