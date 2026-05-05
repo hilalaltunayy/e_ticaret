@@ -58,10 +58,10 @@ class Login extends BaseController
             }
 
             if ($role === 'secretary') {
-                return redirect()->to(base_url('admin/dashboard'));
+                return redirect()->to(base_url('admin/orders'));
             }
 
-            return redirect()->to(base_url('dashboard_anasayfa'));
+            return redirect()->to(base_url('/'));
         }
 
         $errorCount = ($session->get('login_errors') ?? 0) + 1;
