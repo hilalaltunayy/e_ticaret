@@ -27,7 +27,7 @@
                         <?php $label = (string) ($item['label'] ?? 'Menu'); ?>
                         <a
                             href="<?= esc((string) ($item['url'] ?? '#')) ?>"
-                            class="storefront-menu-link<?= ! empty($item['active']) ? ' is-active' : '' ?><?= $label === 'Giris Yap' ? ' storefront-menu-link--cta' : '' ?>"
+                            class="storefront-menu-link<?= ! empty($item['active']) ? ' is-active' : '' ?><?= ! empty($item['is_auth']) ? ' storefront-menu-link--cta' : '' ?>"
                         >
                             <?= esc($label) ?>
                         </a>

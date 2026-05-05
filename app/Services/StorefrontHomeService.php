@@ -343,13 +343,18 @@ class StorefrontHomeService
 
     private function buildHeaderMenuItems(): array
     {
+        $isLoggedIn = (bool) session()->get('isLoggedIn');
+        $authItem = $isLoggedIn
+            ? ['label' => 'Çıkış Yap', 'url' => base_url('logout'), 'is_auth' => true]
+            : ['label' => 'Giriş Yap', 'url' => base_url('login'), 'is_auth' => true];
+
         return [
             ['label' => 'Anasayfa', 'url' => base_url('/'), 'active' => true],
             ['label' => 'Favorilerim', 'url' => base_url('yardim/favorilerim')],
             ['label' => 'Sepetim', 'url' => base_url('yardim/sepetim')],
             ['label' => 'Siparislerim', 'url' => base_url('yardim/siparislerim')],
             ['label' => 'Hesabim', 'url' => base_url('yardim/hesabim')],
-            ['label' => 'Giris Yap', 'url' => base_url('login')],
+            $authItem,
         ];
     }
 
