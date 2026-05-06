@@ -14,6 +14,10 @@ $routes = Services::routes();
 // ACIK ALAN - HERKES ERISEBILIR
 // ----------------------------------------------------
 $routes->get('/', 'StorefrontController::home');
+$routes->get('yardim/favorilerim', 'Favorites::index', ['filter' => 'auth']);
+$routes->post('favorites/toggle', 'Favorites::toggle', ['filter' => 'auth']);
+$routes->post('favorites/remove', 'Favorites::remove', ['filter' => 'auth']);
+$routes->post('favorites/add-to-cart', 'Favorites::addToCart', ['filter' => 'auth']);
 $routes->get('yardim/(:segment)', 'StorefrontController::placeholder/$1');
 $routes->get('login', 'Login::index');
 $routes->post('login/auth', 'Login::auth');

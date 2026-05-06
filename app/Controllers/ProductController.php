@@ -3,16 +3,19 @@
 namespace App\Controllers;
 
 use App\Services\ProductsService;
+use App\Services\FavoriteService;
 use App\Services\StorefrontHomeService;
 
 class ProductController extends BaseController
 {
     protected ProductsService $productsService;
+    protected FavoriteService $favoriteService;
     protected StorefrontHomeService $storefrontHomeService;
 
     public function __construct()
     {
         $this->productsService = new ProductsService();
+        $this->favoriteService = new FavoriteService();
         $this->storefrontHomeService = new StorefrontHomeService();
     }
 
@@ -48,6 +51,7 @@ class ProductController extends BaseController
         return view('site/products/product_detail', array_merge($this->storefrontViewData(), [
             'product' => $product,
             'similarProducts' => $this->productsService->getSimilarProductsByProduct($product, 4),
+            'isFavorited' => $this->resolveFavoriteState((string) ($product->id ?? '')),
         ]));
     }
 
@@ -101,5 +105,24 @@ class ProductController extends BaseController
             'paket' => 'Ortak Paketler',
             default => 'Tum Urunler',
         };
+    }
+
+    private function resolveFavoriteState(string $productId): bool
+    {
+        if ($productId === '' || !session()->get('isLoggedIn')) {
+            return false;
+        }
+
+        $user = session()->get('user');
+        $userId = is_array($user) ? trim((string) ($user['id'] ?? '')) : '';
+        if ($userId === '') {
+            $userId = trim((string) session()->get('user_id'));
+        }
+
+        if ($userId === '') {
+            return false;
+        }
+
+        return $this->favoriteService->isFavorite($userId, $productId);
     }
 }

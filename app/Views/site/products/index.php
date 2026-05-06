@@ -298,16 +298,23 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
                             <div class="book-card-body d-flex flex-column">
                                 <h2 class="book-card-title"><?= esc($product->product_name) ?></h2>
                                 <p class="book-card-author"><?= esc($product->author ?? 'Yazar Bilinmiyor') ?></p>
-                                <div class="book-card-footer">
-                                    <div class="price-wrap">
-                                        <span class="price-label">Fiyat</span>
-                                        <span class="price-tag"><?= number_format((float) $product->price, 2) ?> TL</span>
-                                    </div>
-                                    <a href="<?= esc((string) ($product->detail_url ?? base_url('products/detail/' . $product->id))) ?>" class="product-detail-btn">
-                                        <span>Detayi Gor</span>
-                                        <i class="ti ti-arrow-up-right"></i>
-                                    </a>
-                                </div>
+                                 <div class="book-card-footer">
+                                     <div class="price-wrap">
+                                         <span class="price-label">Fiyat</span>
+                                         <span class="price-tag"><?= number_format((float) $product->price, 2) ?> TL</span>
+                                     </div>
+                                     <form action="<?= base_url('favorites/toggle') ?>" method="post" class="d-inline">
+                                         <?= csrf_field() ?>
+                                         <input type="hidden" name="product_id" value="<?= esc((string) $product->id) ?>">
+                                         <button type="submit" class="product-detail-btn" title="Favori">
+                                             <i class="ti ti-heart"></i>
+                                         </button>
+                                     </form>
+                                     <a href="<?= esc((string) ($product->detail_url ?? base_url('products/detail/' . $product->id))) ?>" class="product-detail-btn">
+                                         <span>Detayi Gor</span>
+                                         <i class="ti ti-arrow-up-right"></i>
+                                     </a>
+                                 </div>
                             </div>
                         </article>
                     </div>

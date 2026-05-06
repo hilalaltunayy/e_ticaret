@@ -5,6 +5,7 @@
 helper('product_media');
 
 $productName = is_object($product ?? null) ? (string) ($product->product_name ?? '') : (string) ($product['product_name'] ?? '');
+$productId = is_object($product ?? null) ? (string) ($product->id ?? '') : (string) ($product['id'] ?? '');
 $productPrice = is_object($product ?? null) ? (float) ($product->price ?? 0) : (float) ($product['price'] ?? 0);
 $productStock = is_object($product ?? null) ? (int) ($product->stock ?? 0) : (int) ($product['stock'] ?? 0);
 $productType = is_object($product ?? null) ? (string) ($product->type ?? '') : (string) ($product['type'] ?? '');
@@ -32,6 +33,7 @@ $productStockToneClass = $productType === 'dijital' || $productStock > 0
 $productRatingValue = '4.8';
 $productReviewLabel = '12 degerlendirme';
 $similarProducts = is_array($similarProducts ?? null) ? $similarProducts : [];
+$isFavorited = (bool) ($isFavorited ?? false);
 
 ?>
 
@@ -76,10 +78,14 @@ $similarProducts = is_array($similarProducts ?? null) ? $similarProducts : [];
         position: relative;
         padding: 1.1rem;
     }
-    .book-detail-favorite {
+    .book-detail-favorite-form {
         position: absolute;
         top: 1rem;
         right: 1rem;
+        z-index: 3;
+        margin: 0;
+    }
+    .book-detail-favorite {
         width: 44px;
         height: 44px;
         border-radius: 999px;
@@ -91,6 +97,16 @@ $similarProducts = is_array($similarProducts ?? null) ? $similarProducts : [];
         justify-content: center;
         box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
         cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .book-detail-favorite:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 24px rgba(15, 23, 42, 0.12);
+    }
+    .book-detail-favorite.is-active {
+        color: #dc2626;
+        border-color: rgba(220, 38, 38, 0.25);
+        background: #fff1f2;
     }
     .book-detail-cover-frame {
         padding: 0.5rem;
@@ -679,6 +695,13 @@ $similarProducts = is_array($similarProducts ?? null) ? $similarProducts : [];
 </style>
 
 <div class="book-detail-page">
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success mb-3"><?= esc((string) session()->getFlashdata('success')) ?></div>
+    <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger mb-3"><?= esc((string) session()->getFlashdata('error')) ?></div>
+    <?php endif; ?>
+
     <nav class="book-detail-breadcrumb" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="<?= base_url('/') ?>">Anasayfa</a></li>
@@ -689,9 +712,18 @@ $similarProducts = is_array($similarProducts ?? null) ? $similarProducts : [];
 
     <section class="book-detail-hero">
         <div class="book-detail-cover-card">
-            <button type="button" class="book-detail-favorite" aria-label="Favorilere ekle">
-                <i class="ti ti-heart"></i>
-            </button>
+            <form action="<?= base_url('favorites/toggle') ?>" method="post" class="book-detail-favorite-form">
+                <?= csrf_field() ?>
+                <input type="hidden" name="product_id" value="<?= esc($productId) ?>">
+                <button
+                    type="submit"
+                    class="book-detail-favorite<?= $isFavorited ? ' is-active' : '' ?>"
+                    aria-label="<?= $isFavorited ? 'Favorilerden kaldır' : 'Favorilere ekle' ?>"
+                    title="<?= $isFavorited ? 'Favorilerden kaldır' : 'Favorilere ekle' ?>"
+                >
+                    <i class="ti <?= $isFavorited ? 'ti-heart-filled' : 'ti-heart' ?>"></i>
+                </button>
+            </form>
 
             <div class="book-detail-cover-frame">
                 <img src="<?= esc($productImageUrl) ?>" alt="<?= esc($productName) ?>" class="book-detail-cover-image">
