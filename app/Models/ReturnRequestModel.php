@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
-class ShipmentEventModel extends BaseUuidModel
+class ReturnRequestModel extends BaseUuidModel
 {
-    protected $table = 'shipment_events';
+    protected $table = 'return_requests';
     protected $returnType = 'array';
     protected $allowedFields = [
         'id',
-        'shipment_id',
+        'order_id',
+        'user_id',
         'status',
-        'title',
+        'reason',
         'note',
-        'location',
-        'event_time',
+        'requested_at',
+        'resolved_at',
         'created_at',
         'updated_at',
         'deleted_at',

@@ -12,6 +12,7 @@ class ShipmentModel extends BaseUuidModel
         'carrier',
         'tracking_number',
         'status',
+        'estimated_delivery_at',
         'shipped_at',
         'delivered_at',
         'created_at',

@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\CartItemModel;
-use App\Models\CartModel;
 use App\Models\FavoriteModel;
 use App\Models\ProductsModel;
 
@@ -11,15 +9,13 @@ class FavoriteService
 {
     private FavoriteModel $favoriteModel;
     private ProductsModel $productsModel;
-    private CartModel $cartModel;
-    private CartItemModel $cartItemModel;
+    private CartService $cartService;
 
     public function __construct()
     {
         $this->favoriteModel = new FavoriteModel();
         $this->productsModel = new ProductsModel();
-        $this->cartModel = new CartModel();
-        $this->cartItemModel = new CartItemModel();
+        $this->cartService = new CartService();
         helper('product_media');
     }
 
@@ -33,7 +29,7 @@ class FavoriteService
         $items = [];
         foreach ($rows as $row) {
             $product = $this->productsModel->where('id', (string) ($row['product_id'] ?? ''))->first();
-            if (!is_array($product) || $product === []) {
+            if (! is_array($product) || $product === []) {
                 continue;
             }
 
@@ -60,7 +56,7 @@ class FavoriteService
                 'is_digital' => $isDigital,
                 'available_stock' => max(0, $availableStock),
                 'can_add_to_cart' => $canAddToCart,
-                'stock_message' => $isDigital ? 'Dijital ürün' : (($availableStock > 0) ? 'Stokta mevcut' : 'Stokta yok'),
+                'stock_message' => $isDigital ? 'Dijital urun' : (($availableStock > 0) ? 'Stokta mevcut' : 'Stokta yok'),
                 'favorited_at' => (string) ($row['created_at'] ?? ''),
             ];
         }
@@ -82,7 +78,7 @@ class FavoriteService
     {
         $product = $this->findUsableProductForFavorite($productId);
         if ($product === null) {
-            return ['success' => false, 'message' => 'Ürün favorilere eklenemedi.'];
+            return ['success' => false, 'message' => 'Urun favorilere eklenemedi.'];
         }
 
         $existing = $this->favoriteModel
@@ -92,7 +88,7 @@ class FavoriteService
 
         if (is_array($existing)) {
             $this->favoriteModel->delete((string) $existing['id']);
-            return ['success' => true, 'message' => 'Ürün favorilerden kaldırıldı.', 'state' => 'removed'];
+            return ['success' => true, 'message' => 'Urun favorilerden kaldirildi.', 'state' => 'removed'];
         }
 
         $inserted = $this->favoriteModel->insert([
@@ -102,10 +98,10 @@ class FavoriteService
         ]);
 
         if ($inserted === false) {
-            return ['success' => false, 'message' => 'Favori işlemi başarısız oldu.'];
+            return ['success' => false, 'message' => 'Favori islemi basarisiz oldu.'];
         }
 
-        return ['success' => true, 'message' => 'Ürün favorilere eklendi.', 'state' => 'added'];
+        return ['success' => true, 'message' => 'Urun favorilere eklendi.', 'state' => 'added'];
     }
 
     public function removeFavorite(string $userId, string $productId): array
@@ -115,12 +111,12 @@ class FavoriteService
             ->where('product_id', $productId)
             ->first();
 
-        if (!is_array($existing)) {
-            return ['success' => false, 'message' => 'Favori kaydı bulunamadı.'];
+        if (! is_array($existing)) {
+            return ['success' => false, 'message' => 'Favori kaydi bulunamadi.'];
         }
 
         $this->favoriteModel->delete((string) $existing['id']);
-        return ['success' => true, 'message' => 'Ürün favorilerden kaldırıldı.'];
+        return ['success' => true, 'message' => 'Urun favorilerden kaldirildi.'];
     }
 
     public function addFavoriteProductToCart(string $userId, string $productId): array
@@ -129,83 +125,22 @@ class FavoriteService
             ->where('user_id', $userId)
             ->where('product_id', $productId)
             ->first();
-        if (!is_array($favorite)) {
-            return ['success' => false, 'message' => 'Ürün favorilerinizde bulunamadı.'];
+
+        if (! is_array($favorite)) {
+            return ['success' => false, 'message' => 'Urun favorilerinizde bulunamadi.'];
         }
 
-        $product = $this->findUsableProductForFavorite($productId);
-        if ($product === null) {
-            return ['success' => false, 'message' => 'Ürün sepete eklenemiyor.'];
-        }
-
-        $type = strtolower(trim((string) ($product['type'] ?? '')));
-        $isDigital = $type === 'dijital';
-        $availableStock = (int) ($product['stock_count'] ?? ($product['stock'] ?? 0)) - (int) ($product['reserved_count'] ?? 0);
-        if (!$isDigital && $availableStock <= 0) {
-            return ['success' => false, 'message' => 'Stokta olmayan ürün sepete eklenemez.'];
-        }
-
-        $cart = $this->cartModel
-            ->where('user_id', $userId)
-            ->where('status', 'ACTIVE')
-            ->first();
-
-        if (!is_array($cart)) {
-            $newCartId = $this->cartModel->insert([
-                'user_id' => $userId,
-                'status' => 'ACTIVE',
-                'currency' => 'TRY',
-            ], true);
-            if ($newCartId === false) {
-                return ['success' => false, 'message' => 'Sepet oluşturulamadı.'];
-            }
-            $cart = $this->cartModel->find((string) $newCartId);
-        }
-
-        if (!is_array($cart) || empty($cart['id'])) {
-            return ['success' => false, 'message' => 'Sepet bulunamadı.'];
-        }
-
-        $cartId = (string) $cart['id'];
-        $cartItem = $this->cartItemModel
-            ->where('cart_id', $cartId)
-            ->where('product_id', $productId)
-            ->first();
-
-        $unitPrice = (float) ($product['price'] ?? 0);
-        if (is_array($cartItem)) {
-            $currentQuantity = max(1, (int) ($cartItem['quantity'] ?? 1));
-            $nextQuantity = $isDigital ? 1 : ($currentQuantity + 1);
-            $ok = $this->cartItemModel->update((string) $cartItem['id'], [
-                'quantity' => $nextQuantity,
-                'unit_price_snapshot' => $unitPrice,
-            ]);
-            if (!$ok) {
-                return ['success' => false, 'message' => 'Sepet güncellenemedi.'];
-            }
-        } else {
-            $ok = $this->cartItemModel->insert([
-                'cart_id' => $cartId,
-                'product_id' => $productId,
-                'quantity' => 1,
-                'unit_price_snapshot' => $unitPrice,
-            ]);
-            if ($ok === false) {
-                return ['success' => false, 'message' => 'Sepete eklenemedi.'];
-            }
-        }
-
-        return ['success' => true, 'message' => 'Ürün sepete eklendi.'];
+        return $this->cartService->addProduct($userId, $productId, 1);
     }
 
     private function findUsableProductForFavorite(string $productId): ?array
     {
         $product = $this->productsModel->where('id', $productId)->first();
-        if (!is_array($product) || $product === []) {
+        if (! is_array($product) || $product === []) {
             return null;
         }
 
-        if ((int) ($product['is_active'] ?? 0) !== 1 || !empty($product['deleted_at'])) {
+        if ((int) ($product['is_active'] ?? 0) !== 1 || ! empty($product['deleted_at'])) {
             return null;
         }
 

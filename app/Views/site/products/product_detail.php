@@ -86,8 +86,8 @@ $isFavorited = (bool) ($isFavorited ?? false);
         margin: 0;
     }
     .book-detail-favorite {
-        width: 44px;
-        height: 44px;
+        width: 48px;
+        height: 48px;
         border-radius: 999px;
         border: 1px solid rgba(148, 163, 184, 0.25);
         background: rgba(255, 255, 255, 0.96);
@@ -104,9 +104,16 @@ $isFavorited = (bool) ($isFavorited ?? false);
         box-shadow: 0 14px 24px rgba(15, 23, 42, 0.12);
     }
     .book-detail-favorite.is-active {
-        color: #dc2626;
+        color: #e11d48;
         border-color: rgba(220, 38, 38, 0.25);
         background: #fff1f2;
+    }
+    .book-detail-favorite-icon {
+        font-size: 1.35rem;
+        line-height: 1;
+        font-weight: 700;
+        display: inline-block;
+        color: currentColor;
     }
     .book-detail-cover-frame {
         padding: 0.5rem;
@@ -342,6 +349,9 @@ $isFavorited = (bool) ($isFavorited ?? false);
     .book-detail-secondary-btn:hover {
         color: #0f172a;
         transform: translateY(-1px);
+    }
+    .book-detail-cart-form {
+        margin: 0;
     }
     .book-detail-content-card {
         padding: 1.35rem 0 0;
@@ -721,7 +731,7 @@ $isFavorited = (bool) ($isFavorited ?? false);
                     aria-label="<?= $isFavorited ? 'Favorilerden kaldır' : 'Favorilere ekle' ?>"
                     title="<?= $isFavorited ? 'Favorilerden kaldır' : 'Favorilere ekle' ?>"
                 >
-                    <i class="ti <?= $isFavorited ? 'ti-heart-filled' : 'ti-heart' ?>"></i>
+                    <span class="book-detail-favorite-icon" aria-hidden="true"><?= $isFavorited ? '♥' : '♡' ?></span>
                 </button>
             </form>
 
@@ -796,10 +806,14 @@ $isFavorited = (bool) ($isFavorited ?? false);
             </div>
 
             <div class="book-detail-actions">
-                <a href="#" class="book-detail-primary-btn" aria-label="Sepete ekle">
-                    <i class="ti ti-shopping-cart-plus"></i>
-                    <span>Sepete Ekle</span>
-                </a>
+                <form action="<?= base_url('cart/add') ?>" method="post" class="book-detail-cart-form">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="product_id" value="<?= esc($productId) ?>">
+                    <button type="submit" class="book-detail-primary-btn" aria-label="Sepete ekle">
+                        <i class="ti ti-shopping-cart-plus"></i>
+                        <span>Sepete Ekle</span>
+                    </button>
+                </form>
                 <a href="<?= base_url('products/selection') ?>" class="book-detail-secondary-btn">
                     <i class="ti ti-arrow-left"></i>
                     <span>Listeye Don</span>

@@ -201,6 +201,35 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         white-space: nowrap;
     }
+    .product-card-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    .product-card-actions form {
+        margin: 0;
+    }
+    .product-add-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.78rem 0.92rem;
+        border-radius: 14px;
+        border: 1px solid rgba(29, 78, 216, 0.14);
+        background: rgba(239, 246, 255, 0.92);
+        color: #1d4ed8;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-decoration: none;
+        min-height: 46px;
+    }
+    .product-add-btn:hover {
+        color: #0f52ba;
+        transform: translateY(-1px);
+    }
     .product-detail-btn:hover {
         color: #fff;
         transform: translateY(-1px);
@@ -267,6 +296,13 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
                 </div>
             </section>
 
+            <?php if (session()->getFlashdata('success')): ?>
+                <div class="alert alert-success mb-0"><?= esc((string) session()->getFlashdata('success')) ?></div>
+            <?php endif; ?>
+            <?php if (session()->getFlashdata('error')): ?>
+                <div class="alert alert-danger mb-0"><?= esc((string) session()->getFlashdata('error')) ?></div>
+            <?php endif; ?>
+
             <div class="row g-4 products-grid">
             <?php if ($currentCat === null): ?>
                 <div class="col-12">
@@ -303,17 +339,26 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
                                          <span class="price-label">Fiyat</span>
                                          <span class="price-tag"><?= number_format((float) $product->price, 2) ?> TL</span>
                                      </div>
-                                     <form action="<?= base_url('favorites/toggle') ?>" method="post" class="d-inline">
-                                         <?= csrf_field() ?>
-                                         <input type="hidden" name="product_id" value="<?= esc((string) $product->id) ?>">
-                                         <button type="submit" class="product-detail-btn" title="Favori">
-                                             <i class="ti ti-heart"></i>
-                                         </button>
-                                     </form>
-                                     <a href="<?= esc((string) ($product->detail_url ?? base_url('products/detail/' . $product->id))) ?>" class="product-detail-btn">
-                                         <span>Detayi Gor</span>
-                                         <i class="ti ti-arrow-up-right"></i>
-                                     </a>
+                                     <div class="product-card-actions">
+                                         <form action="<?= base_url('favorites/toggle') ?>" method="post" class="d-inline">
+                                             <?= csrf_field() ?>
+                                             <input type="hidden" name="product_id" value="<?= esc((string) $product->id) ?>">
+                                             <button type="submit" class="product-detail-btn" title="Favori">
+                                                 <i class="ti ti-heart"></i>
+                                             </button>
+                                         </form>
+                                         <form action="<?= base_url('cart/add') ?>" method="post" class="d-inline">
+                                             <?= csrf_field() ?>
+                                             <input type="hidden" name="product_id" value="<?= esc((string) $product->id) ?>">
+                                             <button type="submit" class="product-add-btn" title="Sepete Ekle">
+                                                 <i class="ti ti-shopping-cart-plus"></i>
+                                             </button>
+                                         </form>
+                                         <a href="<?= esc((string) ($product->detail_url ?? base_url('products/detail/' . $product->id))) ?>" class="product-detail-btn">
+                                             <span>Detayi Gor</span>
+                                             <i class="ti ti-arrow-up-right"></i>
+                                         </a>
+                                     </div>
                                  </div>
                             </div>
                         </article>
