@@ -3,16 +3,19 @@
 namespace App\Controllers;
 
 use App\Services\CartService;
+use App\Services\CartStorefrontBindingService;
 use App\Services\StorefrontHomeService;
 
 class Cart extends BaseController
 {
     private CartService $cartService;
+    private CartStorefrontBindingService $cartStorefrontBindingService;
     private StorefrontHomeService $storefrontHomeService;
 
     public function __construct()
     {
         $this->cartService = new CartService();
+        $this->cartStorefrontBindingService = new CartStorefrontBindingService();
         $this->storefrontHomeService = new StorefrontHomeService();
     }
 
@@ -27,6 +30,7 @@ class Cart extends BaseController
             'title' => 'Sepetim',
             'cartView' => $this->cartService->getCartViewModel($userId),
             'suggestedProducts' => $this->cartService->getSuggestedProducts($userId, 4),
+            'cartBuilderBinding' => $this->cartStorefrontBindingService->getPublishedBinding(),
             'headerMenuItems' => $this->storefrontHomeService->getHeaderMenuItems(),
             'categoryNavItems' => $this->storefrontHomeService->getCategoryNavItems(),
             'searchQuery' => '',

@@ -34,6 +34,27 @@ $productRatingValue = '4.8';
 $productReviewLabel = '12 degerlendirme';
 $similarProducts = is_array($similarProducts ?? null) ? $similarProducts : [];
 $isFavorited = (bool) ($isFavorited ?? false);
+$productDetailBinding = is_array($productDetailBinding ?? null) ? $productDetailBinding : [];
+$productDetailPresenter = is_array($productDetailBinding['presenter'] ?? null) ? $productDetailBinding['presenter'] : [];
+$hasProductDetailConfig = ! empty($productDetailBinding['hasPublishedConfig']);
+$showDetailBreadcrumb = ! $hasProductDetailConfig || ! empty($productDetailPresenter['showBreadcrumb']);
+$detailPageSubtitle = trim((string) ($productDetailPresenter['pageSubtitle'] ?? ''));
+$detailShortDescription = trim((string) ($productDetailPresenter['shortDescription'] ?? ''));
+$detailPromoBadgeText = trim((string) ($productDetailPresenter['promoBadgeText'] ?? ''));
+$detailHeroSectionTitle = trim((string) ($productDetailPresenter['heroSectionTitle'] ?? ''));
+$detailHeroShortDescription = trim((string) ($productDetailPresenter['heroShortDescription'] ?? ''));
+$detailContentSectionTitle = trim((string) ($productDetailPresenter['contentSectionTitle'] ?? '')) ?: 'Urun Icerigi';
+$detailMetaSectionTitle = trim((string) ($productDetailPresenter['metaSectionTitle'] ?? ''));
+$detailLongDescriptionTitle = trim((string) ($productDetailPresenter['longDescriptionTitle'] ?? ''));
+$detailBackCoverTitle = trim((string) ($productDetailPresenter['backCoverTitle'] ?? ''));
+$detailHighlightsTitle = trim((string) ($productDetailPresenter['highlightsTitle'] ?? ''));
+$detailContentNote = trim((string) ($productDetailPresenter['contentNote'] ?? ''));
+$detailReviewSectionTitle = trim((string) ($productDetailPresenter['reviewSectionTitle'] ?? ''));
+$detailReviewSummaryText = trim((string) ($productDetailPresenter['reviewSummaryText'] ?? ''));
+$detailReviewCalloutText = trim((string) ($productDetailPresenter['reviewCalloutText'] ?? ''));
+$detailRelatedSectionTitle = trim((string) ($productDetailPresenter['relatedSectionTitle'] ?? '')) ?: 'Benzer Kitaplar';
+$detailRelatedSectionIntro = trim((string) ($productDetailPresenter['relatedSectionIntro'] ?? ''));
+$detailPurchaseNotes = is_array($productDetailPresenter['purchaseNotes'] ?? null) ? $productDetailPresenter['purchaseNotes'] : [];
 
 ?>
 
@@ -169,6 +190,24 @@ $isFavorited = (bool) ($isFavorited ?? false);
     .book-detail-author strong {
         color: #0f172a;
         font-weight: 700;
+    }
+    .book-detail-helper-stack {
+        display: grid;
+        gap: 0.55rem;
+        margin-top: 0.9rem;
+    }
+    .book-detail-helper-title {
+        color: #1d4ed8;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+    .book-detail-helper-copy {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.7;
+        font-size: 0.95rem;
     }
     .book-detail-rating-row {
         margin-top: 1rem;
@@ -442,6 +481,12 @@ $isFavorited = (bool) ($isFavorited ?? false);
         font-size: 0.92rem;
         margin: 0;
     }
+    .book-detail-inline-heading {
+        margin: 0 0 0.7rem;
+        color: #0f172a;
+        font-size: 0.96rem;
+        font-weight: 700;
+    }
     .book-detail-info-list {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -712,13 +757,15 @@ $isFavorited = (bool) ($isFavorited ?? false);
         <div class="alert alert-danger mb-3"><?= esc((string) session()->getFlashdata('error')) ?></div>
     <?php endif; ?>
 
-    <nav class="book-detail-breadcrumb" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="<?= base_url('/') ?>">Anasayfa</a></li>
-            <li class="breadcrumb-item"><a href="<?= base_url('products/selection') ?>">Kitaplar</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><?= esc($productName) ?></li>
-        </ol>
-    </nav>
+    <?php if ($showDetailBreadcrumb): ?>
+        <nav class="book-detail-breadcrumb" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="<?= base_url('/') ?>">Anasayfa</a></li>
+                <li class="breadcrumb-item"><a href="<?= base_url('products/selection') ?>">Kitaplar</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><?= esc($productName) ?></li>
+            </ol>
+        </nav>
+    <?php endif; ?>
 
     <section class="book-detail-hero">
         <div class="book-detail-cover-card">
@@ -744,6 +791,12 @@ $isFavorited = (bool) ($isFavorited ?? false);
 
         <div class="book-detail-info-card">
             <div class="book-detail-badge-row">
+                <?php if ($detailPromoBadgeText !== ''): ?>
+                    <span class="book-detail-badge">
+                        <i class="ti ti-sparkles"></i>
+                        <?= esc($detailPromoBadgeText) ?>
+                    </span>
+                <?php endif; ?>
                 <span class="book-detail-badge">
                     <i class="ti ti-book-2"></i>
                     <?= esc($productTypeLabel) ?>
@@ -761,6 +814,22 @@ $isFavorited = (bool) ($isFavorited ?? false);
                 Yazar:
                 <strong><?= esc($productAuthor !== '' ? $productAuthor : 'Belirtilmemis') ?></strong>
             </p>
+            <?php if ($detailPageSubtitle !== '' || $detailShortDescription !== '' || $detailHeroSectionTitle !== '' || $detailHeroShortDescription !== ''): ?>
+                <div class="book-detail-helper-stack">
+                    <?php if ($detailHeroSectionTitle !== ''): ?>
+                        <div class="book-detail-helper-title"><?= esc($detailHeroSectionTitle) ?></div>
+                    <?php endif; ?>
+                    <?php if ($detailPageSubtitle !== ''): ?>
+                        <p class="book-detail-helper-copy"><?= esc($detailPageSubtitle) ?></p>
+                    <?php endif; ?>
+                    <?php if ($detailShortDescription !== ''): ?>
+                        <p class="book-detail-helper-copy"><?= esc($detailShortDescription) ?></p>
+                    <?php endif; ?>
+                    <?php if ($detailHeroShortDescription !== ''): ?>
+                        <p class="book-detail-helper-copy"><?= esc($detailHeroShortDescription) ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
 
             <div class="book-detail-rating-row" aria-label="Urun puan ozeti">
                 <div class="book-detail-rating-main">
@@ -819,9 +888,21 @@ $isFavorited = (bool) ($isFavorited ?? false);
                     <span>Listeye Don</span>
                 </a>
             </div>
+            <?php if ($detailPurchaseNotes !== []): ?>
+                <div class="book-detail-notes mt-4">
+                    <?php foreach ($detailPurchaseNotes as $purchaseNote): ?>
+                        <?php if (trim((string) $purchaseNote) === '') {
+                            continue;
+                        } ?>
+                        <div class="book-detail-note">
+                            <p class="book-detail-note-text"><?= esc((string) $purchaseNote) ?></p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
             <div class="book-detail-content-card">
                 <div class="book-detail-tabs-header">
-                    <h2 class="book-detail-section-title">Urun Icerigi</h2>
+                    <h2 class="book-detail-section-title"><?= esc($detailContentSectionTitle) ?></h2>
                     <div class="book-detail-tab-list" role="tablist" aria-label="Urun detay sekmeleri">
                         <button type="button" class="book-detail-tab-button is-active" role="tab" aria-selected="true" aria-controls="book-tab-description" id="book-tab-button-description" data-tab-target="book-tab-description">Aciklama</button>
                         <button type="button" class="book-detail-tab-button" role="tab" aria-selected="false" aria-controls="book-tab-details" id="book-tab-button-details" data-tab-target="book-tab-details">Urun Bilgileri</button>
@@ -831,12 +912,18 @@ $isFavorited = (bool) ($isFavorited ?? false);
                 </div>
 
                 <div class="book-detail-tab-panel is-active" id="book-tab-description" role="tabpanel" aria-labelledby="book-tab-button-description">
+                    <?php if ($detailLongDescriptionTitle !== ''): ?>
+                        <h3 class="book-detail-inline-heading"><?= esc($detailLongDescriptionTitle) ?></h3>
+                    <?php endif; ?>
                     <div class="book-detail-description">
                         <?= esc(trim($productDescription) !== '' ? $productDescription : 'Bu urun icin henuz detayli bir aciklama eklenmemis.') ?>
                     </div>
                 </div>
 
                 <div class="book-detail-tab-panel" id="book-tab-details" role="tabpanel" aria-labelledby="book-tab-button-details">
+                    <?php if ($detailMetaSectionTitle !== ''): ?>
+                        <h3 class="book-detail-inline-heading"><?= esc($detailMetaSectionTitle) ?></h3>
+                    <?php endif; ?>
                     <div class="book-detail-info-list">
                         <div class="book-detail-info-item">
                             <span class="book-detail-meta-label">Yazar</span>
@@ -862,6 +949,22 @@ $isFavorited = (bool) ($isFavorited ?? false);
                 </div>
 
                 <div class="book-detail-tab-panel" id="book-tab-overview" role="tabpanel" aria-labelledby="book-tab-button-overview">
+                    <?php if ($detailContentNote !== '' && ($detailBackCoverTitle !== '' || $detailHighlightsTitle !== '')): ?>
+                        <div class="book-detail-notes mb-3">
+                            <?php if ($detailBackCoverTitle !== ''): ?>
+                                <div class="book-detail-note">
+                                    <div class="book-detail-note-title"><?= esc($detailBackCoverTitle) ?></div>
+                                    <p class="book-detail-note-text"><?= esc($detailContentNote) ?></p>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($detailHighlightsTitle !== ''): ?>
+                                <div class="book-detail-note">
+                                    <div class="book-detail-note-title"><?= esc($detailHighlightsTitle) ?></div>
+                                    <p class="book-detail-note-text"><?= esc($detailContentNote) ?></p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="book-detail-overview-card">
                         <p class="book-detail-overview-text">
                             <?= esc($productName) ?>, <?= esc($productAuthor !== '' ? $productAuthor : 'yazar bilgisi eklenmemis bir eser') ?> imzasi tasiyan
@@ -874,6 +977,18 @@ $isFavorited = (bool) ($isFavorited ?? false);
 
                 <div class="book-detail-tab-panel" id="book-tab-comments" role="tabpanel" aria-labelledby="book-tab-button-comments">
                     <div class="book-detail-comments-empty">
+                        <?php if ($detailReviewSectionTitle !== '' || $detailReviewSummaryText !== ''): ?>
+                            <div class="book-detail-notes mb-3">
+                                <?php if ($detailReviewSectionTitle !== ''): ?>
+                                    <div class="book-detail-note">
+                                        <div class="book-detail-note-title"><?= esc($detailReviewSectionTitle) ?></div>
+                                        <?php if ($detailReviewSummaryText !== ''): ?>
+                                            <p class="book-detail-note-text"><?= esc($detailReviewSummaryText) ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
                         <div class="book-detail-comments-empty-top">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="book-detail-comments-icon">
@@ -899,9 +1014,9 @@ $isFavorited = (bool) ($isFavorited ?? false);
                             </div>
                         </div>
                         <div class="book-detail-comments-divider"></div>
-                        <p class="book-detail-note-text mb-0">
-                            Yorumlar yayinlandiginda bu alanda okur deneyimleri, kisa degerlendirmeler ve puan ozeti birlikte gosterilecek.
-                        </p>
+                        <?php if ($detailReviewCalloutText !== ''): ?>
+                            <p class="book-detail-note-text mb-0"><?= esc($detailReviewCalloutText) ?></p>
+                        <?php endif; ?>
                         <div class="book-detail-comments-empty-actions">
                             <span class="book-detail-comments-chip"><i class="ti ti-star"></i> Degerlendirme bekleniyor</span>
                             <span class="book-detail-comments-chip"><i class="ti ti-notebook"></i> Ilk yorum icin alan hazir</span>
@@ -916,7 +1031,10 @@ $isFavorited = (bool) ($isFavorited ?? false);
         <section class="book-detail-related" aria-labelledby="similar-books-title">
             <div class="book-detail-related-header">
                 <div>
-                    <h2 class="book-detail-related-title" id="similar-books-title">Benzer Kitaplar</h2>
+                    <h2 class="book-detail-related-title" id="similar-books-title"><?= esc($detailRelatedSectionTitle) ?></h2>
+                    <?php if ($detailRelatedSectionIntro !== ''): ?>
+                        <p class="book-detail-note-text mt-2 mb-0"><?= esc($detailRelatedSectionIntro) ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
 

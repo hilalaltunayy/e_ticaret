@@ -7,6 +7,17 @@ use App\Models\BlockTypeModel;
 
 class CartPageBuilderService
 {
+    private const OPTIONAL_TEXT_FIELDS = [
+        'sayfa_alt_basligi',
+        'kisa_aciklama',
+        'sepet_urunleri_aciklama',
+        'fiyat_uyari_aciklama',
+        'stok_uyari_aciklama',
+        'kupon_kampanya_aciklama',
+        'guvenli_odeme_kisa_notu',
+        'bos_sepet_aciklama',
+    ];
+
     public function __construct(
         private ?PageVersionService $pageVersionService = null,
         private ?BlockInstanceModel $blockInstanceModel = null,
@@ -119,29 +130,29 @@ class CartPageBuilderService
                 'bos_sepet_alani' => ['active' => true, 'order' => 7],
             ],
             'sayfa_basligi' => 'Sepetim',
-            'sayfa_alt_basligi' => 'Sepetinizdeki urunleri kontrol edip odeme adimina gecin.',
+            'sayfa_alt_basligi' => '',
             'breadcrumb_goster' => true,
-            'kisa_aciklama' => 'Fiyat, stok ve kampanya bilgileri siparis oncesinde tekrar kontrol edilir.',
+            'kisa_aciklama' => '',
             'sepet_urunleri_baslik' => 'Sepetinizdeki Urunler',
-            'sepet_urunleri_aciklama' => 'Urun adetlerini guncelleyebilir veya urunleri sepetinizden kaldirabilirsiniz.',
+            'sepet_urunleri_aciklama' => '',
             'urun_gorseli_goster' => true,
             'format_etiketi_goster' => true,
             'adet_kontrolu_goster' => true,
             'kaldir_buton_metni' => 'Kaldir',
             'fiyat_uyari_baslik' => 'Fiyat Guncellemesi',
-            'fiyat_uyari_aciklama' => 'Sepete eklediginiz andan sonra fiyati degisen urunler burada bilgilendirme kutusuyla vurgulanir.',
+            'fiyat_uyari_aciklama' => '',
             'fiyat_farki_bilgi_kutusu_goster' => true,
             'eski_fiyat_etiketi' => 'Sepete eklendigindeki fiyat',
             'guncel_fiyat_etiketi' => 'Guncel fiyat',
             'toplam_guncelleme_notu' => 'Toplam tutar odeme adiminda en guncel fiyatlara gore yenilenir.',
             'stok_uyari_baslik' => 'Stok ve Uygunluk Kontrolu',
-            'stok_uyari_aciklama' => 'Fiziksel urunlerde stok durumu mesaj bazli gosterilir, dijital urunlerde stok mesaji yer almaz.',
+            'stok_uyari_aciklama' => '',
             'dusuk_stok_uyarisi_goster' => true,
             'tukenme_mesaji_goster' => true,
             'dusuk_stok_mesaj_sablonu' => 'Son {count} urun',
             'son_urun_mesaj_sablonu' => 'Son urun',
             'kupon_kampanya_baslik' => 'Kupon ve Kampanyalar',
-            'kupon_kampanya_aciklama' => 'Aktif kampanya ve kupon bilgilerini odeme oncesinde gozden gecirin.',
+            'kupon_kampanya_aciklama' => '',
             'kupon_alani_goster' => true,
             'kampanya_bilgi_notu' => 'Bu sipariste uygulanabilen kampanyalar odeme adiminda otomatik degerlendirilir.',
             'ucretsiz_kargo_bilgi_notu' => '500 TL ve uzeri alisverislerde ucretsiz kargo firsati sunulur.',
@@ -151,9 +162,9 @@ class CartPageBuilderService
             'kargo_goster' => true,
             'genel_toplam_basligi' => 'Genel Toplam',
             'odeme_sayfasina_git_buton_metni' => 'Odeme Sayfasina Git',
-            'guvenli_odeme_kisa_notu' => 'Guvenli odeme adiminda kart ve adres bilgileriniz korunur.',
+            'guvenli_odeme_kisa_notu' => '',
             'bos_sepet_baslik' => 'Sepetiniz Su Anda Bos',
-            'bos_sepet_aciklama' => 'Katalogtan urun ekleyerek alisverise devam edebilirsiniz.',
+            'bos_sepet_aciklama' => '',
             'alisverise_basla_buton_metni' => 'Alisverise Basla',
         ];
     }
@@ -256,7 +267,12 @@ class CartPageBuilderService
             'guvenli_odeme_kisa_notu', 'bos_sepet_baslik', 'bos_sepet_aciklama',
             'alisverise_basla_buton_metni',
         ] as $key) {
-            $config[$key] = $this->fallbackText((string) ($config[$key] ?? ''), (string) $defaults[$key]);
+            $value = trim((string) ($config[$key] ?? ''));
+            if ($value === '' && ! in_array($key, self::OPTIONAL_TEXT_FIELDS, true)) {
+                $value = (string) $defaults[$key];
+            }
+
+            $config[$key] = $value;
         }
 
         foreach ([
@@ -309,12 +325,5 @@ class CartPageBuilderService
         }
 
         return $value;
-    }
-
-    private function fallbackText(string $value, string $fallback): string
-    {
-        $value = trim($value);
-
-        return $value === '' ? $fallback : $value;
     }
 }

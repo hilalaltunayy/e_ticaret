@@ -97,39 +97,6 @@ $scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i',
                         </div>
 
                         <div class="accordion-item border rounded mb-3">
-                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filterArea">Filtre Alani</button></h2>
-                            <div id="filterArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
-                                <div class="accordion-body">
-                                    <div class="row g-3 mb-3">
-                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_filter_active" name="section_filtre_alani_active" value="1" <?= old('section_filtre_alani_active', ! empty($sections['filtre_alani']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_filter_active">Aktif</label></div></div>
-                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_filtre_alani_order" class="form-control" value="<?= esc((string) old('section_filtre_alani_order', (string) ($sections['filtre_alani']['order'] ?? 2))) ?>"></div>
-                                    </div>
-                                    <div class="mb-3"><label class="form-label">Filtre Basligi</label><input type="text" name="filtre_basligi" class="form-control" value="<?= esc(old('filtre_basligi', (string) ($config['filtre_basligi'] ?? ''))) ?>"></div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6"><label class="form-label">Filtre Konumu</label><select name="filtre_konumu" class="form-select"><option value="left" <?= old('filtre_konumu', (string) ($config['filtre_konumu'] ?? 'left')) === 'left' ? 'selected' : '' ?>>Sol</option><option value="top" <?= old('filtre_konumu', (string) ($config['filtre_konumu'] ?? 'left')) === 'top' ? 'selected' : '' ?>>Ust</option></select></div>
-                                        <div class="col-md-6 d-flex flex-column justify-content-end gap-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="filtreler_goster" name="filtreler_goster" value="1" <?= old('filtreler_goster', ! empty($config['filtreler_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="filtreler_goster">Filtreleri goster</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="filtre_ozeti_goster" name="filtre_ozeti_goster" value="1" <?= old('filtre_ozeti_goster', ! empty($config['filtre_ozeti_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="filtre_ozeti_goster">Filtre ozetini goster</label></div></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item border rounded mb-3">
-                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#toolbarArea">Siralama ve Sonuc Cubugu</button></h2>
-                            <div id="toolbarArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
-                                <div class="accordion-body">
-                                    <div class="row g-3 mb-3">
-                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_toolbar_active" name="section_siralama_sonuc_cubugu_active" value="1" <?= old('section_siralama_sonuc_cubugu_active', ! empty($sections['siralama_sonuc_cubugu']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_toolbar_active">Aktif</label></div></div>
-                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_siralama_sonuc_cubugu_order" class="form-control" value="<?= esc((string) old('section_siralama_sonuc_cubugu_order', (string) ($sections['siralama_sonuc_cubugu']['order'] ?? 3))) ?>"></div>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6"><label class="form-label">Varsayilan Grid Yogunlugu</label><select name="varsayilan_grid_yogunlugu" class="form-select"><?php foreach (['2', '3', '4'] as $value): ?><option value="<?= esc($value) ?>" <?= old('varsayilan_grid_yogunlugu', (string) ($config['varsayilan_grid_yogunlugu'] ?? '3')) === $value ? 'selected' : '' ?>><?= esc($value) ?> Kolon</option><?php endforeach; ?></select></div>
-                                        <div class="col-md-6 d-flex flex-column justify-content-end gap-2"><div class="form-check"><input class="form-check-input" type="checkbox" id="siralama_cubugu_goster" name="siralama_cubugu_goster" value="1" <?= old('siralama_cubugu_goster', ! empty($config['siralama_cubugu_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="siralama_cubugu_goster">Siralama cubugunu goster</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="sonuc_sayisi_goster" name="sonuc_sayisi_goster" value="1" <?= old('sonuc_sayisi_goster', ! empty($config['sonuc_sayisi_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="sonuc_sayisi_goster">Sonuc sayisini goster</label></div><div class="form-check"><input class="form-check-input" type="checkbox" id="aktif_filtre_etiketleri_goster" name="aktif_filtre_etiketleri_goster" value="1" <?= old('aktif_filtre_etiketleri_goster', ! empty($config['aktif_filtre_etiketleri_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="aktif_filtre_etiketleri_goster">Aktif filtre etiketlerini goster</label></div></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item border rounded mb-3">
                             <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gridArea">Urun Listesi Gorunumu</button></h2>
                             <div id="gridArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
                                 <div class="accordion-body">
@@ -146,23 +113,6 @@ $scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i',
                                         <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="favori_butonu_goster" name="favori_butonu_goster" value="1" <?= old('favori_butonu_goster', ! empty($config['favori_butonu_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="favori_butonu_goster">Favori butonunu goster</label></div></div>
                                         <div class="col-12"><div class="form-check"><input class="form-check-input" type="checkbox" id="hizli_aksiyonlari_goster" name="hizli_aksiyonlari_goster" value="1" <?= old('hizli_aksiyonlari_goster', ! empty($config['hizli_aksiyonlari_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="hizli_aksiyonlari_goster">Hizli aksiyonlari goster</label></div></div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item border rounded mb-3">
-                            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#noticeArea">Bilgilendirme / Kampanya Alani</button></h2>
-                            <div id="noticeArea" class="accordion-collapse collapse" data-bs-parent="#productListSectionsAccordion">
-                                <div class="accordion-body">
-                                    <div class="row g-3 mb-3">
-                                        <div class="col-md-6"><label class="form-label">Bolum Durumu</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="section_notice_active" name="section_bilgilendirme_kampanya_alani_active" value="1" <?= old('section_bilgilendirme_kampanya_alani_active', ! empty($sections['bilgilendirme_kampanya_alani']['active']) ? '1' : '') ? 'checked' : '' ?>><label class="form-check-label" for="section_notice_active">Aktif</label></div></div>
-                                        <div class="col-md-6"><label class="form-label">Sira</label><input type="number" min="1" name="section_bilgilendirme_kampanya_alani_order" class="form-control" value="<?= esc((string) old('section_bilgilendirme_kampanya_alani_order', (string) ($sections['bilgilendirme_kampanya_alani']['order'] ?? 5))) ?>"></div>
-                                    </div>
-                                    <div class="form-check mb-3"><input class="form-check-input" type="checkbox" id="bilgilendirme_alani_goster" name="bilgilendirme_alani_goster" value="1" <?= old('bilgilendirme_alani_goster', ! empty($config['bilgilendirme_alani_goster'])) ? 'checked' : '' ?>><label class="form-check-label" for="bilgilendirme_alani_goster">Bilgilendirme alanini goster</label></div>
-                                    <div class="mb-3"><label class="form-label">Bilgilendirme Basligi</label><input type="text" name="bilgilendirme_basligi" class="form-control" value="<?= esc(old('bilgilendirme_basligi', (string) ($config['bilgilendirme_basligi'] ?? ''))) ?>"></div>
-                                    <div class="mb-3"><label class="form-label">Bilgilendirme Metni</label><textarea name="bilgilendirme_metni" rows="3" class="form-control"><?= esc(old('bilgilendirme_metni', (string) ($config['bilgilendirme_metni'] ?? ''))) ?></textarea></div>
-                                    <div class="mb-3"><label class="form-label">Bilgilendirme Tonu</label><select name="bilgilendirme_tonu" class="form-select"><?php foreach (['info' => 'Bilgi', 'success' => 'Basari', 'warning' => 'Uyari', 'danger' => 'Dikkat'] as $value => $label): ?><option value="<?= esc($value) ?>" <?= old('bilgilendirme_tonu', (string) ($config['bilgilendirme_tonu'] ?? 'info')) === $value ? 'selected' : '' ?>><?= esc($label) ?></option><?php endforeach; ?></select></div>
-                                    <div class="card border shadow-none mb-0" data-media-group><div class="card-body"><div class="ratio ratio-16x9 rounded overflow-hidden bg-light mb-3 d-none" data-media-preview-wrap><img src="" alt="Bilgilendirme gorseli" class="img-fluid object-fit-cover w-100 h-100" data-media-preview-image></div><div class="border rounded text-center p-4" data-media-placeholder><i class="ti ti-photo-up fs-2 text-muted d-block mb-2"></i><div class="fw-semibold mb-1">Kampanya gorseli secin</div><div class="small text-muted">Bilgilendirme bolumunde kullanilir.</div></div><div class="d-flex flex-wrap gap-2 mt-3"><button type="button" class="btn btn-sm btn-primary" data-media-browse>Gorsel Sec</button><button type="button" class="btn btn-sm btn-outline-danger" data-media-clear>Kaldir</button></div><input type="file" class="d-none" accept="image/*" data-media-file><div class="mt-3"><label class="form-label small text-muted">Gelişmis Yol Alani</label><input type="text" name="bilgilendirme_gorseli" class="form-control" value="<?= esc(old('bilgilendirme_gorseli', (string) ($config['bilgilendirme_gorseli'] ?? ''))) ?>" placeholder="/uploads/product-list-notice.jpg" data-media-path></div></div></div>
                                 </div>
                             </div>
                         </div>
@@ -207,7 +157,7 @@ $scheduledPublishInputValue = $scheduledPublishValue !== '' ? date('Y-m-d\TH:i',
 
     <div class="col-xxl-7">
         <div class="card mb-4">
-            <div class="card-header"><h5 class="mb-1">Mini Sayfa Onizlemesi</h5></div>
+            <div class="card-header"><h5 class="mb-1">Canli sayfa yapisi on izlemesi</h5></div>
             <div class="card-body">
                 <?= view('admin/pages/partials/product_list_preview', ['productListPreview' => $productListPreview ?? []]) ?>
             </div>

@@ -5,6 +5,32 @@
 $cartView = is_array($cartView ?? null) ? $cartView : [];
 $cartItems = is_array($cartView['items'] ?? null) ? $cartView['items'] : [];
 $suggestedProducts = is_array($suggestedProducts ?? null) ? $suggestedProducts : [];
+$cartBuilderBinding = is_array($cartBuilderBinding ?? null) ? $cartBuilderBinding : [];
+$cartBuilderPresenter = is_array($cartBuilderBinding['presenter'] ?? null) ? $cartBuilderBinding['presenter'] : [];
+$hasCartBuilderConfig = ! empty($cartBuilderBinding['hasPublishedConfig']);
+
+$showCartBreadcrumb = $hasCartBuilderConfig && ! empty($cartBuilderPresenter['showBreadcrumb']);
+$cartPageTitle = trim((string) ($cartBuilderPresenter['pageTitle'] ?? '')) ?: 'Sepetim';
+$cartPageSubtitle = trim((string) ($cartBuilderPresenter['pageSubtitle'] ?? ''));
+if (! $hasCartBuilderConfig && $cartPageSubtitle === '') {
+    $cartPageSubtitle = 'Sepetinizdeki urunleri kontrol edebilir, adetleri guncelleyebilirsiniz.';
+}
+$cartShortDescription = trim((string) ($cartBuilderPresenter['shortDescription'] ?? ''));
+$cartItemsTitle = trim((string) ($cartBuilderPresenter['itemsTitle'] ?? ''));
+$cartItemsDescription = trim((string) ($cartBuilderPresenter['itemsDescription'] ?? ''));
+$cartSummaryTitle = trim((string) ($cartBuilderPresenter['summaryTitle'] ?? '')) ?: 'Siparis Ozeti';
+$cartGrandTotalLabel = trim((string) ($cartBuilderPresenter['grandTotalLabel'] ?? '')) ?: 'Genel toplam';
+$cartCheckoutButtonText = trim((string) ($cartBuilderPresenter['checkoutButtonText'] ?? ''));
+if ($cartCheckoutButtonText === '' || in_array($cartCheckoutButtonText, ['Odeme adimi sonraki sprintte eklenecek', 'Sanal POS Sonraki Sprintte'], true)) {
+    $cartCheckoutButtonText = 'Odeme Bilgilerine Gec';
+}
+$cartSecurePaymentNote = trim((string) ($cartBuilderPresenter['securePaymentNote'] ?? ''));
+$cartEmptyTitle = trim((string) ($cartBuilderPresenter['emptyTitle'] ?? '')) ?: 'Sepetinizde urun yok.';
+$cartEmptyDescription = trim((string) ($cartBuilderPresenter['emptyDescription'] ?? ''));
+if (! $hasCartBuilderConfig && $cartEmptyDescription === '') {
+    $cartEmptyDescription = 'Favori urunlerinizi veya begendiginiz kitaplari sepete ekleyerek alisverise devam edebilirsiniz.';
+}
+$cartEmptyButtonText = trim((string) ($cartBuilderPresenter['emptyButtonText'] ?? '')) ?: 'Urunleri Kesfet';
 ?>
 <style>
     .cart-page {
@@ -25,6 +51,28 @@ $suggestedProducts = is_array($suggestedProducts ?? null) ? $suggestedProducts :
         margin: 0.45rem 0 0;
         color: #64748b;
         max-width: 760px;
+        line-height: 1.6;
+    }
+    .cart-breadcrumb {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-bottom: 0.7rem;
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .cart-breadcrumb a {
+        color: #475569;
+        text-decoration: none;
+    }
+    .cart-breadcrumb a:hover {
+        color: #0f172a;
+    }
+    .cart-short-description {
+        margin: 0.75rem 0 0;
+        color: #475569;
+        max-width: 780px;
         line-height: 1.6;
     }
     .cart-alert-stack {
@@ -65,6 +113,20 @@ $suggestedProducts = is_array($suggestedProducts ?? null) ? $suggestedProducts :
     .cart-items-column {
         display: grid;
         gap: 1rem;
+    }
+    .cart-items-header {
+        margin-bottom: 0.15rem;
+    }
+    .cart-items-title {
+        margin: 0;
+        color: #0f172a;
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+    .cart-items-description {
+        margin: 0.35rem 0 0;
+        color: #64748b;
+        line-height: 1.6;
     }
     .cart-item-card {
         padding: 1rem;
@@ -391,8 +453,20 @@ $suggestedProducts = is_array($suggestedProducts ?? null) ? $suggestedProducts :
 
 <section class="cart-page">
     <header class="cart-header">
-        <h1 class="cart-title">Sepetim</h1>
-        <p class="cart-subtitle">Sepetinizdeki urunleri kontrol edebilir, adetleri guncelleyebilirsiniz.</p>
+        <?php if ($showCartBreadcrumb): ?>
+            <div class="cart-breadcrumb">
+                <a href="<?= base_url('/') ?>">Ana Sayfa</a>
+                <span>/</span>
+                <span><?= esc($cartPageTitle) ?></span>
+            </div>
+        <?php endif; ?>
+        <h1 class="cart-title"><?= esc($cartPageTitle) ?></h1>
+        <?php if ($cartPageSubtitle !== ''): ?>
+            <p class="cart-subtitle"><?= esc($cartPageSubtitle) ?></p>
+        <?php endif; ?>
+        <?php if ($cartShortDescription !== ''): ?>
+            <p class="cart-short-description"><?= esc($cartShortDescription) ?></p>
+        <?php endif; ?>
     </header>
 
     <div class="cart-alert-stack">
@@ -412,13 +486,25 @@ $suggestedProducts = is_array($suggestedProducts ?? null) ? $suggestedProducts :
 
     <?php if ($cartItems === []): ?>
         <div class="cart-empty-card">
-            <h2 class="cart-empty-title">Sepetinizde urun yok.</h2>
-            <p class="cart-empty-text">Favori urunlerinizi veya begendiginiz kitaplari sepete ekleyerek alisverise devam edebilirsiniz.</p>
-            <a href="<?= base_url('products/selection') ?>" class="btn btn-primary px-4">Urunleri Kesfet</a>
+            <h2 class="cart-empty-title"><?= esc($cartEmptyTitle) ?></h2>
+            <?php if ($cartEmptyDescription !== ''): ?>
+                <p class="cart-empty-text"><?= esc($cartEmptyDescription) ?></p>
+            <?php endif; ?>
+            <a href="<?= base_url('products/selection') ?>" class="btn btn-primary px-4"><?= esc($cartEmptyButtonText) ?></a>
         </div>
     <?php else: ?>
         <div class="cart-layout">
             <div class="cart-items-column">
+                <?php if ($cartItemsTitle !== '' || $cartItemsDescription !== ''): ?>
+                    <div class="cart-items-header">
+                        <?php if ($cartItemsTitle !== ''): ?>
+                            <h2 class="cart-items-title"><?= esc($cartItemsTitle) ?></h2>
+                        <?php endif; ?>
+                        <?php if ($cartItemsDescription !== ''): ?>
+                            <p class="cart-items-description"><?= esc($cartItemsDescription) ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
                 <?php foreach ($cartItems as $item): ?>
                     <article class="cart-item-card">
                         <div class="cart-item-grid">
@@ -493,7 +579,7 @@ $suggestedProducts = is_array($suggestedProducts ?? null) ? $suggestedProducts :
             </div>
 
             <aside class="cart-summary-card">
-                <h2 class="cart-summary-title">Siparis Ozeti</h2>
+                <h2 class="cart-summary-title"><?= esc($cartSummaryTitle) ?></h2>
                 <div class="cart-summary-row">
                     <span>Urun adedi</span>
                     <strong><?= esc((string) ($cartView['item_count'] ?? 0)) ?></strong>
@@ -516,13 +602,16 @@ $suggestedProducts = is_array($suggestedProducts ?? null) ? $suggestedProducts :
                 <div class="cart-summary-divider"></div>
 
                 <div class="cart-summary-total">
-                    <span>Genel toplam</span>
+                    <span><?= esc($cartGrandTotalLabel) ?></span>
                     <span><?= number_format((float) ($cartView['grand_total_current'] ?? 0), 2, ',', '.') ?> TL</span>
                 </div>
                 <p class="cart-summary-note"><?= esc((string) ($cartView['shipping_info'] ?? 'Kargo ucreti odeme adiminda hesaplanacak.')) ?></p>
+                <?php if ($cartSecurePaymentNote !== ''): ?>
+                    <p class="cart-summary-note"><?= esc($cartSecurePaymentNote) ?></p>
+                <?php endif; ?>
 
                 <div class="cart-summary-actions">
-                    <button type="button" class="btn cart-summary-disabled" disabled>Odeme adimi sonraki sprintte eklenecek</button>
+                    <a href="<?= base_url('yardim/odeme') ?>" class="btn btn-primary"><?= esc($cartCheckoutButtonText) ?></a>
                     <a href="<?= base_url('products/selection') ?>" class="btn btn-outline-primary">Alisverise Devam Et</a>
                     <form action="<?= base_url('cart/clear') ?>" method="post">
                         <?= csrf_field() ?>

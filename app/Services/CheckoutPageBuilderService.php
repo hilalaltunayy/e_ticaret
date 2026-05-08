@@ -7,6 +7,21 @@ use App\Models\BlockTypeModel;
 
 class CheckoutPageBuilderService
 {
+    private const OPTIONAL_TEXT_FIELDS = [
+        'sayfa_alt_basligi',
+        'guven_kisa_notu',
+        'adim_cubugu_aciklama',
+        'teslimat_aciklama',
+        'ayni_adres_notu',
+        'zorunlu_alan_bilgi_metni',
+        'odeme_aciklama',
+        'guvenli_odeme_notu',
+        'siparis_tipi_notu',
+        'bilgi_kutusu_aciklama',
+        'guven_mesaji',
+        'alt_yardim_metni',
+    ];
+
     public function __construct(
         private ?PageVersionService $pageVersionService = null,
         private ?BlockInstanceModel $blockInstanceModel = null,
@@ -118,30 +133,30 @@ class CheckoutPageBuilderService
                 'bilgilendirme_guven_cta_alani' => ['active' => true, 'order' => 6],
             ],
             'sayfa_basligi' => 'Guvenli Checkout',
-            'sayfa_alt_basligi' => 'Teslimat ve odeme adimlarini tamamlayarak siparisinizi olusturun.',
+            'sayfa_alt_basligi' => '',
             'breadcrumb_goster' => true,
-            'guven_kisa_notu' => 'SSL korumasi aktif, bilgileriniz guvende islenir.',
-            'adim_cubugu_aciklama' => 'Teslimat, odeme ve onay adimlarini sirasiyla tamamlayin.',
+            'guven_kisa_notu' => '',
+            'adim_cubugu_aciklama' => '',
             'adim_cubugu_gorunur' => true,
             'teslimat_baslik' => 'Teslimat ve Fatura Bilgileri',
-            'teslimat_aciklama' => 'Adres ve iletisim bilgilerinizi eksiksiz girin.',
-            'ayni_adres_notu' => 'Fatura adresi teslimat adresi ile ayni olabilir.',
-            'zorunlu_alan_bilgi_metni' => '* ile isaretli alanlar zorunludur.',
+            'teslimat_aciklama' => '',
+            'ayni_adres_notu' => '',
+            'zorunlu_alan_bilgi_metni' => '',
             'odeme_baslik' => 'Odeme Yontemi',
-            'odeme_aciklama' => 'Tercih ettiginiz odeme yontemini secin.',
-            'guvenli_odeme_notu' => 'Kart bilgileriniz PCI uyumlu guvenli altyapida islenir.',
+            'odeme_aciklama' => '',
+            'guvenli_odeme_notu' => '',
             'kart_logo_goster' => true,
             'guven_rozeti_goster' => true,
             'ozet_baslik' => 'Siparis Ozeti',
             'kupon_alani_goster' => true,
             'indirim_satiri_goster' => true,
             'kargo_satiri_goster' => true,
-            'siparis_tipi_notu' => 'Dijital urunlerde teslimat e-posta ile saglanir.',
+            'siparis_tipi_notu' => '',
             'bilgi_kutusu_baslik' => 'Siparisinizi Tamamlamadan Once',
-            'bilgi_kutusu_aciklama' => 'Adres, odeme ve siparis ozeti bilgilerinizi son kez kontrol edin.',
-            'guven_mesaji' => '7/24 destek ve guvenli odeme korumasi ile yaninizdayiz.',
+            'bilgi_kutusu_aciklama' => '',
+            'guven_mesaji' => '',
             'tamamla_buton_metni' => 'Siparisi Tamamla',
-            'alt_yardim_metni' => 'Bir sorun olursa destek ekibimiz yardim icin hazir.',
+            'alt_yardim_metni' => '',
         ];
     }
 
@@ -178,30 +193,30 @@ class CheckoutPageBuilderService
                 ],
             ],
             'sayfa_basligi' => trim((string) ($input['sayfa_basligi'] ?? $defaults['sayfa_basligi'])),
-            'sayfa_alt_basligi' => trim((string) ($input['sayfa_alt_basligi'] ?? $defaults['sayfa_alt_basligi'])),
+            'sayfa_alt_basligi' => $this->sanitizeOptionalText($input['sayfa_alt_basligi'] ?? $defaults['sayfa_alt_basligi']),
             'breadcrumb_goster' => $this->sanitizeBool($input['breadcrumb_goster'] ?? null),
-            'guven_kisa_notu' => trim((string) ($input['guven_kisa_notu'] ?? $defaults['guven_kisa_notu'])),
-            'adim_cubugu_aciklama' => trim((string) ($input['adim_cubugu_aciklama'] ?? $defaults['adim_cubugu_aciklama'])),
+            'guven_kisa_notu' => $this->sanitizeOptionalText($input['guven_kisa_notu'] ?? $defaults['guven_kisa_notu']),
+            'adim_cubugu_aciklama' => $this->sanitizeOptionalText($input['adim_cubugu_aciklama'] ?? $defaults['adim_cubugu_aciklama']),
             'adim_cubugu_gorunur' => $this->sanitizeBool($input['adim_cubugu_gorunur'] ?? null),
             'teslimat_baslik' => trim((string) ($input['teslimat_baslik'] ?? $defaults['teslimat_baslik'])),
-            'teslimat_aciklama' => trim((string) ($input['teslimat_aciklama'] ?? $defaults['teslimat_aciklama'])),
-            'ayni_adres_notu' => trim((string) ($input['ayni_adres_notu'] ?? $defaults['ayni_adres_notu'])),
-            'zorunlu_alan_bilgi_metni' => trim((string) ($input['zorunlu_alan_bilgi_metni'] ?? $defaults['zorunlu_alan_bilgi_metni'])),
+            'teslimat_aciklama' => $this->sanitizeOptionalText($input['teslimat_aciklama'] ?? $defaults['teslimat_aciklama']),
+            'ayni_adres_notu' => $this->sanitizeOptionalText($input['ayni_adres_notu'] ?? $defaults['ayni_adres_notu']),
+            'zorunlu_alan_bilgi_metni' => $this->sanitizeOptionalText($input['zorunlu_alan_bilgi_metni'] ?? $defaults['zorunlu_alan_bilgi_metni']),
             'odeme_baslik' => trim((string) ($input['odeme_baslik'] ?? $defaults['odeme_baslik'])),
-            'odeme_aciklama' => trim((string) ($input['odeme_aciklama'] ?? $defaults['odeme_aciklama'])),
-            'guvenli_odeme_notu' => trim((string) ($input['guvenli_odeme_notu'] ?? $defaults['guvenli_odeme_notu'])),
+            'odeme_aciklama' => $this->sanitizeOptionalText($input['odeme_aciklama'] ?? $defaults['odeme_aciklama']),
+            'guvenli_odeme_notu' => $this->sanitizeOptionalText($input['guvenli_odeme_notu'] ?? $defaults['guvenli_odeme_notu']),
             'kart_logo_goster' => $this->sanitizeBool($input['kart_logo_goster'] ?? null),
             'guven_rozeti_goster' => $this->sanitizeBool($input['guven_rozeti_goster'] ?? null),
             'ozet_baslik' => trim((string) ($input['ozet_baslik'] ?? $defaults['ozet_baslik'])),
             'kupon_alani_goster' => $this->sanitizeBool($input['kupon_alani_goster'] ?? null),
             'indirim_satiri_goster' => $this->sanitizeBool($input['indirim_satiri_goster'] ?? null),
             'kargo_satiri_goster' => $this->sanitizeBool($input['kargo_satiri_goster'] ?? null),
-            'siparis_tipi_notu' => trim((string) ($input['siparis_tipi_notu'] ?? $defaults['siparis_tipi_notu'])),
+            'siparis_tipi_notu' => $this->sanitizeOptionalText($input['siparis_tipi_notu'] ?? $defaults['siparis_tipi_notu']),
             'bilgi_kutusu_baslik' => trim((string) ($input['bilgi_kutusu_baslik'] ?? $defaults['bilgi_kutusu_baslik'])),
-            'bilgi_kutusu_aciklama' => trim((string) ($input['bilgi_kutusu_aciklama'] ?? $defaults['bilgi_kutusu_aciklama'])),
-            'guven_mesaji' => trim((string) ($input['guven_mesaji'] ?? $defaults['guven_mesaji'])),
+            'bilgi_kutusu_aciklama' => $this->sanitizeOptionalText($input['bilgi_kutusu_aciklama'] ?? $defaults['bilgi_kutusu_aciklama']),
+            'guven_mesaji' => $this->sanitizeOptionalText($input['guven_mesaji'] ?? $defaults['guven_mesaji']),
             'tamamla_buton_metni' => trim((string) ($input['tamamla_buton_metni'] ?? $defaults['tamamla_buton_metni'])),
-            'alt_yardim_metni' => trim((string) ($input['alt_yardim_metni'] ?? $defaults['alt_yardim_metni'])),
+            'alt_yardim_metni' => $this->sanitizeOptionalText($input['alt_yardim_metni'] ?? $defaults['alt_yardim_metni']),
         ];
     }
 
@@ -228,25 +243,17 @@ class CheckoutPageBuilderService
 
         foreach ([
             'sayfa_basligi',
-            'sayfa_alt_basligi',
-            'guven_kisa_notu',
-            'adim_cubugu_aciklama',
             'teslimat_baslik',
-            'teslimat_aciklama',
-            'ayni_adres_notu',
-            'zorunlu_alan_bilgi_metni',
             'odeme_baslik',
-            'odeme_aciklama',
-            'guvenli_odeme_notu',
             'ozet_baslik',
-            'siparis_tipi_notu',
             'bilgi_kutusu_baslik',
-            'bilgi_kutusu_aciklama',
-            'guven_mesaji',
             'tamamla_buton_metni',
-            'alt_yardim_metni',
         ] as $key) {
             $config[$key] = $this->fallbackText((string) ($config[$key] ?? ''), (string) $defaults[$key]);
+        }
+
+        foreach (self::OPTIONAL_TEXT_FIELDS as $key) {
+            $config[$key] = trim((string) ($config[$key] ?? ''));
         }
 
         foreach ([
@@ -309,5 +316,10 @@ class CheckoutPageBuilderService
         $value = trim($value);
 
         return $value === '' ? $fallback : $value;
+    }
+
+    private function sanitizeOptionalText(mixed $value): string
+    {
+        return trim((string) $value);
     }
 }

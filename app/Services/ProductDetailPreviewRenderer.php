@@ -4,6 +4,32 @@ namespace App\Services;
 
 class ProductDetailPreviewRenderer
 {
+    private const LEGACY_DEFAULT_HELPER_TEXTS = [
+        'Tanitim, fiyat ve guven notlari ayni sayfada dengeli bir bicimde sunulur.',
+        'Kapak, format, yazar ve hizli satin alma aksiyonlarini bir arada sunun.',
+        'Kullaniciya fiyat, stok ve teslimat notlarini guven veren bir alanda gosterin.',
+        'Dijital urunlerde erisim satin alma sonrasi e-posta ile iletilir.',
+        'Basili urunlerde hazirlama ve kargo bilgisi siparis adiminda netlesir.',
+        'Guvenli alisveris ve onayli odeme altyapisi ile korunur.',
+        'Iade, destek ve satin alma guvencesi tek ekranda gorunur.',
+    ];
+
+    private const OPTIONAL_TEXT_FIELDS = [
+        'sayfa_alt_basligi',
+        'kisa_aciklama',
+        'bilgi_kampanya_rozeti_metni',
+        'urun_tanitim_kisa_aciklama',
+        'fiyat_satin_alma_aciklama',
+        'dijital_erisim_kisa_notu',
+        'teslimat_kargo_kisa_notu',
+        'guvenli_alisveris_kisa_notu',
+        'icerik_aciklama_notu',
+        'yorum_ozeti_metni',
+        'yorum_yap_cagrisi_metni',
+        'ilgili_urunler_cta_aciklama',
+        'guven_notu_kisa_bilgi',
+    ];
+
     public function build(array $config): array
     {
         $config = $this->normalizeConfig($config);
@@ -119,25 +145,25 @@ class ProductDetailPreviewRenderer
                 'ilgili_urunler_cta_alani' => ['active' => true, 'order' => 7],
             ],
             'sayfa_basligi' => 'Urun Detayi',
-            'sayfa_alt_basligi' => 'Urunun tum detaylarini, fiyat bilgisini ve satin alma alanini yonetin.',
+            'sayfa_alt_basligi' => '',
             'breadcrumb_goster' => true,
-            'kisa_aciklama' => 'Tanitim, fiyat ve guven notlari ayni sayfada dengeli bir bicimde sunulur.',
-            'bilgi_kampanya_rozeti_metni' => 'Editorun Secimi',
+            'kisa_aciklama' => '',
+            'bilgi_kampanya_rozeti_metni' => '',
             'urun_tanitim_baslik' => 'Urun Ana Tanitimi',
-            'urun_tanitim_kisa_aciklama' => 'Kapak, format, yazar ve hizli satin alma aksiyonlarini bir arada sunun.',
+            'urun_tanitim_kisa_aciklama' => '',
             'kapak_galeri_goster' => true,
             'format_etiketi_goster' => true,
             'yazar_bilgisi_goster' => true,
             'favori_butonu_goster' => true,
             'sepete_ekle_buton_metni' => 'Sepete Ekle',
             'fiyat_satin_alma_baslik' => 'Fiyat ve Satin Alma Bilgisi',
-            'fiyat_satin_alma_aciklama' => 'Kullaniciya fiyat, stok ve teslimat notlarini guven veren bir alanda gosterin.',
+            'fiyat_satin_alma_aciklama' => '',
             'eski_fiyat_goster' => true,
             'indirim_rozeti_goster' => true,
             'stok_uygunluk_bilgisi_goster' => true,
-            'dijital_erisim_kisa_notu' => 'Dijital urunlerde erisim satin alma sonrasi e-posta ile iletilir.',
-            'teslimat_kargo_kisa_notu' => 'Basili urunlerde hazirlama ve kargo bilgisi siparis adiminda netlesir.',
-            'guvenli_alisveris_kisa_notu' => 'Guvenli alisveris ve onayli odeme altyapisi ile korunur.',
+            'dijital_erisim_kisa_notu' => '',
+            'teslimat_kargo_kisa_notu' => '',
+            'guvenli_alisveris_kisa_notu' => '',
             'urun_meta_bilgi_baslik' => 'Urun Meta Bilgileri',
             'isbn_goster' => true,
             'dil_goster' => true,
@@ -149,17 +175,17 @@ class ProductDetailPreviewRenderer
             'uzun_aciklama_basligi' => 'Urun Aciklamasi',
             'arka_kapak_tanitim_basligi' => 'Arka Kapak / Tanitim',
             'one_cikanlar_basligi' => 'One Cikanlar',
-            'icerik_aciklama_notu' => 'Bu alan urunun neden tercih edilmesi gerektigini ozetler.',
+            'icerik_aciklama_notu' => '',
             'yorum_puan_baslik' => 'Yorumlar ve Puanlar',
-            'yorum_ozeti_metni' => 'Kullanicilarin geri bildirimleri satin alma kararini destekler.',
+            'yorum_ozeti_metni' => '',
             'puan_ortalamasi_goster' => true,
             'yorum_sayisi_goster' => true,
-            'yorum_yap_cagrisi_metni' => 'Deneyimini paylas ve diger kullanicilara yol goster.',
+            'yorum_yap_cagrisi_metni' => '',
             'ilgili_urunler_cta_baslik' => 'Ilgili Urunler ve CTA',
-            'ilgili_urunler_cta_aciklama' => 'Benzer urunler ve ek aksiyon alaniyla kesfetme akisini guclendir.',
+            'ilgili_urunler_cta_aciklama' => '',
             'benzer_urunler_basligi' => 'Benzer Urunler',
             'cta_buton_metni' => 'Hemen Incele',
-            'guven_notu_kisa_bilgi' => 'Iade, destek ve satin alma guvencesi tek ekranda gorunur.',
+            'guven_notu_kisa_bilgi' => '',
         ];
 
         $config['sections'] = is_array($config['sections'] ?? null) ? $config['sections'] : [];
@@ -181,7 +207,16 @@ class ProductDetailPreviewRenderer
 
         foreach ($defaults as $key => $value) {
             if (is_string($value)) {
-                $config[$key] = trim((string) $config[$key]) !== '' ? trim((string) $config[$key]) : $value;
+                $current = trim((string) $config[$key]);
+                if ($current === '' && ! in_array($key, self::OPTIONAL_TEXT_FIELDS, true)) {
+                    $current = $value;
+                }
+
+                if (in_array($key, self::OPTIONAL_TEXT_FIELDS, true)) {
+                    $current = $this->sanitizeOptionalText($current);
+                }
+
+                $config[$key] = $current;
             } else {
                 $config[$key] = ! empty($config[$key]);
             }
@@ -208,5 +243,16 @@ class ProductDetailPreviewRenderer
         $value = (int) $input[$key];
 
         return ($value < $min || $value > $max) ? $fallback : $value;
+    }
+
+    private function sanitizeOptionalText(mixed $value): string
+    {
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        return in_array($value, self::LEGACY_DEFAULT_HELPER_TEXTS, true) ? '' : $value;
     }
 }

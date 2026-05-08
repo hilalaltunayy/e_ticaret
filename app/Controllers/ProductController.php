@@ -4,18 +4,24 @@ namespace App\Controllers;
 
 use App\Services\ProductsService;
 use App\Services\FavoriteService;
+use App\Services\ProductDetailStorefrontBindingService;
+use App\Services\ProductListStorefrontBindingService;
 use App\Services\StorefrontHomeService;
 
 class ProductController extends BaseController
 {
     protected ProductsService $productsService;
     protected FavoriteService $favoriteService;
+    protected ProductDetailStorefrontBindingService $productDetailStorefrontBindingService;
+    protected ProductListStorefrontBindingService $productListStorefrontBindingService;
     protected StorefrontHomeService $storefrontHomeService;
 
     public function __construct()
     {
         $this->productsService = new ProductsService();
         $this->favoriteService = new FavoriteService();
+        $this->productDetailStorefrontBindingService = new ProductDetailStorefrontBindingService();
+        $this->productListStorefrontBindingService = new ProductListStorefrontBindingService();
         $this->storefrontHomeService = new StorefrontHomeService();
     }
 
@@ -29,6 +35,7 @@ class ProductController extends BaseController
             'selectedCat' => 'all',
             'type' => '',
             'title' => 'Tum Urunler',
+            'productListBinding' => $this->resolveProductListBinding($products),
         ]));
     }
 
@@ -52,6 +59,7 @@ class ProductController extends BaseController
             'product' => $product,
             'similarProducts' => $this->productsService->getSimilarProductsByProduct($product, 4),
             'isFavorited' => $this->resolveFavoriteState((string) ($product->id ?? '')),
+            'productDetailBinding' => $this->productDetailStorefrontBindingService->getPublishedBinding(),
         ]));
     }
 
@@ -71,6 +79,7 @@ class ProductController extends BaseController
             'selectedCat' => 'all',
             'type' => (string) $type,
             'title' => $this->resolveTypeTitle((string) $type),
+            'productListBinding' => $this->resolveProductListBinding($products),
         ]));
     }
 
@@ -85,6 +94,7 @@ class ProductController extends BaseController
             'products' => $products,
             'selectedCat' => $categoryId ?? 'all',
             'title' => $this->resolveTypeTitle((string) $type),
+            'productListBinding' => $this->resolveProductListBinding($products),
         ]));
     }
 
@@ -124,5 +134,12 @@ class ProductController extends BaseController
         }
 
         return $this->favoriteService->isFavorite($userId, $productId);
+    }
+
+    private function resolveProductListBinding(array $products): array
+    {
+        return $this->productListStorefrontBindingService->getPublishedBinding([
+            'productCount' => count($products),
+        ]);
     }
 }

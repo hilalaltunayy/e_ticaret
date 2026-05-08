@@ -16,6 +16,7 @@ $routes = Services::routes();
 $routes->get('/', 'StorefrontController::home');
 $routes->get('yardim/favorilerim', 'Favorites::index', ['filter' => 'auth']);
 $routes->get('yardim/sepetim', 'Cart::index', ['filter' => 'auth']);
+$routes->get('yardim/odeme', 'Checkout::index', ['filter' => 'auth']);
 $routes->get('yardim/hesabim', 'Account::index', ['filter' => 'auth']);
 $routes->post('yardim/hesabim/profil', 'Account::updateProfile', ['filter' => 'auth']);
 $routes->post('yardim/hesabim/sifre', 'Account::updatePassword', ['filter' => 'auth']);

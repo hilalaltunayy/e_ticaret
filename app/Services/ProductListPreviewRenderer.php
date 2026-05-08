@@ -12,6 +12,7 @@ class ProductListPreviewRenderer
         return [
             'config' => $config,
             'sections' => $sections,
+            'sectionMap' => $this->mapSectionsByKey($sections),
             'gridColClass' => $this->gridColumnClass((string) ($config['grid_yogunlugu'] ?? '3')),
             'visibleSectionCount' => count(array_filter($sections, static fn (array $section): bool => ! empty($section['active']))),
             'hiddenSectionCount' => count(array_filter($sections, static fn (array $section): bool => empty($section['active']))),
@@ -97,10 +98,7 @@ class ProductListPreviewRenderer
     {
         $sectionMeta = [
             'sayfa_ust_alani' => ['title' => 'Sayfa Ust Alani', 'icon' => 'ti ti-layout-navbar'],
-            'filtre_alani' => ['title' => 'Filtre Alani', 'icon' => 'ti ti-adjustments-horizontal'],
-            'siralama_sonuc_cubugu' => ['title' => 'Siralama ve Sonuc Cubugu', 'icon' => 'ti ti-arrows-sort'],
             'urun_listesi_gorunumu' => ['title' => 'Urun Listesi Gorunumu', 'icon' => 'ti ti-layout-grid'],
-            'bilgilendirme_kampanya_alani' => ['title' => 'Bilgilendirme / Kampanya Alani', 'icon' => 'ti ti-speakerphone'],
             'bos_sonuc_alani' => ['title' => 'Bos Sonuc Alani', 'icon' => 'ti ti-mood-empty'],
             'alt_aciklama_alani' => ['title' => 'Alt Aciklama Alani', 'icon' => 'ti ti-align-box-bottom-left'],
         ];
@@ -251,6 +249,22 @@ class ProductListPreviewRenderer
         return $gridDensity === '2'
             ? 'col-md-6'
             : ($gridDensity === '4' ? 'col-xl-3 col-md-6' : 'col-lg-4 col-md-6');
+    }
+
+    private function mapSectionsByKey(array $sections): array
+    {
+        $mapped = [];
+
+        foreach ($sections as $section) {
+            $key = trim((string) ($section['key'] ?? ''));
+            if ($key === '') {
+                continue;
+            }
+
+            $mapped[$key] = $section;
+        }
+
+        return $mapped;
     }
 
     private function fallbackText(string $value, string $fallback): string

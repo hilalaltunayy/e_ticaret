@@ -66,7 +66,7 @@
     }
 
     .storefront-topbar {
-        padding: 0 0 14px;
+        padding: 8px 0 14px;
     }
 
     .storefront-brand {
@@ -86,14 +86,14 @@
         flex: 0 0 auto;
     }
 
-    .storefront-brand-text {
+    .storefront-header .storefront-brand-text {
         display: inline-flex;
         align-items: center;
         line-height: 1;
         font-size: 1.08rem;
         font-weight: 800;
         letter-spacing: -0.01em;
-        color: var(--storefront-accent-dark);
+        color: #0D2B5B;
     }
 
     .storefront-topbar-grid {
@@ -507,7 +507,7 @@
             gap: 10px;
         }
 
-        .storefront-brand-text {
+        .storefront-header .storefront-brand-text {
             font-size: 0.98rem;
         }
     }

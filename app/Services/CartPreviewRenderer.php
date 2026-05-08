@@ -4,6 +4,17 @@ namespace App\Services;
 
 class CartPreviewRenderer
 {
+    private const OPTIONAL_TEXT_FIELDS = [
+        'sayfa_alt_basligi',
+        'kisa_aciklama',
+        'sepet_urunleri_aciklama',
+        'fiyat_uyari_aciklama',
+        'stok_uyari_aciklama',
+        'kupon_kampanya_aciklama',
+        'guvenli_odeme_kisa_notu',
+        'bos_sepet_aciklama',
+    ];
+
     public function build(array $config): array
     {
         $config = $this->normalizeConfig($config);
@@ -18,6 +29,7 @@ class CartPreviewRenderer
             'visibleSectionCount' => count(array_filter($sections, static fn (array $section): bool => ! empty($section['active']))),
             'pricingDeltaCount' => count(array_filter($sampleItems, static fn (array $item): bool => ! empty($item['has_price_change']))),
             'stockWarningCount' => count(array_filter($sampleItems, static fn (array $item): bool => trim((string) ($item['stock_message'] ?? '')) !== '')),
+            'optionalBlocks' => $this->buildOptionalBlocks($config, $sampleItems),
         ];
     }
 
@@ -101,31 +113,24 @@ class CartPreviewRenderer
     {
         $items = [
             [
-                'name' => 'BeAble Pro Defter Seti',
-                'type' => 'fiziksel',
+                'name' => 'Sepetteki Roman',
+                'type' => 'Basili',
                 'quantity' => 2,
-                'snapshot_price' => 189.90,
+                'snapshot_price' => 219.90,
                 'current_price' => 199.90,
                 'stock_level' => 4,
-                'image_label' => 'DEFTER',
+                'stock_state' => 'Stokta mevcut',
+                'image_label' => 'ROMAN',
             ],
             [
-                'name' => 'BeAble Pro Egitim PDF Paketi',
-                'type' => 'dijital',
+                'name' => 'Dijital Kutuphane Paketi',
+                'type' => 'Dijital',
                 'quantity' => 1,
                 'snapshot_price' => 129.90,
                 'current_price' => 129.90,
                 'stock_level' => null,
-                'image_label' => 'PDF',
-            ],
-            [
-                'name' => 'BeAble Pro Kalem',
-                'type' => 'fiziksel',
-                'quantity' => 1,
-                'snapshot_price' => 59.90,
-                'current_price' => 59.90,
-                'stock_level' => 1,
-                'image_label' => 'KALEM',
+                'stock_state' => 'Aninda teslim',
+                'image_label' => 'E-KITAP',
             ],
         ];
 
@@ -142,7 +147,7 @@ class CartPreviewRenderer
 
     private function resolveStockMessage(array $item, array $config): string
     {
-        if (($item['type'] ?? '') !== 'fiziksel') {
+        if (mb_strtolower((string) ($item['type'] ?? ''), 'UTF-8') !== 'basili') {
             return '';
         }
 
@@ -168,6 +173,30 @@ class CartPreviewRenderer
         return '';
     }
 
+    private function buildOptionalBlocks(array $config, array $items): array
+    {
+        return [
+            'priceNotice' => [
+                'active' => ! empty($config['sections']['fiyat_guncelleme_uyari_alani']['active']),
+                'title' => trim((string) ($config['fiyat_uyari_baslik'] ?? '')),
+                'description' => trim((string) ($config['fiyat_uyari_aciklama'] ?? '')),
+                'changedItemCount' => count(array_filter($items, static fn (array $item): bool => ! empty($item['has_price_change']))),
+            ],
+            'stockNotice' => [
+                'active' => ! empty($config['sections']['stok_uygunluk_uyari_alani']['active']),
+                'title' => trim((string) ($config['stok_uyari_baslik'] ?? '')),
+                'description' => trim((string) ($config['stok_uyari_aciklama'] ?? '')),
+                'warningCount' => count(array_filter($items, static fn (array $item): bool => trim((string) ($item['stock_message'] ?? '')) !== '')),
+            ],
+            'couponNotice' => [
+                'active' => ! empty($config['sections']['kupon_kampanya_alani']['active']),
+                'title' => trim((string) ($config['kupon_kampanya_baslik'] ?? '')),
+                'description' => trim((string) ($config['kupon_kampanya_aciklama'] ?? '')),
+                'hasCouponInput' => ! empty($config['kupon_alani_goster']),
+            ],
+        ];
+    }
+
     private function normalizeConfig(array $config): array
     {
         $defaults = [
@@ -181,29 +210,29 @@ class CartPreviewRenderer
                 'bos_sepet_alani' => ['active' => true, 'order' => 7],
             ],
             'sayfa_basligi' => 'Sepetim',
-            'sayfa_alt_basligi' => 'Sepetinizdeki urunleri kontrol edip odeme adimina gecin.',
+            'sayfa_alt_basligi' => '',
             'breadcrumb_goster' => true,
-            'kisa_aciklama' => 'Fiyat, stok ve kampanya bilgileri siparis oncesinde tekrar kontrol edilir.',
+            'kisa_aciklama' => '',
             'sepet_urunleri_baslik' => 'Sepetinizdeki Urunler',
-            'sepet_urunleri_aciklama' => 'Urun adetlerini guncelleyebilir veya urunleri sepetinizden kaldirabilirsiniz.',
+            'sepet_urunleri_aciklama' => '',
             'urun_gorseli_goster' => true,
             'format_etiketi_goster' => true,
             'adet_kontrolu_goster' => true,
             'kaldir_buton_metni' => 'Kaldir',
             'fiyat_uyari_baslik' => 'Fiyat Guncellemesi',
-            'fiyat_uyari_aciklama' => 'Sepete eklediginiz andan sonra fiyati degisen urunler burada bilgilendirme kutusuyla vurgulanir.',
+            'fiyat_uyari_aciklama' => '',
             'fiyat_farki_bilgi_kutusu_goster' => true,
             'eski_fiyat_etiketi' => 'Sepete eklendigindeki fiyat',
             'guncel_fiyat_etiketi' => 'Guncel fiyat',
             'toplam_guncelleme_notu' => 'Toplam tutar odeme adiminda en guncel fiyatlara gore yenilenir.',
             'stok_uyari_baslik' => 'Stok ve Uygunluk Kontrolu',
-            'stok_uyari_aciklama' => 'Fiziksel urunlerde stok durumu mesaj bazli gosterilir, dijital urunlerde stok mesaji yer almaz.',
+            'stok_uyari_aciklama' => '',
             'dusuk_stok_uyarisi_goster' => true,
             'tukenme_mesaji_goster' => true,
             'dusuk_stok_mesaj_sablonu' => 'Son {count} urun',
             'son_urun_mesaj_sablonu' => 'Son urun',
             'kupon_kampanya_baslik' => 'Kupon ve Kampanyalar',
-            'kupon_kampanya_aciklama' => 'Aktif kampanya ve kupon bilgilerini odeme oncesinde gozden gecirin.',
+            'kupon_kampanya_aciklama' => '',
             'kupon_alani_goster' => true,
             'kampanya_bilgi_notu' => 'Bu sipariste uygulanabilen kampanyalar odeme adiminda otomatik degerlendirilir.',
             'ucretsiz_kargo_bilgi_notu' => '500 TL ve uzeri alisverislerde ucretsiz kargo firsati sunulur.',
@@ -213,9 +242,9 @@ class CartPreviewRenderer
             'kargo_goster' => true,
             'genel_toplam_basligi' => 'Genel Toplam',
             'odeme_sayfasina_git_buton_metni' => 'Odeme Sayfasina Git',
-            'guvenli_odeme_kisa_notu' => 'Guvenli odeme adiminda kart ve adres bilgileriniz korunur.',
+            'guvenli_odeme_kisa_notu' => '',
             'bos_sepet_baslik' => 'Sepetiniz Su Anda Bos',
-            'bos_sepet_aciklama' => 'Katalogtan urun ekleyerek alisverise devam edebilirsiniz.',
+            'bos_sepet_aciklama' => '',
             'alisverise_basla_buton_metni' => 'Alisverise Basla',
         ];
 
@@ -238,7 +267,12 @@ class CartPreviewRenderer
 
         foreach ($defaults as $key => $value) {
             if (is_string($value)) {
-                $config[$key] = trim((string) $config[$key]) !== '' ? trim((string) $config[$key]) : $value;
+                $current = trim((string) $config[$key]);
+                if ($current === '' && ! in_array($key, self::OPTIONAL_TEXT_FIELDS, true)) {
+                    $current = $value;
+                }
+
+                $config[$key] = $current;
             }
         }
 

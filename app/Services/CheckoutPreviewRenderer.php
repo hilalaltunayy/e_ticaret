@@ -4,6 +4,21 @@ namespace App\Services;
 
 class CheckoutPreviewRenderer
 {
+    private const OPTIONAL_TEXT_FIELDS = [
+        'sayfa_alt_basligi',
+        'guven_kisa_notu',
+        'adim_cubugu_aciklama',
+        'teslimat_aciklama',
+        'ayni_adres_notu',
+        'zorunlu_alan_bilgi_metni',
+        'odeme_aciklama',
+        'guvenli_odeme_notu',
+        'siparis_tipi_notu',
+        'bilgi_kutusu_aciklama',
+        'guven_mesaji',
+        'alt_yardim_metni',
+    ];
+
     public function build(array $config): array
     {
         $config = $this->normalizeConfig($config);
@@ -115,30 +130,30 @@ class CheckoutPreviewRenderer
                 'bilgilendirme_guven_cta_alani' => ['active' => true, 'order' => 6],
             ],
             'sayfa_basligi' => 'Guvenli Checkout',
-            'sayfa_alt_basligi' => 'Teslimat ve odeme adimlarini tamamlayarak siparisinizi olusturun.',
+            'sayfa_alt_basligi' => '',
             'breadcrumb_goster' => true,
-            'guven_kisa_notu' => 'SSL korumasi aktif, bilgileriniz guvende islenir.',
-            'adim_cubugu_aciklama' => 'Teslimat, odeme ve onay adimlarini sirasiyla tamamlayin.',
+            'guven_kisa_notu' => '',
+            'adim_cubugu_aciklama' => '',
             'adim_cubugu_gorunur' => true,
             'teslimat_baslik' => 'Teslimat ve Fatura Bilgileri',
-            'teslimat_aciklama' => 'Adres ve iletisim bilgilerinizi eksiksiz girin.',
-            'ayni_adres_notu' => 'Fatura adresi teslimat adresi ile ayni olabilir.',
-            'zorunlu_alan_bilgi_metni' => '* ile isaretli alanlar zorunludur.',
+            'teslimat_aciklama' => '',
+            'ayni_adres_notu' => '',
+            'zorunlu_alan_bilgi_metni' => '',
             'odeme_baslik' => 'Odeme Yontemi',
-            'odeme_aciklama' => 'Tercih ettiginiz odeme yontemini secin.',
-            'guvenli_odeme_notu' => 'Kart bilgileriniz PCI uyumlu guvenli altyapida islenir.',
+            'odeme_aciklama' => '',
+            'guvenli_odeme_notu' => '',
             'kart_logo_goster' => true,
             'guven_rozeti_goster' => true,
             'ozet_baslik' => 'Siparis Ozeti',
             'kupon_alani_goster' => true,
             'indirim_satiri_goster' => true,
             'kargo_satiri_goster' => true,
-            'siparis_tipi_notu' => 'Dijital urunlerde teslimat e-posta ile saglanir.',
+            'siparis_tipi_notu' => '',
             'bilgi_kutusu_baslik' => 'Siparisinizi Tamamlamadan Once',
-            'bilgi_kutusu_aciklama' => 'Adres, odeme ve siparis ozeti bilgilerinizi son kez kontrol edin.',
-            'guven_mesaji' => '7/24 destek ve guvenli odeme korumasi ile yaninizdayiz.',
+            'bilgi_kutusu_aciklama' => '',
+            'guven_mesaji' => '',
             'tamamla_buton_metni' => 'Siparisi Tamamla',
-            'alt_yardim_metni' => 'Bir sorun olursa destek ekibimiz yardim icin hazir.',
+            'alt_yardim_metni' => '',
         ];
 
         $config['sections'] = is_array($config['sections'] ?? null) ? $config['sections'] : [];
@@ -160,7 +175,12 @@ class CheckoutPreviewRenderer
 
         foreach ($defaults as $key => $value) {
             if (is_string($value)) {
-                $config[$key] = trim((string) $config[$key]) !== '' ? trim((string) $config[$key]) : $value;
+                $current = trim((string) $config[$key]);
+                if ($current === '' && ! in_array($key, self::OPTIONAL_TEXT_FIELDS, true)) {
+                    $current = $value;
+                }
+
+                $config[$key] = $current;
             }
         }
 

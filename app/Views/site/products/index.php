@@ -9,6 +9,19 @@ $bookList = $products ?? [];
 $categories = $categories ?? [];
 $currentTypeLabel = $currentType !== '' ? ucfirst((string) $currentType) : 'Tum urunler';
 $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all") : base_url('products/selection');
+$productListBinding = is_array($productListBinding ?? null) ? $productListBinding : [];
+$productListPresenter = is_array($productListBinding['presenter'] ?? null) ? $productListBinding['presenter'] : [];
+$builderHero = is_array($productListPresenter['hero'] ?? null) ? $productListPresenter['hero'] : [];
+$builderBanner = is_array($productListPresenter['banner'] ?? null) ? $productListPresenter['banner'] : [];
+$builderEmptyState = is_array($productListPresenter['emptyState'] ?? null) ? $productListPresenter['emptyState'] : [];
+$builderFooterDescription = is_array($productListPresenter['footerDescription'] ?? null) ? $productListPresenter['footerDescription'] : [];
+$hasPublishedProductListBinding = ! empty($productListBinding['hasPublishedConfig']);
+$showHero = ! $hasPublishedProductListBinding || ! array_key_exists('enabled', $builderHero) || ! empty($builderHero['enabled']);
+$showBreadcrumb = ! $hasPublishedProductListBinding || ! array_key_exists('showBreadcrumb', $builderHero) || ! empty($builderHero['showBreadcrumb']);
+$heroSubtitle = trim((string) ($builderHero['subtitle'] ?? ''));
+$showBuilderBanner = ! empty($builderBanner['enabled']);
+$bannerTone = trim((string) ($builderBanner['tone'] ?? 'soft'));
+$showFooterDescription = ! empty($builderFooterDescription['enabled']);
 ?>
 <style>
     .pc-container {
@@ -25,6 +38,9 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
         max-width: 1280px;
         margin: 0 auto;
         padding: 1.1rem 1.25rem 0;
+    }
+    .storefront-main .pc-content.products-page {
+        padding-top: 0.35rem;
     }
     .products-shell {
         display: flex;
@@ -62,6 +78,13 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
         font-weight: 800;
         letter-spacing: -0.03em;
     }
+    .products-hero-subtitle {
+        margin: 0.55rem 0 0;
+        max-width: 720px;
+        color: #64748b;
+        font-size: 0.98rem;
+        line-height: 1.7;
+    }
     .products-toolbar {
         display: flex;
         align-items: center;
@@ -90,6 +113,49 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
     .products-grid {
         margin-top: 0.1rem;
         align-items: stretch;
+    }
+    .products-builder-banner,
+    .products-builder-footer {
+        border-radius: 22px;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+        padding: 1rem 1.15rem;
+    }
+    .products-builder-banner h2,
+    .products-builder-footer h2 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 1.05rem;
+        font-weight: 800;
+    }
+    .products-builder-banner p,
+    .products-builder-footer p {
+        margin: 0.45rem 0 0;
+        color: #64748b;
+        line-height: 1.7;
+    }
+    .products-builder-banner--soft {
+        background: linear-gradient(180deg, rgba(239, 246, 255, 0.95) 0%, rgba(255, 255, 255, 0.96) 100%);
+    }
+    .products-builder-banner--light {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.96) 100%);
+    }
+    .products-builder-banner--dark {
+        background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+        border-color: rgba(15, 23, 42, 0.15);
+    }
+    .products-builder-banner--dark h2,
+    .products-builder-banner--dark p {
+        color: #f8fafc;
+    }
+    .products-builder-banner--accent {
+        background: linear-gradient(135deg, rgba(29, 78, 216, 0.95) 0%, rgba(56, 189, 248, 0.92) 100%);
+        border-color: transparent;
+    }
+    .products-builder-banner--accent h2,
+    .products-builder-banner--accent p {
+        color: #eff6ff;
     }
     .book-card {
         position: relative;
@@ -246,6 +312,9 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
         .storefront-main .pc-content {
             padding: 0.9rem 1rem 0;
         }
+        .storefront-main .pc-content.products-page {
+            padding-top: 0.3rem;
+        }
         .products-hero {
             padding: 0.95rem 1rem;
             border-radius: 20px;
@@ -257,6 +326,9 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
     @media (max-width: 767.98px) {
         .storefront-main .pc-content {
             padding: 0.75rem 0.85rem 0;
+        }
+        .storefront-main .pc-content.products-page {
+            padding-top: 0.2rem;
         }
         .products-shell {
             gap: 1.1rem;
@@ -276,31 +348,49 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
 </style>
 
 <div class="pc-container">
-    <div class="pc-content">
+    <div class="pc-content products-page">
         <div class="products-shell">
-            <section class="products-hero">
-                <div class="products-hero-meta">
-                    <i class="ti ti-book-2"></i>
-                    <span><?= esc($currentTypeLabel) ?> koleksiyonu</span>
-                </div>
-                <div class="products-toolbar">
-                    <div>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-2">
-                                <li class="breadcrumb-item"><a href="<?= base_url('products/selection') ?>" style="color: #E67E22; font-weight: 700;">Urun Secimi</a></li>
-                                <li class="breadcrumb-item active" style="color: #7c5c46;"><?= esc($currentTypeLabel) ?></li>
-                            </ol>
-                        </nav>
-                        <h1 class="products-hero-title"><?= esc($title) ?></h1>
+            <?php if ($showHero): ?>
+                <section class="products-hero">
+                    <div class="products-hero-meta">
+                        <i class="ti ti-book-2"></i>
+                        <span><?= esc($currentTypeLabel) ?> koleksiyonu</span>
                     </div>
-                </div>
-            </section>
+                    <div class="products-toolbar">
+                        <div>
+                            <?php if ($showBreadcrumb): ?>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-2">
+                                        <li class="breadcrumb-item"><a href="<?= base_url('products/selection') ?>" style="color: #E67E22; font-weight: 700;">Urun Secimi</a></li>
+                                        <li class="breadcrumb-item active" style="color: #7c5c46;"><?= esc($currentTypeLabel) ?></li>
+                                    </ol>
+                                </nav>
+                            <?php endif; ?>
+                            <h1 class="products-hero-title"><?= esc($title) ?></h1>
+                            <?php if ($heroSubtitle !== ''): ?>
+                                <p class="products-hero-subtitle"><?= esc($heroSubtitle) ?></p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </section>
+            <?php endif; ?>
 
             <?php if (session()->getFlashdata('success')): ?>
                 <div class="alert alert-success mb-0"><?= esc((string) session()->getFlashdata('success')) ?></div>
             <?php endif; ?>
             <?php if (session()->getFlashdata('error')): ?>
                 <div class="alert alert-danger mb-0"><?= esc((string) session()->getFlashdata('error')) ?></div>
+            <?php endif; ?>
+
+            <?php if ($showBuilderBanner): ?>
+                <section class="products-builder-banner products-builder-banner--<?= esc($bannerTone) ?>">
+                    <?php if (trim((string) ($builderBanner['title'] ?? '')) !== ''): ?>
+                        <h2><?= esc((string) $builderBanner['title']) ?></h2>
+                    <?php endif; ?>
+                    <?php if (trim((string) ($builderBanner['subtitle'] ?? '')) !== ''): ?>
+                        <p><?= esc((string) $builderBanner['subtitle']) ?></p>
+                    <?php endif; ?>
+                </section>
             <?php endif; ?>
 
             <div class="row g-4 products-grid">
@@ -313,7 +403,12 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
             <?php elseif (empty($bookList)): ?>
                 <div class="col-12">
                     <div class="products-empty text-center">
-                        <p class="text-muted mb-0">Bu kategoride henuz bir urun bulunamadi.</p>
+                        <?php if (trim((string) ($builderEmptyState['title'] ?? '')) !== ''): ?>
+                            <h4 class="text-muted mb-2"><?= esc((string) $builderEmptyState['title']) ?></h4>
+                        <?php endif; ?>
+                        <p class="text-muted mb-0">
+                            <?= esc((string) ($builderEmptyState['description'] ?? 'Bu kategoride henuz bir urun bulunamadi.')) ?>
+                        </p>
                     </div>
                 </div>
             <?php else: ?>
@@ -366,6 +461,17 @@ $allProductsUrl = $currentType !== '' ? base_url("products/list/$currentType/all
                 <?php endforeach; ?>
             <?php endif; ?>
             </div>
+
+            <?php if ($showFooterDescription): ?>
+                <section class="products-builder-footer">
+                    <?php if (trim((string) ($builderFooterDescription['title'] ?? '')) !== ''): ?>
+                        <h2><?= esc((string) $builderFooterDescription['title']) ?></h2>
+                    <?php endif; ?>
+                    <?php if (trim((string) ($builderFooterDescription['text'] ?? '')) !== ''): ?>
+                        <p><?= esc((string) $builderFooterDescription['text']) ?></p>
+                    <?php endif; ?>
+                </section>
+            <?php endif; ?>
         </div>
     </div>
 </div>
