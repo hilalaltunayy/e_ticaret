@@ -30,8 +30,20 @@ $productStockLabel = $productType === 'dijital'
 $productStockToneClass = $productType === 'dijital' || $productStock > 0
     ? 'book-detail-stock--available'
     : 'book-detail-stock--limited';
-$productRatingValue = '4.8';
-$productReviewLabel = '12 degerlendirme';
+$approvedReviews = is_array($approvedReviews ?? null) ? $approvedReviews : [];
+$reviewSummary = is_array($reviewSummary ?? null) ? $reviewSummary : [];
+$reviewUiState = is_array($reviewUiState ?? null) ? $reviewUiState : [];
+$reviewCount = max(0, (int) ($reviewSummary['review_count'] ?? 0));
+$averageRatingRaw = $reviewSummary['average_rating'] ?? null;
+$averageRating = $averageRatingRaw !== null && $averageRatingRaw !== '' ? (float) $averageRatingRaw : null;
+$averageRatingValue = $averageRating !== null ? max(0, min(5, $averageRating)) : 0.0;
+$averageRatingPercent = max(0, min(100, ($averageRatingValue / 5) * 100));
+$productRatingValue = $averageRating !== null ? number_format($averageRating, 1, ',', '.') : '0,0';
+$productReviewLabel = $reviewCount > 0 ? $reviewCount . ' degerlendirme' : 'Henuz degerlendirme yok';
+$reviewPillLabel = $reviewCount > 0 ? 'Onayli okur yorumlari' : 'Ilk yorumu siz yazin';
+$isReviewUserLoggedIn = (bool) ($reviewUiState['isLoggedIn'] ?? false);
+$canSubmitReview = (bool) ($reviewUiState['canSubmitReview'] ?? false);
+$hasSubmittedReview = (bool) ($reviewUiState['hasSubmittedReview'] ?? false);
 $similarProducts = is_array($similarProducts ?? null) ? $similarProducts : [];
 $isFavorited = (bool) ($isFavorited ?? false);
 $productDetailBinding = is_array($productDetailBinding ?? null) ? $productDetailBinding : [];
@@ -229,21 +241,31 @@ $detailPurchaseNotes = is_array($productDetailPresenter['purchaseNotes'] ?? null
         flex-wrap: wrap;
     }
     .book-detail-rating-stars {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.2rem;
-        color: #f59e0b;
+        --rating-percent: 0%;
+        position: relative;
+        display: inline-block;
+        line-height: 1;
         font-size: 1rem;
-        letter-spacing: 0.02em;
+        letter-spacing: 0.12rem;
+        color: #cbd5e1;
+        white-space: nowrap;
+    }
+    .book-detail-rating-stars--sm {
+        font-size: 0.9rem;
+        letter-spacing: 0.1rem;
+    }
+    .book-detail-rating-stars-base,
+    .book-detail-rating-stars-fill {
+        display: block;
         line-height: 1;
     }
-    .book-detail-rating-star {
-        display: inline-block;
+    .book-detail-rating-stars-fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: var(--rating-percent);
+        overflow: hidden;
         color: #f59e0b;
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
-    }
-    .book-detail-rating-star--muted {
-        color: #cbd5e1;
     }
     .book-detail-rating-score {
         display: inline-flex;
@@ -584,6 +606,81 @@ $detailPurchaseNotes = is_array($productDetailPresenter['purchaseNotes'] ?? null
         font-size: 0.85rem;
         font-weight: 600;
     }
+    .book-detail-review-list {
+        display: grid;
+        gap: 1rem;
+    }
+    .book-detail-review-card,
+    .book-detail-review-form-card {
+        border: 1px solid rgba(226, 232, 240, 0.92);
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 251, 255, 0.98) 100%);
+        padding: 1.15rem 1.2rem;
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.05);
+    }
+    .book-detail-review-header {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.65rem;
+    }
+    .book-detail-review-author {
+        color: #0f172a;
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .book-detail-review-date {
+        color: #64748b;
+        font-size: 0.88rem;
+    }
+    .book-detail-review-title {
+        color: #0f172a;
+        font-size: 0.98rem;
+        font-weight: 700;
+        margin: 0.2rem 0 0.55rem;
+    }
+    .book-detail-review-comment {
+        color: #475569;
+        font-size: 0.95rem;
+        line-height: 1.75;
+        margin: 0;
+        white-space: pre-line;
+    }
+    .book-detail-review-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.9rem;
+    }
+    .book-detail-review-form-grid .book-detail-form-field--full {
+        grid-column: 1 / -1;
+    }
+    .book-detail-form-label {
+        display: block;
+        color: #0f172a;
+        font-size: 0.88rem;
+        font-weight: 700;
+        margin-bottom: 0.45rem;
+    }
+    .book-detail-form-note {
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        margin: 0;
+    }
+    .book-detail-review-form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+    .book-detail-review-empty {
+        margin-top: 1rem;
+    }
     .book-detail-related {
         margin-top: 1.85rem;
     }
@@ -746,6 +843,9 @@ $detailPurchaseNotes = is_array($productDetailPresenter['purchaseNotes'] ?? null
         .book-detail-related-grid {
             grid-template-columns: 1fr;
         }
+        .book-detail-review-form-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
@@ -833,12 +933,9 @@ $detailPurchaseNotes = is_array($productDetailPresenter['purchaseNotes'] ?? null
 
             <div class="book-detail-rating-row" aria-label="Urun puan ozeti">
                 <div class="book-detail-rating-main">
-                    <div class="book-detail-rating-stars" aria-hidden="true">
-                        <span class="book-detail-rating-star">★</span>
-                        <span class="book-detail-rating-star">★</span>
-                        <span class="book-detail-rating-star">★</span>
-                        <span class="book-detail-rating-star">★</span>
-                        <span class="book-detail-rating-star book-detail-rating-star--muted">★</span>
+                    <div class="book-detail-rating-stars" style="--rating-percent: <?= esc((string) $averageRatingPercent) ?>%;" aria-label="<?= esc($productRatingValue) ?>/5">
+                        <span class="book-detail-rating-stars-base">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                        <span class="book-detail-rating-stars-fill" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
                     </div>
                     <div class="book-detail-rating-score">
                         <strong><?= esc($productRatingValue) ?></strong>
@@ -848,7 +945,7 @@ $detailPurchaseNotes = is_array($productDetailPresenter['purchaseNotes'] ?? null
                 </div>
                 <span class="book-detail-rating-pill">
                     <i class="ti ti-message-circle-star"></i>
-                    Okur yorumu yakinda
+                    <?= esc($reviewPillLabel) ?>
                 </span>
             </div>
 
@@ -976,36 +1073,38 @@ $detailPurchaseNotes = is_array($productDetailPresenter['purchaseNotes'] ?? null
                 </div>
 
                 <div class="book-detail-tab-panel" id="book-tab-comments" role="tabpanel" aria-labelledby="book-tab-button-comments">
+                    <?php if ($detailReviewSectionTitle !== '' || $detailReviewSummaryText !== ''): ?>
+                        <div class="book-detail-notes mb-3">
+                            <?php if ($detailReviewSectionTitle !== ''): ?>
+                                <div class="book-detail-note">
+                                    <div class="book-detail-note-title"><?= esc($detailReviewSectionTitle) ?></div>
+                                    <?php if ($detailReviewSummaryText !== ''): ?>
+                                        <p class="book-detail-note-text"><?= esc($detailReviewSummaryText) ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="book-detail-comments-empty">
-                        <?php if ($detailReviewSectionTitle !== '' || $detailReviewSummaryText !== ''): ?>
-                            <div class="book-detail-notes mb-3">
-                                <?php if ($detailReviewSectionTitle !== ''): ?>
-                                    <div class="book-detail-note">
-                                        <div class="book-detail-note-title"><?= esc($detailReviewSectionTitle) ?></div>
-                                        <?php if ($detailReviewSummaryText !== ''): ?>
-                                            <p class="book-detail-note-text"><?= esc($detailReviewSummaryText) ?></p>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        <?php endif; ?>
                         <div class="book-detail-comments-empty-top">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="book-detail-comments-icon">
                                     <i class="ti ti-message-2-heart"></i>
                                 </div>
                                 <div>
-                                    <h3 class="book-detail-comments-empty-title">Okur yorumlari icin hazir alan</h3>
-                                    <p class="book-detail-note-text mb-0">Bu eser icin henuz paylasilmis bir okur yorumu bulunmuyor.</p>
+                                    <h3 class="book-detail-comments-empty-title">Okur Yorumlari</h3>
+                                    <p class="book-detail-note-text mb-0">
+                                        <?= $reviewCount > 0
+                                            ? 'Onaylanmis okur yorumlarini bu alanda inceleyebilirsiniz.'
+                                            : 'Bu eser icin henuz yayinlanmis bir okur yorumu bulunmuyor.' ?>
+                                    </p>
                                 </div>
                             </div>
                             <div class="book-detail-comments-summary">
-                                <div class="book-detail-rating-stars" aria-hidden="true">
-                                    <i class="ti ti-star-filled"></i>
-                                    <i class="ti ti-star-filled"></i>
-                                    <i class="ti ti-star-filled"></i>
-                                    <i class="ti ti-star-filled"></i>
-                                    <i class="ti ti-star-half-filled"></i>
+                                <div class="book-detail-rating-stars" style="--rating-percent: <?= esc((string) $averageRatingPercent) ?>%;" aria-label="<?= esc($productRatingValue) ?>/5">
+                                    <span class="book-detail-rating-stars-base">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                    <span class="book-detail-rating-stars-fill" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
                                 </div>
                                 <div>
                                     <div class="book-detail-comments-summary-score"><?= esc($productRatingValue) ?>/5</div>
@@ -1013,14 +1112,122 @@ $detailPurchaseNotes = is_array($productDetailPresenter['purchaseNotes'] ?? null
                                 </div>
                             </div>
                         </div>
+
+                        <?php if ($approvedReviews !== []): ?>
+                            <div class="book-detail-review-list mt-3">
+                                <?php foreach ($approvedReviews as $review): ?>
+                                    <?php
+                                    $reviewRating = max(1, min(5, (int) ($review['rating'] ?? 0)));
+                                    $reviewRatingPercent = max(0, min(100, ($reviewRating / 5) * 100));
+                                    $reviewAuthor = trim((string) ($review['username'] ?? ''));
+                                    $reviewAuthorEmail = trim((string) ($review['email'] ?? ''));
+                                    if ($reviewAuthor === '') {
+                                        $reviewAuthor = $reviewAuthorEmail !== '' ? $reviewAuthorEmail : 'Okur';
+                                    }
+                                    $reviewTitle = trim((string) ($review['title'] ?? ''));
+                                    $reviewComment = trim((string) ($review['comment'] ?? ''));
+                                    $reviewCreatedAt = trim((string) ($review['created_at'] ?? ''));
+                                    $reviewDateLabel = $reviewCreatedAt !== '' ? date('d.m.Y', strtotime($reviewCreatedAt)) : '';
+                                    ?>
+                                    <article class="book-detail-review-card">
+                                        <div class="book-detail-review-header">
+                                            <div>
+                                                <h4 class="book-detail-review-author mb-1"><?= esc($reviewAuthor !== '' ? $reviewAuthor : 'Okur') ?></h4>
+                                                <div class="book-detail-rating-stars book-detail-rating-stars--sm" style="--rating-percent: <?= esc((string) $reviewRatingPercent) ?>%;" aria-label="<?= esc((string) $reviewRating) ?>/5">
+                                                    <span class="book-detail-rating-stars-base">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                                    <span class="book-detail-rating-stars-fill" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                                </div>
+                                            </div>
+                                            <?php if ($reviewDateLabel !== ''): ?>
+                                                <div class="book-detail-review-date"><?= esc($reviewDateLabel) ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php if ($reviewTitle !== ''): ?>
+                                            <h5 class="book-detail-review-title"><?= esc($reviewTitle) ?></h5>
+                                        <?php endif; ?>
+                                        <?php if ($reviewComment !== ''): ?>
+                                            <p class="book-detail-review-comment"><?= esc($reviewComment) ?></p>
+                                        <?php endif; ?>
+                                    </article>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="book-detail-review-empty">
+                                <p class="book-detail-note-text mb-0">Bu eser icin henuz paylasilmis bir okur yorumu bulunmuyor.</p>
+                            </div>
+                        <?php endif; ?>
+
                         <div class="book-detail-comments-divider"></div>
                         <?php if ($detailReviewCalloutText !== ''): ?>
-                            <p class="book-detail-note-text mb-0"><?= esc($detailReviewCalloutText) ?></p>
+                            <p class="book-detail-note-text mb-3"><?= esc($detailReviewCalloutText) ?></p>
                         <?php endif; ?>
-                        <div class="book-detail-comments-empty-actions">
-                            <span class="book-detail-comments-chip"><i class="ti ti-star"></i> Degerlendirme bekleniyor</span>
-                            <span class="book-detail-comments-chip"><i class="ti ti-notebook"></i> Ilk yorum icin alan hazir</span>
-                        </div>
+
+                        <?php if (! $isReviewUserLoggedIn): ?>
+                            <div class="book-detail-review-form-card">
+                                <div class="book-detail-note-title">Yorum Yap</div>
+                                <p class="book-detail-form-note mb-0">Yorum gonderebilmek icin once giris yapmalisiniz.</p>
+                            </div>
+                        <?php elseif ($hasSubmittedReview): ?>
+                            <div class="book-detail-review-form-card">
+                                <div class="book-detail-note-title">Yorum Durumu</div>
+                                <p class="book-detail-form-note mb-0">Bu urun icin daha once yorum gonderdiniz.</p>
+                            </div>
+                        <?php elseif (! $canSubmitReview): ?>
+                            <div class="book-detail-review-form-card">
+                                <div class="book-detail-note-title">Yorum Yap</div>
+                                <p class="book-detail-form-note mb-0">Yorum yapabilmek icin urunu satin almis olmaniz gerekir.</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="book-detail-review-form-card">
+                                <div class="book-detail-note-title">Yorum Yap</div>
+                                <p class="book-detail-form-note">Yorumunuz moderasyon onayindan sonra yayinlanir.</p>
+                                <form action="<?= base_url('products/detail/' . rawurlencode($productId) . '/reviews') ?>" method="post" class="mt-3">
+                                    <?= csrf_field() ?>
+                                    <div class="book-detail-review-form-grid">
+                                        <div class="book-detail-form-field">
+                                            <label for="review-rating" class="book-detail-form-label">Puan</label>
+                                            <select name="rating" id="review-rating" class="form-select" required>
+                                                <option value="">Seciniz</option>
+                                                <?php for ($score = 5; $score >= 1; $score--): ?>
+                                                    <option value="<?= $score ?>" <?= old('rating') == (string) $score ? 'selected' : '' ?>>
+                                                        <?= $score ?> Yildiz
+                                                    </option>
+                                                <?php endfor; ?>
+                                            </select>
+                                        </div>
+                                        <div class="book-detail-form-field">
+                                            <label for="review-title" class="book-detail-form-label">Baslik</label>
+                                            <input
+                                                type="text"
+                                                id="review-title"
+                                                name="title"
+                                                class="form-control"
+                                                maxlength="255"
+                                                value="<?= esc((string) old('title')) ?>"
+                                                placeholder="Yorumunuz icin kisa bir baslik"
+                                            >
+                                        </div>
+                                        <div class="book-detail-form-field book-detail-form-field--full">
+                                            <label for="review-comment" class="book-detail-form-label">Yorum</label>
+                                            <textarea
+                                                id="review-comment"
+                                                name="comment"
+                                                class="form-control"
+                                                rows="5"
+                                                placeholder="Deneyiminizi diger okurlarla paylasin"
+                                            ><?= esc((string) old('comment')) ?></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="book-detail-review-form-actions">
+                                        <p class="book-detail-form-note mb-0">Baslik veya yorum metni alanlarindan en az birini doldurabilirsiniz.</p>
+                                        <button type="submit" class="book-detail-primary-btn" style="min-width: 0;">
+                                            <i class="ti ti-send"></i>
+                                            <span>Yorumu Gonder</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

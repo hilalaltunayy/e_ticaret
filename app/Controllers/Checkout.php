@@ -45,6 +45,33 @@ class Checkout extends BaseController
         ]);
     }
 
+    public function complete()
+    {
+        $userId = $this->getCurrentUserId();
+        if ($userId === null) {
+            return redirect()->to(base_url('login'))->with('error', 'Siparisi tamamlamak icin giris yapmalisiniz.');
+        }
+
+        $result = $this->checkoutService->completeSimulatedCheckout(
+            $userId,
+            is_array(session()->get('user')) ? session()->get('user') : [],
+            $this->request->getPost() ?: []
+        );
+
+        if (! (bool) ($result['success'] ?? false)) {
+            return redirect()->to(base_url('yardim/odeme'))->withInput()->with('error', (string) ($result['message'] ?? 'Siparis tamamlama islemi basarisiz oldu.'));
+        }
+
+        $orderIdentifier = trim((string) ($result['order_no'] ?? $result['order_id'] ?? ''));
+        if ($orderIdentifier !== '') {
+            return redirect()
+                ->to(base_url('yardim/siparislerim/' . urlencode($orderIdentifier)))
+                ->with('success', (string) ($result['message'] ?? 'Siparisiniz olusturuldu.'));
+        }
+
+        return redirect()->to(base_url('yardim/siparislerim'))->with('success', (string) ($result['message'] ?? 'Siparisiniz olusturuldu.'));
+    }
+
     private function getCurrentUserId(): ?string
     {
         if (! session()->get('isLoggedIn')) {

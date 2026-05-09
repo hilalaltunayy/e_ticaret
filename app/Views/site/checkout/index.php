@@ -30,7 +30,7 @@ $checkoutSummaryTitle = trim((string) ($checkoutBuilderPresenter['summaryTitle']
 $checkoutInfoBoxTitle = trim((string) ($checkoutBuilderPresenter['infoBoxTitle'] ?? ''));
 $checkoutInfoBoxDescription = trim((string) ($checkoutBuilderPresenter['infoBoxDescription'] ?? ''));
 $checkoutTrustMessage = trim((string) ($checkoutBuilderPresenter['trustMessage'] ?? ''));
-$checkoutCompleteButtonLabel = trim((string) ($checkoutBuilderPresenter['completeButtonLabel'] ?? '')) ?: 'Odeme Altyapisi Hazirlaniyor';
+$checkoutCompleteButtonLabel = trim((string) ($checkoutBuilderPresenter['completeButtonLabel'] ?? '')) ?: 'Siparisi Tamamla';
 $checkoutHelpText = trim((string) ($checkoutBuilderPresenter['helpText'] ?? ''));
 ?>
 <style>
@@ -424,7 +424,12 @@ $checkoutHelpText = trim((string) ($checkoutBuilderPresenter['helpText'] ?? ''))
     <?php if (session()->getFlashdata('error')): ?>
         <div class="alert alert-danger mb-3"><?= esc((string) session()->getFlashdata('error')) ?></div>
     <?php endif; ?>
+    <?php if (session()->getFlashdata('success')): ?>
+        <div class="alert alert-success mb-3"><?= esc((string) session()->getFlashdata('success')) ?></div>
+    <?php endif; ?>
 
+    <form method="post" action="<?= base_url('yardim/odeme/tamamla') ?>">
+        <?= csrf_field() ?>
     <div class="checkout-layout">
         <div class="checkout-column">
             <section class="checkout-card">
@@ -445,11 +450,13 @@ $checkoutHelpText = trim((string) ($checkoutBuilderPresenter['helpText'] ?? ''))
                         <label for="checkout-phone" class="checkout-label">Telefon</label>
                         <input
                             type="tel"
+                            name="contact_phone"
                             id="checkout-phone"
                             class="checkout-input"
                             placeholder="05xx xxx xx xx"
-                            value="<?= esc((string) ($contact['phone'] ?? '')) ?>"
+                            value="<?= esc((string) old('contact_phone', (string) ($contact['phone'] ?? ''))) ?>"
                             autocomplete="tel"
+                            required
                         >
                     </div>
                 </div>
@@ -469,27 +476,27 @@ $checkoutHelpText = trim((string) ($checkoutBuilderPresenter['helpText'] ?? ''))
                 <div class="checkout-form-grid two-col">
                     <div class="checkout-field">
                         <label for="delivery-label" class="checkout-label">Adres Basligi</label>
-                        <input type="text" id="delivery-label" class="checkout-input" placeholder="Ev, Is, Yazlik">
+                        <input type="text" name="delivery_label" id="delivery-label" class="checkout-input" placeholder="Ev, Is, Yazlik" value="<?= esc((string) old('delivery_label')) ?>">
                     </div>
                     <div class="checkout-field">
                         <label for="delivery-name" class="checkout-label">Ad Soyad</label>
-                        <input type="text" id="delivery-name" class="checkout-input" placeholder="Ad Soyad" value="<?= esc((string) ($contact['name'] ?? '')) ?>">
+                        <input type="text" name="delivery_name" id="delivery-name" class="checkout-input" placeholder="Ad Soyad" value="<?= esc((string) old('delivery_name', (string) ($contact['name'] ?? ''))) ?>" required>
                     </div>
                     <div class="checkout-field">
                         <label for="delivery-phone" class="checkout-label">Telefon</label>
-                        <input type="tel" id="delivery-phone" class="checkout-input" placeholder="05xx xxx xx xx" value="<?= esc((string) ($contact['phone'] ?? '')) ?>">
+                        <input type="tel" name="delivery_phone" id="delivery-phone" class="checkout-input" placeholder="05xx xxx xx xx" value="<?= esc((string) old('delivery_phone', (string) ($contact['phone'] ?? ''))) ?>" required>
                     </div>
                     <div class="checkout-field">
                         <label for="delivery-city" class="checkout-label">Il</label>
-                        <input type="text" id="delivery-city" class="checkout-input" placeholder="Il">
+                        <input type="text" name="delivery_city" id="delivery-city" class="checkout-input" placeholder="Il" value="<?= esc((string) old('delivery_city')) ?>" required>
                     </div>
                     <div class="checkout-field">
                         <label for="delivery-town" class="checkout-label">Ilce</label>
-                        <input type="text" id="delivery-town" class="checkout-input" placeholder="Ilce">
+                        <input type="text" name="delivery_town" id="delivery-town" class="checkout-input" placeholder="Ilce" value="<?= esc((string) old('delivery_town')) ?>" required>
                     </div>
                     <div class="checkout-field full">
                         <label for="delivery-address" class="checkout-label">Adres</label>
-                        <textarea id="delivery-address" class="checkout-textarea" placeholder="Mahalle, sokak, bina ve daire bilgilerinizi girin."></textarea>
+                        <textarea name="delivery_address" id="delivery-address" class="checkout-textarea" placeholder="Mahalle, sokak, bina ve daire bilgilerinizi girin." required><?= esc((string) old('delivery_address')) ?></textarea>
                     </div>
                 </div>
                 <p class="checkout-inline-note">Adres bilgileri siparis olusturma entegrasyonu baglandiginda kaydedilecektir.</p>
@@ -519,15 +526,15 @@ $checkoutHelpText = trim((string) ($checkoutBuilderPresenter['helpText'] ?? ''))
                 <div class="checkout-form-grid two-col">
                     <div class="checkout-field full">
                         <label for="invoice-name" class="checkout-label">Fatura Adi</label>
-                        <input type="text" id="invoice-name" class="checkout-input" placeholder="Fatura unvani veya ad soyad">
+                        <input type="text" name="invoice_name" id="invoice-name" class="checkout-input" placeholder="Fatura unvani veya ad soyad" value="<?= esc((string) old('invoice_name')) ?>">
                     </div>
                     <div class="checkout-field">
                         <label for="invoice-tax-no" class="checkout-label">Vergi No</label>
-                        <input type="text" id="invoice-tax-no" class="checkout-input" placeholder="Opsiyonel">
+                        <input type="text" name="invoice_tax_no" id="invoice-tax-no" class="checkout-input" placeholder="Opsiyonel" value="<?= esc((string) old('invoice_tax_no')) ?>">
                     </div>
                     <div class="checkout-field">
                         <label for="invoice-tax-office" class="checkout-label">Vergi Dairesi</label>
-                        <input type="text" id="invoice-tax-office" class="checkout-input" placeholder="Opsiyonel">
+                        <input type="text" name="invoice_tax_office" id="invoice-tax-office" class="checkout-input" placeholder="Opsiyonel" value="<?= esc((string) old('invoice_tax_office')) ?>">
                     </div>
                 </div>
             </section>
@@ -563,9 +570,6 @@ $checkoutHelpText = trim((string) ($checkoutBuilderPresenter['helpText'] ?? ''))
                 <?php if ($checkoutSecurePaymentNote !== ''): ?>
                     <p class="checkout-card-text"><?= esc($checkoutSecurePaymentNote) ?></p>
                 <?php endif; ?>
-                <div class="checkout-actions">
-                    <button type="button" class="btn checkout-disabled" disabled><?= esc($checkoutCompleteButtonLabel) ?></button>
-                </div>
             </section>
 
             <section class="checkout-card">
@@ -629,10 +633,10 @@ $checkoutHelpText = trim((string) ($checkoutBuilderPresenter['helpText'] ?? ''))
             <p class="checkout-summary-note"><?= esc((string) ($cartView['shipping_info'] ?? 'Kargo ucreti odeme adiminda hesaplanacak.')) ?></p>
 
             <div class="checkout-actions">
-                <button type="button" class="btn checkout-disabled" disabled><?= esc($checkoutCompleteButtonLabel) ?></button>
+                <button type="submit" class="btn btn-primary"><?= esc($checkoutCompleteButtonLabel) ?></button>
                 <a href="<?= base_url('yardim/sepetim') ?>" class="btn btn-outline-primary">Sepete Don</a>
             </div>
-            <p class="checkout-inline-note">Siparis olusturma ve odeme alma entegrasyonu sonraki asamada baglanacaktir.</p>
+            <p class="checkout-inline-note">Bu adim simule siparis tamamlama yapar. Gercek odeme islemi ve sanal POS baglantisi henuz devreye alinmamistir.</p>
 
             <?php if ($checkoutInfoBoxTitle !== '' || $checkoutInfoBoxDescription !== ''): ?>
                 <div class="alert alert-light border mt-3 mb-0">
@@ -663,5 +667,6 @@ $checkoutHelpText = trim((string) ($checkoutBuilderPresenter['helpText'] ?? ''))
             </div>
         </aside>
     </div>
+    </form>
 </section>
 <?= $this->endSection() ?>

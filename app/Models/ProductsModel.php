@@ -564,6 +564,60 @@ class ProductsModel extends BaseUuidModel
         return (bool) $this->db->transStatus();
     }
 
+    public function finalizeReservedForPaidOrder(string $productId, int $qty, string $orderId, ?string $actorUserId = null): bool
+    {
+        if ($qty <= 0 || trim($orderId) === '' || trim((string) $actorUserId) === '') {
+            return false;
+        }
+
+        $product = $this->getProductForStock($productId);
+        if (! $product) {
+            return false;
+        }
+
+        $oldStock = (int) ($product['stock_count'] ?? 0);
+        $reserved = (int) ($product['reserved_count'] ?? 0);
+        if ($reserved < $qty || $oldStock < $qty) {
+            return false;
+        }
+
+        $newStock = $oldStock - $qty;
+        $newReserved = $reserved - $qty;
+
+        $this->db->transStart();
+
+        $updated = $this->update($productId, [
+            'stock_count' => $newStock,
+            'reserved_count' => $newReserved,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        if (! $updated) {
+            $this->db->transRollback();
+            return false;
+        }
+
+        $logged = $this->logStockChange(
+            $productId,
+            $oldStock,
+            $newStock,
+            'order_paid',
+            'Simule odeme tamamlandi: ' . $qty,
+            (string) $actorUserId,
+            null,
+            $orderId
+        );
+
+        if (! $logged) {
+            $this->db->transRollback();
+            return false;
+        }
+
+        $this->db->transComplete();
+
+        return (bool) $this->db->transStatus();
+    }
+
     public function getStockHistoryDaily(string $productId, int $days = 30): array
     {
         $days = max(1, $days);

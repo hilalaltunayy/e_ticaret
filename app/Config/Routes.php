@@ -17,6 +17,7 @@ $routes->get('/', 'StorefrontController::home');
 $routes->get('yardim/favorilerim', 'Favorites::index', ['filter' => 'auth']);
 $routes->get('yardim/sepetim', 'Cart::index', ['filter' => 'auth']);
 $routes->get('yardim/odeme', 'Checkout::index', ['filter' => 'auth']);
+$routes->post('yardim/odeme/tamamla', 'Checkout::complete', ['filter' => 'auth']);
 $routes->get('yardim/hesabim', 'Account::index', ['filter' => 'auth']);
 $routes->post('yardim/hesabim/profil', 'Account::updateProfile', ['filter' => 'auth']);
 $routes->post('yardim/hesabim/sifre', 'Account::updatePassword', ['filter' => 'auth']);
@@ -73,6 +74,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 // En spesifik rota EN USTTE
 $routes->get('products/detail/(:segment)', 'ProductController::detail/$1');
+$routes->post('products/detail/(:segment)/reviews', 'ProductController::submitReview/$1', ['filter' => 'auth']);
 $routes->get('products/list/(:any)/(:any)', 'ProductController::listByCategory/$1/$2');
 
 // Tip bazli liste
@@ -189,6 +191,10 @@ $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_products'
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_reviews'], function ($routes) {
     $routes->get('reviews', 'Admin\Reviews::index');
+    $routes->post('reviews/(:segment)/approve', 'Admin\Reviews::approve/$1');
+    $routes->post('reviews/(:segment)/hide', 'Admin\Reviews::hide/$1');
+    $routes->post('reviews/(:segment)/reject', 'Admin\Reviews::reject/$1');
+    $routes->post('reviews/(:segment)/delete', 'Admin\Reviews::delete/$1');
 });
 
 $routes->group('admin', ['filter' => 'role:admin,secretary|perm:manage_complaints'], function ($routes) {
