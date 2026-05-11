@@ -31,7 +31,7 @@ This file covers the Domain KB domains currently tracked for the CodeIgniter 4 e
   - Domain: All tracked domains
   - Related files: `ai/domain-kb/00_repo_inventory.md`, `ai/domain-kb/kb-manifest.yaml`
 
-- Claim: Cart, checkout, Favorites / Wishlist, Review, account, and payment runtime flows are missing or unclear at route level.
+- Claim: Cart, checkout, Favorites / Wishlist, Review, account, and payment domains contain mixed static evidence; some runtime route and business-flow confirmation still needs review.
   - Source: `app/Config/Routes.php`, `ai/domain-kb/02_route_permission_matrix.md`, `ai/domain-kb/06_route_baseline.md`
   - Confidence: High
   - Domain: Cart / Favorites / Wishlist / Review / Frontend Storefront / Order
@@ -150,13 +150,13 @@ This file is the domain-oriented working guide. Route, table, permission, and fi
 ## Domain: Cart
 
 - Purpose: Represent cart and checkout experience; currently mostly visible as page builder preview/config.
-- Related files: `CartPageBuilderService.php`, `CartPreviewRenderer.php`, `CheckoutPageBuilderService.php`, `CheckoutPreviewRenderer.php`, `app/Views/admin/pages/cart_builder.php`, `app/Views/admin/pages/checkout_builder.php`, `app/Views/admin/pages/partials/cart_preview.php`, `app/Views/admin/pages/partials/checkout_preview.php`, `CouponService.php`, `CouponModel.php`, `CouponTargetModel.php`, `CouponRedemptionModel.php`.
-- Related routes: `admin/pages/cart-builder/update`, `admin/pages/checkout-builder/update`, page builder draft/block routes. Public cart/checkout routes are not visible in the static inventory.
+- Related files: `CartPageBuilderService.php`, `CartPreviewRenderer.php`, `CheckoutPageBuilderService.php`, `CheckoutPreviewRenderer.php`, `CartService.php`, `CheckoutService.php`, `CartModel.php`, `CartItemModel.php`, `app/Views/admin/pages/cart_builder.php`, `app/Views/admin/pages/checkout_builder.php`, `app/Views/admin/pages/partials/cart_preview.php`, `app/Views/admin/pages/partials/checkout_preview.php`, `CouponService.php`, `CouponModel.php`, `CouponTargetModel.php`, `CouponRedemptionModel.php`.
+- Related routes: `admin/pages/cart-builder/update`, `admin/pages/checkout-builder/update`, page builder draft/block routes, plus static route evidence for `yardim/sepetim`, `yardim/odeme`, and `yardim/odeme/tamamla`. The end-to-end public runtime checkout flow still needs review.
 - Related tables: `coupons`, `coupon_targets`, `coupon_redemptions`, plus `pages`, `page_versions`, `block_instances` for page builder.
 - Related permissions: Page builder routes are admin-only through `role:admin`.
-- Current status: Cart/checkout builder UI and preview renderers exist.
-- Missing: Runtime cart model/controller/session, checkout submission, and payment flow are not visible.
-- Risks: UI exists but backend commerce flow may be absent or located elsewhere. Assumption: Cart domain is currently represented at builder level.
+- Current status: Builder/preview evidence exists, and static service/model/route evidence also exists for cart and checkout. The complete runtime checkout path still needs review before it is treated as fully confirmed.
+- Missing: Payment completion behavior, order handoff, and full runtime flow confirmation are not yet fully mapped in this KB file.
+- Risks: Builder/preview evidence can be mistaken for a fully confirmed runtime commerce flow.
 - KB update triggers: Cart/checkout controller, model, route, payment, coupon redemption, or builder service changes.
 
 ## Domain: Campaign / Coupon
@@ -189,25 +189,25 @@ This file is the domain-oriented working guide. Route, table, permission, and fi
 ## Domain: Favorites / Wishlist
 
 - Purpose: Manage user favorite/wishlist products.
-- Related files: No clear application files found.
-- Related routes: No clear route found.
-- Related tables: No clear migration/table found.
+- Related files: `Favorites.php`, `FavoriteService.php`, `FavoriteModel.php`, and `app/Views/site/favorites/index.php`.
+- Related routes: Static route evidence exists for `yardim/favorilerim`, `favorites/toggle`, `favorites/remove`, and `favorites/add-to-cart`.
+- Related tables: `favorites` model evidence exists; migration/table confirmation still needs review.
 - Related permissions: None.
-- Current status: Missing domain.
-- Missing: Controller, model, migration, service, and view.
-- Risks: User task documents may mention this need, but application code does not show an implementation.
+- Current status: Static code evidence exists. Controller/model/service evidence is present, but the complete business flow and data lifecycle are not yet fully confirmed in the KB.
+- Missing: Migration/table mapping, route-to-view coverage details, and full runtime behavior confirmation still need review.
+- Risks: Partial static evidence can be mistaken for a fully validated runtime implementation.
 - KB update triggers: New route/model/service/view/migration files named `favorite`, `wishlist`, `saved`, or `like`.
 
 ## Domain: Review
 
 - Purpose: Manage product review/rating flow.
-- Related files: No clear application files found.
-- Related routes: No clear route found.
-- Related tables: No clear migration/table found.
+- Related files: `ProductReviewModel.php`, `ReviewService.php`, `ReviewEligibilityService.php`, `Admin/Reviews.php`, and `Admin/AdminReviewModerationService.php`.
+- Related routes: Static route evidence exists for product review submission and admin review moderation routes.
+- Related tables: Review model evidence exists; migration/table confirmation still needs review.
 - Related permissions: None.
-- Current status: Missing domain.
-- Missing: Review model, migration, moderation controller, storefront submit view, and admin review screen.
-- Risks: Secretary review moderation tasks may exist in planning documents, but no application code counterpart is visible.
+- Current status: Static code evidence exists. Controller/model/service evidence is present, but the complete business flow and moderation/runtime linkage are not yet fully confirmed in the KB.
+- Missing: Migration/table mapping, storefront-to-moderation flow confirmation, and full runtime behavior review still need review.
+- Risks: Static review and moderation evidence can be mistaken for a fully confirmed end-to-end runtime implementation.
 - KB update triggers: New file/route/table names containing `review`, `rating`, `comment`, or `moderation`.
 
 ## Domain: Page Builder
@@ -254,7 +254,7 @@ This file is the domain-oriented working guide. Route, table, permission, and fi
 - Related tables: `products`, `categories`, `authors`, `types`, plus `pages`, `page_versions`, `block_instances`, and `block_types` for page builder.
 - Related permissions: Public storefront routes have no permission; `dashboard_anasayfa` is under the auth filter.
 - Current status: Public home and product list/detail flow exist; user dashboard view exists.
-- Missing: Account pages, favorites, reviews, and cart/checkout runtime flows are not visible.
+- Missing: Account, favorites, reviews, and cart/checkout flows still need fuller runtime confirmation in this KB.
 - Risks: `site/products/product_selection.php` is not linked by the active selection route. Page builder public render scope must be mapped separately.
 - KB update triggers: Storefront/Product/Home controller, storefront service, site views, page builder public rendering, or public route changes.
 - Controlled update note: REAL-TEST-001 marks `app/Views/site/products/list.php` as high impact for Frontend Storefront and `app/Models/ProductsModel.php` as low impact for Frontend Storefront. With the available input, this is treated as a storefront view impact only; backend-flow impact is not confirmed. Needs Review if the view change adds form actions, route targets, cart/favorite/review behavior, or other runtime backend implications.
@@ -263,7 +263,7 @@ This file is the domain-oriented working guide. Route, table, permission, and fi
 
 - Assumption: Domain status is based on static repository evidence and the current KB files, not runtime execution.
 - Assumption: Campaign/Coupon currently belongs near Cart/Admin Panel until a first-class domain decision is made.
-- Assumption: Missing runtime routes for cart, checkout, favorites, account, and review mean those flows are not currently visible at route level.
+- Assumption: Static code evidence exists for cart, checkout, favorites, and review, but complete runtime route and business-flow confirmation still needs review.
 
 ## Risks
 

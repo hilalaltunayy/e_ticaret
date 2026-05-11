@@ -1,0 +1,11 @@
+[mcp_servers.gitnexus]
+command = "docker"
+args = [
+  "exec",
+  "-i",
+  "gitnexus",
+  "sh",
+  "-lc",
+  "cd /workspace && npx -y gitnexus@1.6.3 mcp"
+]
+startup_timeout_ms = 30000

@@ -443,13 +443,21 @@ domains:
         - app/Config/Routes.php
         - app/Views/site/products/product_detail.php
       globs:
+        - app/Controllers/*Favorite*.php
         - app/Controllers/**/*Favorite*.php
+        - app/Controllers/*Wishlist*.php
         - app/Controllers/**/*Wishlist*.php
+        - app/Models/*Favorite*.php
         - app/Models/**/*Favorite*.php
+        - app/Models/*Wishlist*.php
         - app/Models/**/*Wishlist*.php
+        - app/Services/*Favorite*.php
         - app/Services/**/*Favorite*.php
+        - app/Services/*Wishlist*.php
         - app/Services/**/*Wishlist*.php
+        - app/Database/Migrations/*Favorite*.php
         - app/Database/Migrations/**/*Favorite*.php
+        - app/Database/Migrations/*Wishlist*.php
         - app/Database/Migrations/**/*Wishlist*.php
       broad_review:
         - app/Views/site/products/product_detail.php
@@ -468,13 +476,21 @@ domains:
         - app/Config/Routes.php
         - app/Views/site/products/product_detail.php
       globs:
+        - app/Controllers/*Review*.php
         - app/Controllers/**/*Review*.php
+        - app/Controllers/*Rating*.php
         - app/Controllers/**/*Rating*.php
+        - app/Models/*Review*.php
         - app/Models/**/*Review*.php
+        - app/Models/*Rating*.php
         - app/Models/**/*Rating*.php
+        - app/Services/*Review*.php
         - app/Services/**/*Review*.php
+        - app/Services/*Rating*.php
         - app/Services/**/*Rating*.php
+        - app/Database/Migrations/*Review*.php
         - app/Database/Migrations/**/*Review*.php
+        - app/Database/Migrations/*Rating*.php
         - app/Database/Migrations/**/*Rating*.php
       broad_review:
         - app/Views/site/products/product_detail.php
@@ -714,13 +730,13 @@ needs_review:
       - order
       - admin_panel
   - path: app/Views/site/products/product_detail.php
-    reason: Contains favorite/rating UI fragments, but matching backend runtime routes and models are not visible.
+    reason: Contains favorite/rating UI fragments and static backend evidence exists, but the complete runtime route and business-flow linkage still needs review.
     related_domains:
       - favorites_wishlist
       - review
 
 assumptions:
   - "Assumption: Cart and checkout are currently represented mainly by admin page builder preview/configuration files, not by a clear runtime commerce flow."
-  - "Assumption: Favorites / Wishlist and Review are not implemented as backend route/model/service flows in the reviewed repository state."
+  - "Assumption: Favorites / Wishlist and Review have static controller/model/service evidence in the repository, but complete runtime route and business-flow confirmation still needs review."
   - "Assumption: Campaign / Coupon should be tracked as a separate automation domain even though earlier KB files describe it partly through Cart and Admin Panel."
   - "Assumption: Public page rendering for all page builder page types still needs a dedicated runtime render matrix."
