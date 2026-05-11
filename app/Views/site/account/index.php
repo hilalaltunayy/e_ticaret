@@ -249,22 +249,18 @@ $errors = is_array($errors) ? $errors : [];
         <a href="<?= base_url('yardim/siparislerim') ?>" class="account-stat-card">
             <span class="account-stat-label">Siparişlerim</span>
             <strong class="account-stat-value"><?= esc((string) ($stats['orders_count'] ?? 0)) ?></strong>
-            <span class="account-stat-help">Sipariş geçmişinizi görüntüleyin ve son durumlarını takip edin.</span>
         </a>
         <a href="<?= base_url('yardim/favorilerim') ?>" class="account-stat-card">
             <span class="account-stat-label">Favorilerim</span>
             <strong class="account-stat-value"><?= esc((string) ($stats['favorites_count'] ?? 0)) ?></strong>
-            <span class="account-stat-help">Kaydettiğiniz kitaplara hızlıca geri dönün.</span>
         </a>
         <a href="<?= base_url('yardim/sepetim') ?>" class="account-stat-card">
             <span class="account-stat-label">Sepetim</span>
             <strong class="account-stat-value"><?= esc((string) ($stats['cart_item_count'] ?? 0)) ?></strong>
-            <span class="account-stat-help">Aktif sepetinizde bekleyen ürünleri gözden geçirin.</span>
         </a>
         <a href="#security" class="account-stat-card">
             <span class="account-stat-label">Güvenlik</span>
             <strong class="account-stat-value">•••</strong>
-            <span class="account-stat-help"><?= esc((string) ($stats['security_label'] ?? 'Şifrenizi güncelleyin')) ?></span>
         </a>
     </div>
 
