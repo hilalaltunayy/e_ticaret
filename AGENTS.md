@@ -147,3 +147,13 @@ This addendum strengthens workflow behavior for delivery-class requests and does
 - Planning output `Next Action` MUST indicate waiting state by including `WAITING_FOR_USER_APPROVAL`.
 
 <!-- gitnexus:end -->
+
+## Windows Git Command Fallback
+
+- If plain `git` is not found in Codex shell, use this full path for Git commands: `C:\Program Files\Git\cmd\git.exe`
+- In PowerShell, run with the call operator:
+  - `& "C:\Program Files\Git\cmd\git.exe" status --short`
+  - `& "C:\Program Files\Git\cmd\git.exe" branch --show-current`
+  - `& "C:\Program Files\Git\cmd\git.exe" diff --name-only`
+- Do not mark the task as `BLOCKED` only because plain `git` is unavailable; if the full-path command works, continue execution.
+- Test Agent, Coder Agent, and Planning Agent may use this fallback during git verification.
