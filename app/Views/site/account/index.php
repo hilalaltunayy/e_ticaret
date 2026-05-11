@@ -268,7 +268,6 @@ $errors = is_array($errors) ? $errors : [];
         <div class="account-column">
             <section class="account-card">
                 <h2 class="account-card-title">Profil Bilgileri</h2>
-                <p class="account-card-text">Hesabınızda görünen temel bilgileri güncel tutarak sipariş ve destek süreçlerini daha rahat yönetebilirsiniz.</p>
 
                 <form action="<?= base_url('yardim/hesabim/profil') ?>" method="post" class="account-form-grid">
                     <?= csrf_field() ?>
