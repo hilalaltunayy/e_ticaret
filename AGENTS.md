@@ -127,4 +127,23 @@ Plan, Coder, and Test phases all inherit GitNexus-first behavior:
 - Use direct file reads only when GitNexus output is insufficient for required detail.
 - When direct reads are used after GitNexus, include a note: "GitNexus yetersiz kaldı, hedefli dosya okumasına geÃ§ildi."
 
+## Planning Phase Enforcement Addendum (Mandatory)
+
+This addendum strengthens workflow behavior for delivery-class requests and does not weaken any existing GitNexus-first rule.
+
+- For any development, UI change, bugfix, refactor, migration, integration, cleanup, or test request, the first assistant output MUST be treated as Planning phase output.
+- Planning phase output MUST be emitted as `PLAN_PACKET v1` format; free-text short plans are not allowed for delivery-class requests.
+- `PLAN_PACKET v1` MUST include these fields/sections:
+  - `TEST_EXPECTATIONS`
+  - `GITNEXUS_FIRST_EVIDENCE`
+  - `WAITING_FOR_USER_APPROVAL`
+- The following user expressions MUST be treated as plan-only triggers:
+  - "şimdilik dosya değiştirme"
+  - "kod yazma"
+  - "önce ne yapacağını söyle"
+  - "planını sun"
+  - "implementasyon başlatma"
+- When a plan-only trigger is present, transition to Coder phase is forbidden until explicit user approval is received.
+- Planning output `Next Action` MUST indicate waiting state by including `WAITING_FOR_USER_APPROVAL`.
+
 <!-- gitnexus:end -->

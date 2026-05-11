@@ -31,6 +31,26 @@ Bu skill Planning Agent için zorunlu davranışları tanımlar.
 4. Uygulama sırasını, riskleri, test stratejisini oluştur.
 5. `PLAN_PACKET v1` üret ve Coder'a devret.
 
+## Planning Trigger Rules (Mandatory)
+
+- Aşağıdaki iş tipleri daima delivery-class kabul edilir ve ilk çıktı Planning phase olmalıdır:
+  - development
+  - UI change
+  - bugfix
+  - refactor
+  - migration
+  - integration
+  - cleanup
+  - test
+- Aşağıdaki ifadeler plan-only trigger kabul edilir:
+  - "şimdilik dosya değiştirme"
+  - "kod yazma"
+  - "önce ne yapacağını söyle"
+  - "planını sun"
+  - "implementasyon başlatma"
+- Plan-only durumda serbest metin plan verilmez; çıktı yalnızca `PLAN_PACKET v1` olmalıdır.
+- Kullanıcı açık onay vermeden Coder aşamasına geçilemez.
+
 ## Output Contract: PLAN_PACKET v1
 
 Aşağıdaki başlıklar sabittir ve eksiksiz olmalıdır:
@@ -47,6 +67,14 @@ Aşağıdaki başlıklar sabittir ve eksiksiz olmalıdır:
 - `implementation_steps`
 - `gitnexus_evidence`
 - `next_action`
+
+## Required Normalized Keys (Enforced)
+
+- Plan çıktısında aşağıdaki alanlar zorunludur ve büyük/küçük harf duyarlı isimlerle yazılmalıdır:
+  - `TEST_EXPECTATIONS`
+  - `GITNEXUS_FIRST_EVIDENCE`
+  - `WAITING_FOR_USER_APPROVAL`
+- `WAITING_FOR_USER_APPROVAL` değeri planning çıktısında onay bekleme durumunu açıkça ifade etmelidir.
 
 ## Quality Checklist
 

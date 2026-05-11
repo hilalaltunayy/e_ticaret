@@ -49,6 +49,9 @@ Makine/insan uyumluluğu için aşağıdaki alan adlarını kullan:
 1. `PLAN_PACKET v1`
 - planning output
 - must include `out_of_scope`, `test_expectations`, `gitnexus_evidence`
+- must include `TEST_EXPECTATIONS`, `GITNEXUS_FIRST_EVIDENCE`, `WAITING_FOR_USER_APPROVAL`
+- for delivery-class tasks, this packet is mandatory as first output
+- if user gives plan-only instructions, Coder transition is blocked until explicit approval
 
 2. `CODER_REPORT v1`
 - implementation output
@@ -82,3 +85,15 @@ Makine/insan uyumluluğu için aşağıdaki alan adlarını kullan:
 
 - `FAIL` or `BLOCKED` -> always produce `CODER_FEEDBACK v1`
 - `PASS` -> produce `FINAL_STATUS v1`
+
+## Planning Gate Rules (Mandatory Addendum)
+
+- Delivery-class tasks include: development, UI change, bugfix, refactor, migration, integration, cleanup, and test tasks.
+- For delivery-class tasks, first response MUST be `PLAN_PACKET v1` (no free-text substitute).
+- Plan-only trigger examples:
+  - "şimdilik dosya değiştirme"
+  - "kod yazma"
+  - "önce ne yapacağını söyle"
+  - "planını sun"
+  - "implementasyon başlatma"
+- While `WAITING_FOR_USER_APPROVAL` is pending, Coder phase MUST NOT start.

@@ -50,5 +50,22 @@ status: PLANNED_APPROVED
 - Impact evidence:
 - Targeted file-read note (if any):
 
+### GITNEXUS_FIRST_EVIDENCE
+- query:
+- context:
+- impact:
+- direct_read_fallback_note:
+
+### WAITING_FOR_USER_APPROVAL
+- required: true
+- approval_status: PENDING
+- blocker: "Do not start coding before explicit user approval."
+
 ### Next Action
 - Handoff to Coder Agent with `PLAN_PACKET v1`.
+
+## Planning-Only Enforcement (Additive)
+
+- If user asks to avoid file changes/code changes or asks to see plan first, emit only `PLAN_PACKET v1`.
+- In that case `WAITING_FOR_USER_APPROVAL.approval_status` must remain `PENDING`.
+- Move to Coder phase only after explicit approval from user.
