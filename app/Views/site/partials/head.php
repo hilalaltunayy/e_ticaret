@@ -134,7 +134,71 @@
         justify-content: flex-end;
         align-items: center;
         min-width: 0;
-        overflow: hidden;
+        overflow: visible;
+    }
+
+    .storefront-menu-dropdown {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .storefront-menu-dropdown::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        height: 10px;
+    }
+
+    .storefront-menu-link--has-submenu {
+        gap: 5px;
+    }
+
+    .storefront-menu-caret {
+        font-size: 0.9rem;
+        transition: transform 0.2s ease;
+    }
+
+    .storefront-submenu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        min-width: 210px;
+        display: none;
+        padding: 8px;
+        margin-top: 2px;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: #fff;
+        box-shadow: 0 14px 28px rgba(17, 25, 54, 0.12);
+        z-index: 30;
+    }
+
+    .storefront-submenu-link {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 9px;
+        color: var(--storefront-ink);
+        text-decoration: none;
+        font-size: 0.86rem;
+        font-weight: 700;
+    }
+
+    .storefront-submenu-link:hover {
+        color: var(--storefront-accent-dark);
+        background: rgba(22, 119, 255, 0.08);
+    }
+
+    .storefront-menu-dropdown:hover .storefront-submenu,
+    .storefront-menu-dropdown:focus-within .storefront-submenu {
+        display: block;
+    }
+
+    .storefront-menu-dropdown:hover .storefront-menu-caret,
+    .storefront-menu-dropdown:focus-within .storefront-menu-caret {
+        transform: rotate(180deg);
     }
 
     .storefront-menu-link,
@@ -483,6 +547,15 @@
             justify-content: flex-start;
             flex-wrap: wrap;
             overflow: visible;
+        }
+
+        .storefront-menu-dropdown {
+            position: static;
+        }
+
+        .storefront-submenu {
+            right: auto;
+            left: 0;
         }
     }
 
