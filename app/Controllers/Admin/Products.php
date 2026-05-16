@@ -5,14 +5,18 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\AuthorModel;
 use App\Models\ProductsModel;
+use App\Services\DigitalBookContentService;
 use App\Services\ProductsService;
 
 class Products extends BaseController
 {
+    private DigitalBookContentService $digitalBookContentService;
+
     public function __construct(
         private ?ProductsService $productsService = null
     ) {
         $this->productsService = $this->productsService ?? new ProductsService();
+        $this->digitalBookContentService = new DigitalBookContentService();
     }
 
     public function index()
@@ -131,6 +135,12 @@ class Products extends BaseController
             }
         }
 
+        if ($authorId !== '' && (new AuthorModel())->find($authorId) === null) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Secilen yazar bulunamadi.');
+        }
+
         if ($newCategory !== '') {
             $createdCategoryId = $this->productsService->findOrCreateCategoryByName($newCategory);
             $categoryId = (string) $createdCategoryId;
@@ -142,7 +152,7 @@ class Products extends BaseController
 
         $payload = [
             'product_name' => trim((string) ($input['product_name'] ?? '')),
-            'author_id' => $authorId,
+            'author_id' => $authorId !== '' ? $authorId : null,
             'author' => '',
             'category_id' => $categoryId,
             'description' => trim((string) ($input['description'] ?? '')),
@@ -171,6 +181,12 @@ class Products extends BaseController
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Urun kaydedilemedi. Lutfen tekrar deneyin.');
+        }
+
+        $isDigital = strtolower((string) ($payload['type'] ?? '')) === 'dijital';
+        $description = trim((string) ($payload['description'] ?? ''));
+        if ($isDigital && $description !== '') {
+            $this->digitalBookContentService->saveContentForProduct((string) $createdId, $description, 'admin_description');
         }
 
         return redirect()->to(site_url('admin/products'))
@@ -259,6 +275,12 @@ class Products extends BaseController
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Urun guncellenemedi.');
+        }
+
+        $isDigital = strtolower(trim((string) ($product['type'] ?? ''))) === 'dijital';
+        $description = trim((string) ($updateData['description'] ?? ''));
+        if ($isDigital && $description !== '') {
+            $this->digitalBookContentService->saveContentForProduct($id, $description, 'admin_description');
         }
 
         if (($imageUpload['uploaded'] ?? false) === true) {

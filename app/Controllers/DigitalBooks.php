@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Services\DigitalBookLibraryService;
+use App\Services\DigitalBookHighlightService;
 use App\Services\DigitalBookReaderService;
 use App\Services\StorefrontHomeService;
 use CodeIgniter\Exceptions\PageNotFoundException;
@@ -12,12 +13,14 @@ class DigitalBooks extends BaseController
     private StorefrontHomeService $storefrontHomeService;
     private DigitalBookLibraryService $digitalBookLibraryService;
     private DigitalBookReaderService $digitalBookReaderService;
+    private DigitalBookHighlightService $digitalBookHighlightService;
 
     public function __construct()
     {
         $this->storefrontHomeService = new StorefrontHomeService();
         $this->digitalBookLibraryService = new DigitalBookLibraryService();
         $this->digitalBookReaderService = new DigitalBookReaderService();
+        $this->digitalBookHighlightService = new DigitalBookHighlightService();
     }
 
     public function index()
@@ -110,6 +113,116 @@ class DigitalBooks extends BaseController
             'hasNext' => (bool) ($payload['has_next'] ?? false),
             'content' => (string) ($payload['content'] ?? ''),
             'isEmpty' => (bool) ($payload['is_empty'] ?? true),
+        ]);
+    }
+
+    public function highlights(string $productId)
+    {
+        $userId = $this->getCurrentUserId();
+        if ($userId === null) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'error' => 'auth_required',
+                'message' => 'Giris yapmaniz gerekiyor.',
+            ]);
+        }
+
+        $access = $this->digitalBookLibraryService->getDigitalBookAccessDecision($userId, $productId);
+        if (! (bool) ($access['allowed'] ?? false)) {
+            if (($access['reason'] ?? '') === 'not_found') {
+                return $this->response->setStatusCode(404)->setJSON([
+                    'error' => 'not_found',
+                    'message' => 'Kitap bulunamadi.',
+                ]);
+            }
+
+            return $this->response->setStatusCode(403)->setJSON([
+                'error' => 'forbidden',
+            ]);
+        }
+
+        $pageNo = (int) ($this->request->getGet('page') ?? 0);
+        $items = $this->digitalBookHighlightService->listHighlights($userId, $productId, $pageNo > 0 ? $pageNo : null);
+
+        return $this->response->setJSON([
+            'highlights' => $items,
+        ]);
+    }
+
+    public function createHighlight(string $productId)
+    {
+        $userId = $this->getCurrentUserId();
+        if ($userId === null) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'error' => 'auth_required',
+                'message' => 'Giris yapmaniz gerekiyor.',
+            ]);
+        }
+
+        $access = $this->digitalBookLibraryService->getDigitalBookAccessDecision($userId, $productId);
+        if (! (bool) ($access['allowed'] ?? false)) {
+            if (($access['reason'] ?? '') === 'not_found') {
+                return $this->response->setStatusCode(404)->setJSON([
+                    'error' => 'not_found',
+                    'message' => 'Kitap bulunamadi.',
+                ]);
+            }
+
+            return $this->response->setStatusCode(403)->setJSON([
+                'error' => 'forbidden',
+            ]);
+        }
+
+        $payload = $this->request->getJSON(true);
+        if (! is_array($payload)) {
+            $payload = $this->request->getPost();
+        }
+
+        $result = $this->digitalBookHighlightService->createHighlight($userId, $productId, $payload);
+        if (! ($result['success'] ?? false)) {
+            return $this->response->setStatusCode((int) ($result['status'] ?? 422))->setJSON([
+                'error' => (string) ($result['error'] ?? 'invalid_request'),
+                'highlight' => $result['highlight'] ?? null,
+            ]);
+        }
+
+        return $this->response->setStatusCode(201)->setJSON([
+            'highlight' => $result['highlight'] ?? null,
+        ]);
+    }
+
+    public function deleteHighlight(string $productId, string $highlightId)
+    {
+        $userId = $this->getCurrentUserId();
+        if ($userId === null) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'error' => 'auth_required',
+                'message' => 'Giris yapmaniz gerekiyor.',
+            ]);
+        }
+
+        $access = $this->digitalBookLibraryService->getDigitalBookAccessDecision($userId, $productId);
+        if (! (bool) ($access['allowed'] ?? false)) {
+            if (($access['reason'] ?? '') === 'not_found') {
+                return $this->response->setStatusCode(404)->setJSON([
+                    'error' => 'not_found',
+                    'message' => 'Kitap bulunamadi.',
+                ]);
+            }
+
+            return $this->response->setStatusCode(403)->setJSON([
+                'error' => 'forbidden',
+            ]);
+        }
+
+        $result = $this->digitalBookHighlightService->deleteHighlight($userId, $productId, $highlightId);
+        if (! ($result['success'] ?? false)) {
+            return $this->response->setStatusCode((int) ($result['status'] ?? 404))->setJSON([
+                'error' => (string) ($result['error'] ?? 'not_found'),
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'ok' => true,
         ]);
     }
 

@@ -5,72 +5,79 @@ description: "Use when the user needs to run GitNexus CLI commands like analyze/
 
 # GitNexus CLI Commands
 
-All commands run inside the `gitnexus` Docker container.
+All commands work via `npx` — no global install required.
 
 ## Commands
 
-### analyze - Build or refresh the index
+### analyze — Build or refresh the index
 
 ```bash
-docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 analyze --verbose"
+npx gitnexus analyze
 ```
 
-Run from the container against `/workspace`. This parses source files, builds the knowledge graph, and writes it to `/workspace/.gitnexus`.
+Run from the project root. This parses all source files, builds the knowledge graph, writes it to `.gitnexus/`, and generates CLAUDE.md / AGENTS.md context files.
 
-| Flag | Effect |
-| --- | --- |
-| `--force` | Force full re-index even if up to date |
+| Flag           | Effect                                                           |
+| -------------- | ---------------------------------------------------------------- |
+| `--force`      | Force full re-index even if up to date                           |
 | `--embeddings` | Enable embedding generation for semantic search (off by default) |
-| `--drop-embeddings` | Drop existing embeddings on rebuild |
+| `--drop-embeddings` | Drop existing embeddings on rebuild. By default, an `analyze` without `--embeddings` preserves them. |
 
-**When to run:** First time in a project, after major code changes, or when `gitnexus://repo/{name}/context` reports the index is stale.
+**When to run:** First time in a project, after major code changes, or when `gitnexus://repo/{name}/context` reports the index is stale. In Claude Code, a PostToolUse hook runs `analyze` automatically after `git commit` and `git merge`, preserving embeddings if previously generated.
 
-### status - Check index freshness
-
-```bash
-docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 status"
-```
-
-Shows whether the current repo has a GitNexus index, when it was last updated, and symbol/relationship counts.
-
-### list - Show all indexed repos
+### status — Check index freshness
 
 ```bash
-docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 list"
+npx gitnexus status
 ```
 
-Lists indexed repositories known to the containerized GitNexus runtime.
+Shows whether the current repo has a GitNexus index, when it was last updated, and symbol/relationship counts. Use this to check if re-indexing is needed.
 
-### mcp - Start MCP server
+### clean — Delete the index
 
 ```bash
-docker exec -i gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 mcp"
+npx gitnexus clean
 ```
 
-Starts GitNexus MCP from inside the container.
+Deletes the `.gitnexus/` directory and unregisters the repo from the global registry. Use before re-indexing if the index is corrupt or after removing GitNexus from a project.
 
-### clean - Delete the index
+| Flag      | Effect                                            |
+| --------- | ------------------------------------------------- |
+| `--force` | Skip confirmation prompt                          |
+| `--all`   | Clean all indexed repos, not just the current one |
+
+### wiki — Generate documentation from the graph
 
 ```bash
-docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 clean"
+npx gitnexus wiki
 ```
 
-Deletes `/workspace/.gitnexus` from the container filesystem/volume.
+Generates repository documentation from the knowledge graph using an LLM. Requires an API key (saved to `~/.gitnexus/config.json` on first use).
 
-### wiki - Generate documentation from the graph
+| Flag                | Effect                                    |
+| ------------------- | ----------------------------------------- |
+| `--force`           | Force full regeneration                   |
+| `--model <model>`   | LLM model (default: minimax/minimax-m2.5) |
+| `--base-url <url>`  | LLM API base URL                          |
+| `--api-key <key>`   | LLM API key                               |
+| `--concurrency <n>` | Parallel LLM calls (default: 3)           |
+| `--gist`            | Publish wiki as a public GitHub Gist      |
+
+### list — Show all indexed repos
 
 ```bash
-docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 wiki"
+npx gitnexus list
 ```
 
-Generates repository documentation from the knowledge graph using an LLM.
+Lists all repositories registered in `~/.gitnexus/registry.json`. The MCP `list_repos` tool provides the same information.
 
 ## After Indexing
 
-1. Read `gitnexus://repo/{name}/context` to verify the index loaded.
-2. Use the other GitNexus skills (`exploring`, `debugging`, `impact-analysis`, `refactoring`) for your task.
+1. **Read `gitnexus://repo/{name}/context`** to verify the index loaded
+2. Use the other GitNexus skills (`exploring`, `debugging`, `impact-analysis`, `refactoring`) for your task
 
 ## Troubleshooting
 
-- If index is stale, run the Docker-based GitNexus analyze command.
-- If MCP data appears stale after re-analyzing, restart the MCP client/session.
+- **"Not inside a git repository"**: Run from a directory inside a git repo
+- **Index is stale after re-analyzing**: Restart Claude Code to reload the MCP server
+- **Embeddings slow**: Omit `--embeddings` (it's off by default) or set `OPENAI_API_KEY` for faster API-based embedding

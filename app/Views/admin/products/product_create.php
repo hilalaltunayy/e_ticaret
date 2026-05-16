@@ -119,6 +119,7 @@ $returnToCreateUrl = site_url('admin/products/create');
                         <div class="col-12">
                             <label class="form-label">Açıklama</label>
                             <textarea name="description" class="form-control" rows="4"><?= esc(old('description')) ?></textarea>
+                            <div class="form-text">Dijital urunlerde bu alan reader icerigi olarak kullanilir.</div>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Kapak Gorseli</label>

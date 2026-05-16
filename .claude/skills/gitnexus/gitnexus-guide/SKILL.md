@@ -1,62 +1,64 @@
-﻿---
+---
 name: gitnexus-guide
-description: "Use when the user asks about GitNexus itself - available tools, how to query the knowledge graph, MCP resources, graph schema, or workflow reference."
+description: "Use when the user asks about GitNexus itself — available tools, how to query the knowledge graph, MCP resources, graph schema, or workflow reference. Examples: \"What GitNexus tools are available?\", \"How do I use GitNexus?\""
 ---
 
 # GitNexus Guide
 
-Quick reference for GitNexus MCP tools, resources, and schema.
+Quick reference for all GitNexus MCP tools, resources, and the knowledge graph schema.
 
 ## Always Start Here
 
-1. Read `gitnexus://repo/{name}/context` for overview and freshness.
-2. Match the task to a GitNexus skill.
-3. Follow that skill workflow.
+For any task involving code understanding, debugging, impact analysis, or refactoring:
 
-> If step 1 warns the index is stale, run the Docker-based GitNexus analyze command.
+1. **Read `gitnexus://repo/{name}/context`** — codebase overview + check index freshness
+2. **Match your task to a skill below** and **read that skill file**
+3. **Follow the skill's workflow and checklist**
 
-## Workflow Bridge (Plan -> Coder -> Test)
+> If step 1 warns the index is stale, run `npx gitnexus analyze` in the terminal first.
 
-GitNexus-first behavior remains mandatory in all roles. For delivery workflow use:
+## Skills
 
-1. Planning phase with `.claude/skills/workflow/plan-skill/SKILL.md`
-2. Coder phase with `.claude/skills/workflow/coder-skill/SKILL.md`
-3. Test phase with `.claude/skills/workflow/test-skill/SKILL.md`
-
-References and handoff contracts live in:
-- `.claude/skills/workflow/references/planning-template.md`
-- `.claude/skills/workflow/references/coder-report-template.md`
-- `.claude/skills/workflow/references/test-verification-template.md`
-- `.claude/skills/workflow/references/handoff-schema.md`
-
-This bridge does not replace GitNexus exploration/impact rules; it adds execution sequencing and handoff discipline.
-
-## Canonical Docker Commands
-
-- Analyze: `docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 analyze --verbose"`
-- Status: `docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 status"`
-- List: `docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 list"`
-- MCP: `docker exec -i gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 mcp"`
+| Task                                         | Skill to read       |
+| -------------------------------------------- | ------------------- |
+| Understand architecture / "How does X work?" | `gitnexus-exploring`         |
+| Blast radius / "What breaks if I change X?"  | `gitnexus-impact-analysis`   |
+| Trace bugs / "Why is X failing?"             | `gitnexus-debugging`         |
+| Rename / extract / split / refactor          | `gitnexus-refactoring`       |
+| Tools, resources, schema reference           | `gitnexus-guide` (this file) |
+| Index, status, clean, wiki CLI commands      | `gitnexus-cli`               |
 
 ## Tools Reference
 
-| Tool | What it gives you |
-| --- | --- |
-| `query` | Execution flows related to a concept |
-| `context` | Symbol callers, callees, and process participation |
-| `impact` | Upstream/downstream blast radius |
-| `detect_changes` | Git-diff impact of current changes |
-| `rename` | Coordinated multi-file rename |
-| `cypher` | Raw graph queries |
-| `list_repos` | Indexed repos |
+| Tool             | What it gives you                                                        |
+| ---------------- | ------------------------------------------------------------------------ |
+| `query`          | Process-grouped code intelligence — execution flows related to a concept |
+| `context`        | 360-degree symbol view — categorized refs, processes it participates in  |
+| `impact`         | Symbol blast radius — what breaks at depth 1/2/3 with confidence         |
+| `detect_changes` | Git-diff impact — what do your current changes affect                    |
+| `rename`         | Multi-file coordinated rename with confidence-tagged edits               |
+| `cypher`         | Raw graph queries (read `gitnexus://repo/{name}/schema` first)           |
+| `list_repos`     | Discover indexed repos                                                   |
 
 ## Resources Reference
 
-| Resource | Content |
-| --- | --- |
-| `gitnexus://repo/{name}/context` | Stats, staleness check |
-| `gitnexus://repo/{name}/clusters` | Functional areas |
-| `gitnexus://repo/{name}/cluster/{clusterName}` | Cluster members |
-| `gitnexus://repo/{name}/processes` | Execution flows |
-| `gitnexus://repo/{name}/process/{processName}` | Step-by-step flow |
-| `gitnexus://repo/{name}/schema` | Graph schema |
+Lightweight reads (~100-500 tokens) for navigation:
+
+| Resource                                       | Content                                   |
+| ---------------------------------------------- | ----------------------------------------- |
+| `gitnexus://repo/{name}/context`               | Stats, staleness check                    |
+| `gitnexus://repo/{name}/clusters`              | All functional areas with cohesion scores |
+| `gitnexus://repo/{name}/cluster/{clusterName}` | Area members                              |
+| `gitnexus://repo/{name}/processes`             | All execution flows                       |
+| `gitnexus://repo/{name}/process/{processName}` | Step-by-step trace                        |
+| `gitnexus://repo/{name}/schema`                | Graph schema for Cypher                   |
+
+## Graph Schema
+
+**Nodes:** File, Function, Class, Interface, Method, Community, Process
+**Edges (via CodeRelation.type):** CALLS, IMPORTS, EXTENDS, IMPLEMENTS, DEFINES, MEMBER_OF, STEP_IN_PROCESS
+
+```cypher
+MATCH (caller)-[:CodeRelation {type: 'CALLS'}]->(f:Function {name: "myFunc"})
+RETURN caller.name, caller.filePath
+```

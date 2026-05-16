@@ -62,6 +62,7 @@ $currentImage = (string) ($product['image'] ?? '');
                         <div class="mb-3">
                             <label class="form-label">Açıklama (opsiyonel)</label>
                             <textarea name="description" rows="4" class="form-control"><?= esc(old('description', (string) ($product['description'] ?? ''))) ?></textarea>
+                            <div class="form-text">Dijital urunlerde bu alan reader icerigi olarak kullanilir.</div>
                         </div>
 
                         <div class="mb-3">

@@ -1,23 +1,9 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **e_ticaret** (51058 symbols, 107883 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **e_ticaret** (51166 symbols, 108217 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
-> If any GitNexus tool warns the index is stale, run the Docker-based GitNexus analyze command.
-
-## Mandatory GitNexus MCP-First Rule
-
-For any question about repository code, implementation details, function counts, symbols, dependencies, call chains, impact, routes, services, models, controllers, or architecture, the agent MUST use GitNexus MCP first.
-
-Do not start with direct repository scanning using rg, grep, find, ls, manual file traversal, or broad file reads.
-
-Allowed workflow:
-1. Use GitNexus MCP `query`/`context`/`impact`/`detect_changes` first.
-2. Use direct file inspection only after GitNexus identifies the relevant files or symbols.
-3. If GitNexus MCP is unavailable, disconnected, stale, or errors, STOP and ask the user: "GitNexus MCP is not available. May I continue with direct repository inspection?"
-4. Do not silently fall back to direct scanning.
-
-If the user asks "how did you get this?", the answer must explicitly say whether GitNexus MCP was used or direct scanning was used with permission.
+> If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
 ## Always Do
 
@@ -53,11 +39,5 @@ If the user asks "how did you get this?", the answer must explicitly say whether
 | Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
 | Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
-
-Canonical Docker commands:
-- Analyze: `docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 analyze --verbose"`
-- Status: `docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 status"`
-- List: `docker exec gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 list"`
-- MCP: `docker exec -i gitnexus sh -lc "cd /workspace && npx -y gitnexus@1.6.3 mcp"`
 
 <!-- gitnexus:end -->

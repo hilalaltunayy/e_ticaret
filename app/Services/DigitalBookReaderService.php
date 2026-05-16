@@ -5,6 +5,12 @@ namespace App\Services;
 class DigitalBookReaderService
 {
     private const CHARS_PER_PAGE = 1400;
+    private DigitalBookContentService $digitalBookContentService;
+
+    public function __construct()
+    {
+        $this->digitalBookContentService = new DigitalBookContentService();
+    }
 
     public function buildReaderPayload(string $productId, int $requestedPage): array
     {
@@ -30,7 +36,12 @@ class DigitalBookReaderService
             return $this->emptyPayload();
         }
 
-        $pages = $this->chunkText((string) ($product['description'] ?? ''));
+        $storedContent = $this->digitalBookContentService->getContentForProduct($productId);
+        $contentSourceText = trim((string) $storedContent) !== ''
+            ? (string) $storedContent
+            : (string) ($product['description'] ?? '');
+
+        $pages = $this->chunkText($contentSourceText);
         $totalPages = count($pages);
         $currentPage = $this->normalizePage($requestedPage, $totalPages);
         $content = $totalPages > 0 ? $pages[$currentPage - 1] : '';
